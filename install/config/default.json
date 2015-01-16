@@ -1,0 +1,886 @@
+{
+  "id": null,
+  "title": "MCN Usage Dashboard",
+  "originalTitle": "MCN Usage Dashboard",
+  "tags": [],
+  "style": "light",
+  "timezone": "utc",
+  "editable": true,
+  "hideControls": false,
+  "sharedCrosshair": false,
+  "rows": [
+    {
+      "title": "New row",
+      "height": "150px",
+      "collapse": false,
+      "editable": true,
+      "panels": [
+        {
+          "id": 1,
+          "span": 12,
+          "editable": true,
+          "type": "text",
+          "mode": "html",
+          "content": "<div class=\"text-center\" style=\"padding-top: 5px\">\n<a href=\"http://blog.zhaw.ch/icclab/\"><img src=\"http://blog.zhaw.ch/icclab/files/2014/04/icclab_logo.png\"></a>\n</div>",
+          "style": {},
+          "title": "",
+          "links": []
+        }
+      ]
+    },
+    {
+      "title": "CPU Utilization",
+      "height": "210px",
+      "editable": true,
+      "collapse": true,
+      "panels": []
+    },
+    {
+      "title": "test",
+      "height": "250px",
+      "editable": true,
+      "collapse": false,
+      "panels": [
+        {
+          "id": 4,
+          "span": 6,
+          "type": "graph",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_formats": [
+            "percent",
+            "short"
+          ],
+          "grid": {
+            "max": null,
+            "min": null,
+            "leftMax": null,
+            "rightMax": null,
+            "leftMin": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold2": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "resolution": 100,
+          "lines": true,
+          "fill": 1,
+          "linewidth": 2,
+          "points": false,
+          "pointradius": 5,
+          "bars": false,
+          "stack": true,
+          "spyable": true,
+          "options": false,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false
+          },
+          "interactive": true,
+          "legend_counts": true,
+          "timezone": "browser",
+          "percentage": false,
+          "zerofill": true,
+          "nullPointMode": "connected",
+          "steppedLine": false,
+          "tooltip": {
+            "value_type": "individual",
+            "query_as_alias": true,
+            "shared": true
+          },
+          "targets": [
+            {
+              "target": "randomWalk('random walk')",
+              "function": "mean",
+              "column": "max",
+              "series": "cpu_util",
+              "query": "select mean(max) from \"cpu_util\" where $timeFilter group by time($interval) order asc",
+              "hide": false,
+              "condition": "",
+              "groupby_field": "",
+              "rawQuery": false
+            }
+          ],
+          "aliasColors": {},
+          "aliasYAxis": {},
+          "title": "CPU Utilization (Mean Max)",
+          "datasource": "graphite",
+          "renderer": "flot",
+          "annotate": {
+            "enable": false
+          },
+          "seriesOverrides": [],
+          "leftYAxisLabel": "CPU Utilization"
+        },
+        {
+          "error": false,
+          "span": 6,
+          "editable": true,
+          "type": "graph",
+          "id": 5,
+          "datasource": null,
+          "renderer": "flot",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_formats": [
+            "percent",
+            "short"
+          ],
+          "grid": {
+            "leftMax": null,
+            "rightMax": null,
+            "leftMin": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold2": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "annotate": {
+            "enable": false
+          },
+          "resolution": 100,
+          "lines": true,
+          "fill": 1,
+          "linewidth": 1,
+          "points": false,
+          "pointradius": 5,
+          "bars": false,
+          "stack": false,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false
+          },
+          "percentage": false,
+          "zerofill": true,
+          "nullPointMode": "connected",
+          "steppedLine": false,
+          "tooltip": {
+            "value_type": "cumulative",
+            "query_as_alias": true,
+            "shared": true
+          },
+          "targets": [
+            {
+              "function": "mean",
+              "column": "min",
+              "series": "cpu_util",
+              "query": "select mean(min) from \"cpu_util\" where $timeFilter group by time($interval) order asc"
+            }
+          ],
+          "aliasColors": {},
+          "seriesOverrides": [],
+          "title": "CPU Utilization (Mean Min)",
+          "leftYAxisLabel": "CPU Utilization"
+        }
+      ]
+    },
+    {
+      "title": "New row",
+      "height": "250px",
+      "editable": true,
+      "collapse": false,
+      "panels": [
+        {
+          "error": false,
+          "span": 12,
+          "editable": true,
+          "type": "graph",
+          "id": 6,
+          "datasource": null,
+          "renderer": "flot",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_formats": [
+            "percent",
+            "none"
+          ],
+          "grid": {
+            "leftMax": null,
+            "rightMax": null,
+            "leftMin": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold2": null,
+            "threshold1Color": "rgba(244, 125, 5, 0.97)",
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "annotate": {
+            "enable": false
+          },
+          "resolution": 100,
+          "lines": true,
+          "fill": 0,
+          "linewidth": 1,
+          "points": false,
+          "pointradius": 5,
+          "bars": false,
+          "stack": false,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": true,
+            "current": false,
+            "total": false,
+            "avg": false,
+            "alignAsTable": false,
+            "rightSide": false
+          },
+          "percentage": false,
+          "zerofill": true,
+          "nullPointMode": "connected",
+          "steppedLine": false,
+          "tooltip": {
+            "value_type": "cumulative",
+            "query_as_alias": true,
+            "shared": true
+          },
+          "targets": [
+            {
+              "target": "",
+              "function": "mean",
+              "column": "max",
+              "series": "cpu_util",
+              "query": "select mean(max) from \"cpu_util\" where $timeFilter group by time($interval) order asc",
+              "alias": "max",
+              "condition": ""
+            },
+            {
+              "target": "",
+              "function": "mean",
+              "column": "min",
+              "series": "cpu_util",
+              "query": "select mean(min) from \"cpu_util\" where $timeFilter group by time($interval) order asc",
+              "alias": "min",
+              "condition": ""
+            },
+            {
+              "function": "mean",
+              "column": "avg",
+              "series": "cpu_util",
+              "query": "select mean(avg) from \"cpu_util\" where $timeFilter group by time($interval) order asc",
+              "groupby_field": "",
+              "fill": "",
+              "alias": "avg",
+              "condition": ""
+            }
+          ],
+          "aliasColors": {},
+          "seriesOverrides": [
+            {
+              "alias": "max",
+              "lines": false,
+              "fillBelowTo": "min"
+            },
+            {
+              "alias": "min",
+              "lines": false
+            }
+          ],
+          "title": "CPU Utilization (Avg vs Max vs Min)",
+          "leftYAxisLabel": "CPU Utilization",
+          "links": []
+        }
+      ]
+    },
+    {
+      "title": "New row",
+      "height": "250px",
+      "editable": true,
+      "collapse": false,
+      "panels": [
+        {
+          "error": false,
+          "span": 12,
+          "editable": true,
+          "type": "graph",
+          "id": 7,
+          "datasource": null,
+          "renderer": "flot",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_formats": [
+            "percent",
+            "short"
+          ],
+          "grid": {
+            "leftMax": null,
+            "rightMax": null,
+            "leftMin": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold2": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "annotate": {
+            "enable": false
+          },
+          "resolution": 100,
+          "lines": true,
+          "fill": 0,
+          "linewidth": 1,
+          "points": false,
+          "pointradius": 5,
+          "bars": false,
+          "stack": false,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false
+          },
+          "percentage": false,
+          "zerofill": true,
+          "nullPointMode": "connected",
+          "steppedLine": false,
+          "tooltip": {
+            "value_type": "cumulative",
+            "query_as_alias": true,
+            "shared": true
+          },
+          "targets": [
+            {
+              "function": "mean",
+              "column": "max",
+              "series": "cpu_util",
+              "query": "select userid, mean(max) from \"cpu_util\" where $timeFilter group by time($interval), userid order asc",
+              "groupby_field": "userid",
+              "rawQuery": false,
+              "interval": ""
+            }
+          ],
+          "aliasColors": {},
+          "seriesOverrides": [],
+          "title": "CPU Util (User Mean Max)"
+        }
+      ]
+    },
+    {
+      "title": "New row",
+      "height": "250px",
+      "editable": true,
+      "collapse": false,
+      "panels": [
+        {
+          "error": false,
+          "span": 12,
+          "editable": true,
+          "type": "graph",
+          "id": 8,
+          "datasource": null,
+          "renderer": "flot",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_formats": [
+            "short",
+            "short"
+          ],
+          "grid": {
+            "leftMax": null,
+            "rightMax": null,
+            "leftMin": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold2": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "annotate": {
+            "enable": false
+          },
+          "resolution": 100,
+          "lines": true,
+          "fill": 1,
+          "linewidth": 1,
+          "points": false,
+          "pointradius": 5,
+          "bars": false,
+          "stack": false,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false
+          },
+          "percentage": false,
+          "zerofill": true,
+          "nullPointMode": "connected",
+          "steppedLine": true,
+          "tooltip": {
+            "value_type": "cumulative",
+            "query_as_alias": true,
+            "shared": true
+          },
+          "targets": [
+            {
+              "function": "mean",
+              "column": "avg",
+              "series": "cpu_util",
+              "query": "select projectid, mean(avg) from \"cpu_util\" where $timeFilter group by time($interval), projectid order asc",
+              "groupby_field": "projectid"
+            }
+          ],
+          "aliasColors": {},
+          "seriesOverrides": [],
+          "title": "CPU Util (Tenant Mean Avg)"
+        }
+      ]
+    },
+    {
+      "title": "New row",
+      "height": "250px",
+      "editable": true,
+      "collapse": false,
+      "panels": [
+        {
+          "error": false,
+          "span": 6,
+          "editable": true,
+          "type": "graph",
+          "id": 9,
+          "datasource": null,
+          "renderer": "flot",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_formats": [
+            "bytes",
+            "short"
+          ],
+          "grid": {
+            "leftMax": null,
+            "rightMax": null,
+            "leftMin": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold2": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "annotate": {
+            "enable": false
+          },
+          "resolution": 100,
+          "lines": true,
+          "fill": 1,
+          "linewidth": 1,
+          "points": false,
+          "pointradius": 5,
+          "bars": false,
+          "stack": false,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false
+          },
+          "percentage": false,
+          "zerofill": true,
+          "nullPointMode": "connected",
+          "steppedLine": false,
+          "tooltip": {
+            "value_type": "cumulative",
+            "query_as_alias": true,
+            "shared": true
+          },
+          "targets": [
+            {
+              "function": "mean",
+              "column": "avg",
+              "series": "disk.read.bytes.rate",
+              "query": "select mean(avg) from \"disk.read.bytes.rate\" where $timeFilter group by time($interval) order asc",
+              "groupby_field": ""
+            }
+          ],
+          "aliasColors": {},
+          "seriesOverrides": [],
+          "title": "Disk.Read.Bytes",
+          "leftYAxisLabel": ""
+        },
+        {
+          "error": false,
+          "span": 6,
+          "editable": true,
+          "type": "graph",
+          "id": 10,
+          "datasource": null,
+          "renderer": "flot",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_formats": [
+            "bytes",
+            "short"
+          ],
+          "grid": {
+            "leftMax": null,
+            "rightMax": null,
+            "leftMin": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold2": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "annotate": {
+            "enable": false
+          },
+          "resolution": 100,
+          "lines": true,
+          "fill": 1,
+          "linewidth": 1,
+          "points": false,
+          "pointradius": 5,
+          "bars": false,
+          "stack": false,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false,
+            "alignAsTable": false,
+            "rightSide": false
+          },
+          "percentage": false,
+          "zerofill": true,
+          "nullPointMode": "connected",
+          "steppedLine": false,
+          "tooltip": {
+            "value_type": "cumulative",
+            "query_as_alias": true,
+            "shared": true
+          },
+          "targets": [
+            {
+              "function": "mean",
+              "column": "avg",
+              "series": "disk.write.bytes.rate",
+              "query": "select mean(avg) from \"disk.write.bytes.rate\" where $timeFilter group by time($interval) order asc"
+            }
+          ],
+          "aliasColors": {},
+          "seriesOverrides": [],
+          "title": "Disk.Write.Bytes"
+        }
+      ]
+    },
+    {
+      "title": "Network Usage",
+      "height": "210px",
+      "collapse": true,
+      "editable": true,
+      "panels": [
+        {
+          "id": 2,
+          "span": 6,
+          "type": "text",
+          "mode": "html",
+          "content": "<br/>\n\n<div class=\"row-fluid\">\n  <div class=\"span6\">\n    <ul>\n      <li>\n        <a href=\"http://grafana.org/docs#configuration\" target=\"_blank\">Configuration</a>\n      </li>\n      <li>\n        <a href=\"http://grafana.org/docs/troubleshooting\" target=\"_blank\">Troubleshooting</a>\n      </li>\n      <li>\n        <a href=\"http://grafana.org/docs/support\" target=\"_blank\">Support</a>\n      </li>\n      <li>\n        <a href=\"http://grafana.org/docs/features/intro\" target=\"_blank\">Getting started</a>  (Must read!)\n      </li>\n    </ul>\n  </div>\n  <div class=\"span6\">\n    <ul>\n      <li>\n        <a href=\"http://grafana.org/docs/features/graphing\" target=\"_blank\">Graphing</a>\n      </li>\n      <li>\n        <a href=\"http://grafana.org/docs/features/annotations\" target=\"_blank\">Annotations</a>\n      </li>\n      <li>\n        <a href=\"http://grafana.org/docs/features/graphite\" target=\"_blank\">Graphite</a>\n      </li>\n      <li>\n        <a href=\"http://grafana.org/docs/features/influxdb\" target=\"_blank\">InfluxDB</a>\n      </li>\n      <li>\n        <a href=\"http://grafana.org/docs/features/opentsdb\" target=\"_blank\">OpenTSDB</a>\n      </li>\n    </ul>\n  </div>\n</div>",
+          "style": {},
+          "title": "Documentation Links"
+        },
+        {
+          "id": 3,
+          "span": 6,
+          "type": "text",
+          "mode": "html",
+          "content": "<br/>\n\n<div class=\"row-fluid\">\n  <div class=\"span12\">\n    <ul>\n      <li>Ctrl+S saves the current dashboard</li>\n      <li>Ctrl+F Opens the dashboard finder</li>\n      <li>Ctrl+H Hide/show row controls</li>\n      <li>Click and drag graph title to move panel</li>\n      <li>Hit Escape to exit graph when in fullscreen or edit mode</li>\n      <li>Click the colored icon in the legend to change series color</li>\n      <li>Ctrl or Shift + Click legend name to hide other series</li>\n    </ul>\n  </div>\n</div>\n",
+          "style": {},
+          "title": "Tips & Shortcuts"
+        }
+      ]
+    },
+    {
+      "title": "New row",
+      "height": "250px",
+      "editable": true,
+      "collapse": false,
+      "panels": [
+        {
+          "error": false,
+          "span": 6,
+          "editable": true,
+          "type": "graph",
+          "id": 11,
+          "datasource": null,
+          "renderer": "flot",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_formats": [
+            "bytes",
+            "short"
+          ],
+          "grid": {
+            "leftMax": null,
+            "rightMax": null,
+            "leftMin": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold2": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "annotate": {
+            "enable": false
+          },
+          "resolution": 100,
+          "lines": true,
+          "fill": 1,
+          "linewidth": 1,
+          "points": false,
+          "pointradius": 5,
+          "bars": false,
+          "stack": false,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false
+          },
+          "percentage": false,
+          "zerofill": true,
+          "nullPointMode": "connected",
+          "steppedLine": false,
+          "tooltip": {
+            "value_type": "cumulative",
+            "query_as_alias": true,
+            "shared": true
+          },
+          "targets": [
+            {
+              "function": "mean",
+              "column": "avg",
+              "series": "network.incoming.bytes.rate",
+              "query": "select mean(avg) from \"network.incoming.bytes.rate\" where $timeFilter group by time($interval) order asc"
+            }
+          ],
+          "aliasColors": {},
+          "seriesOverrides": [],
+          "title": "Network.Incoming.Bytes"
+        },
+        {
+          "error": false,
+          "span": 6,
+          "editable": true,
+          "type": "graph",
+          "id": 12,
+          "datasource": null,
+          "renderer": "flot",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_formats": [
+            "bytes",
+            "short"
+          ],
+          "grid": {
+            "leftMax": null,
+            "rightMax": null,
+            "leftMin": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold2": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "annotate": {
+            "enable": false
+          },
+          "resolution": 100,
+          "lines": true,
+          "fill": 1,
+          "linewidth": 1,
+          "points": false,
+          "pointradius": 5,
+          "bars": false,
+          "stack": false,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false
+          },
+          "percentage": false,
+          "zerofill": true,
+          "nullPointMode": "connected",
+          "steppedLine": false,
+          "tooltip": {
+            "value_type": "individual",
+            "query_as_alias": true,
+            "shared": true
+          },
+          "targets": [
+            {
+              "function": "mean",
+              "column": "avg",
+              "series": "network.outgoing.bytes.rate",
+              "query": "select mean(avg) from \"network.outgoing.bytes.rate\" where $timeFilter group by time($interval) order asc"
+            }
+          ],
+          "aliasColors": {},
+          "seriesOverrides": [],
+          "title": "Network.Outgoing.Bytes"
+        }
+      ]
+    },
+    {
+      "title": "New row",
+      "height": "250px",
+      "editable": true,
+      "collapse": false,
+      "panels": [
+        {
+          "error": false,
+          "span": 12,
+          "editable": true,
+          "type": "graph",
+          "id": 13,
+          "datasource": null,
+          "renderer": "flot",
+          "x-axis": true,
+          "y-axis": true,
+          "scale": 1,
+          "y_formats": [
+            "bytes",
+            "short"
+          ],
+          "grid": {
+            "leftMax": null,
+            "rightMax": null,
+            "leftMin": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold2": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "annotate": {
+            "enable": false
+          },
+          "resolution": 100,
+          "lines": true,
+          "fill": 1,
+          "linewidth": 1,
+          "points": false,
+          "pointradius": 5,
+          "bars": false,
+          "stack": false,
+          "legend": {
+            "show": true,
+            "values": false,
+            "min": false,
+            "max": false,
+            "current": false,
+            "total": false,
+            "avg": false
+          },
+          "percentage": false,
+          "zerofill": true,
+          "nullPointMode": "connected",
+          "steppedLine": false,
+          "tooltip": {
+            "value_type": "cumulative",
+            "query_as_alias": true,
+            "shared": true
+          },
+          "targets": [
+            {
+              "function": "mean",
+              "column": "avg",
+              "series": "network.outgoing.bytes.rate",
+              "query": "select userid, mean(avg) from \"network.outgoing.bytes.rate\" where $timeFilter group by time($interval), userid order asc",
+              "groupby_field": "userid"
+            }
+          ],
+          "aliasColors": {},
+          "seriesOverrides": [],
+          "title": "Network.Outgoing.Bytes per user"
+        }
+      ]
+    }
+  ],
+  "nav": [
+    {
+      "type": "timepicker",
+      "collapse": false,
+      "enable": true,
+      "status": "Stable",
+      "time_options": [
+        "5m",
+        "15m",
+        "1h",
+        "6h",
+        "12h",
+        "24h",
+        "2d",
+        "7d",
+        "30d"
+      ],
+      "refresh_intervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "now": true,
+      "notice": false
+    }
+  ],
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  },
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": [],
+    "enable": false
+  },
+  "refresh": "15m",
+  "version": 6,
+  "hideAllLegends": false
+}

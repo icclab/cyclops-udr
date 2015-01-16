@@ -1,0 +1,12 @@
+KeystoneURL==http://160.85.4.64:5000/v3/auth/tokens
+InfluxDBURL==http://160.85.4.160:8086/db/udr_service/series
+CeilometerURL==http://160.85.4.64:8777/v2/
+InfluxDBUsername==icclab
+InfluxDBPassword==w<>150<^T*F~0B
+KeystoneUsername==pata
+KeystonePassword==Iccl@b
+KeystoneDomainName==default
+KeystoneProjectName==zhaw-users
+CeilometerQueryPartOne==/statistics?q.field=timestamp&q.op=gt&q.value=
+CeilometerQueryPartTwo==&q.field=timestamp&q.op=lt&q.value=
+CeilometerQueryPartThree==&groupby=user_id&groupby=project_id&groupby=resource_id
