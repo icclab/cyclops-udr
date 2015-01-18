@@ -1,4 +1,5 @@
-# User Data Records (UDR) Service                           </br>  - A <a href="http://icclab.github.io/cyclops">CYCLOPS Micro Service</a>
+# User Data Records (UDR) Service 
+## - A <a href="http://icclab.github.io/cyclops">CYCLOPS Micro Service</a>
 UDR Service is one of the micro services as part of CYCLOPS - A Rating, Charging  & Billing solution for cloud being developed by <a href="http://blog.zhaw.ch/icclab/">InIT Cloud Computing Lab</a> at <a href="http://www.zhaw.ch">ZHAW</a>. The service collects the usage data from a source (OpenStack,cloudstack, SaaS, PaaS, etc ..), transforms the data and persists it in a Time Series Database. This harmonized data is exposed through REST APIs. The harmonized usage data from UDR Service is used by other micr services (Rating & Charging Service & Billing Service) to process and generate a bill for the end user as per the usage made.
 
 Salient Features
