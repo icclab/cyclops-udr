@@ -1,4 +1,4 @@
-## User Data Records (UDR) Service - A <a href="http://icclab.github.io/cyclops">CYCLOPS Micro Service</a>
+# User Data Records (UDR) Service - A <a href="http://icclab.github.io/cyclops">CYCLOPS Micro Service</a>
 UDR Service is one of the micro services as part of CYCLOPS - A Rating, Charging  & Billing solution for cloud being developed by <a href="http://blog.zhaw.ch/icclab/">InIT Cloud Computing Lab</a> at <a href="http://www.zhaw.ch">ZHAW</a>. The service collects the usage data from a source (OpenStack,cloudstack, SaaS, PaaS, etc ..), transforms the data and persists it in a Time Series Database. This harmonized data is exposed through REST APIs. The harmonized usage data from UDR Service is used by other micr services (Rating & Charging Service & Billing Service) to process and generate a bill for the end user as per the usage made.
 
 Salient Features
@@ -23,6 +23,9 @@ Salient Features
 #### Full documentation
   Visit the <a href="https://github.com/icclab/cyclops-udr/wiki">wiki</a> for detailed explanation.
   
+### Bugs and issues
+  To report any bugs or issues, please use <a href="https://github.com/icclab/cyclops-udr/issues">Github Issues</a>
+
 #### Components & Libraries
   * <a href="https://www.sensuapp.org">Sensu</a>
   * <a href="https://www.influxdb.com">InfluxDB</a>
@@ -30,9 +33,6 @@ Salient Features
   * <a href="https://httpd.apache.org">Apache2</a> 
   * <a href="https://restlet.com">RESTLET</a> 
   
-### Bugs and issues
-  To report any bugs or issues, please use <a href="https://github.com/icclab/cyclops-udr/issues">Github Issues</a>
-
 ### Communication
   * Google Group : 
   * Email : <a href="http://blog.zhaw.ch/icclab/srikanta-patanjali/">Srikanta</a> (pata at zhaw[dot]ch) or <a href="http://blog.zhaw.ch/icclab/piyush_harsh/">Piyush</a> (harh at zhaw[dot]ch)
