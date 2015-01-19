@@ -21,6 +21,7 @@ Salient Features
 
 
 #### Full documentation
+  Access <a href="http://icclab.github.io/cyclops/javadoc/udrservice/">Javadoc</a>
   Visit the <a href="https://github.com/icclab/cyclops-udr/wiki">wiki</a> for detailed explanation.
   
 ### Bugs and issues
