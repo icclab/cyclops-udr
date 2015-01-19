@@ -35,7 +35,7 @@ Salient Features
   * <a href="https://restlet.com">RESTLET</a> 
   
 ### Communication
-  * Google Group : 
+  * Issues/Ideas/Suggestions : <a href="https://github.com/icclab/cyclops-udr/issues">GitHub Issue</a>
   * Email : <a href="http://blog.zhaw.ch/icclab/srikanta-patanjali/">Srikanta</a> (pata at zhaw[dot]ch) or <a href="http://blog.zhaw.ch/icclab/piyush_harsh/">Piyush</a> (harh at zhaw[dot]ch)
   * Website : http://blog.zhaw.ch/icclab/ 
   * Tweet us @<a href="https://twitter.com/ICC_Lab">ICC_Lab</a>
