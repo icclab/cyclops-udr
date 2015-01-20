@@ -1,0 +1,12 @@
+KeystoneURL==
+InfluxDBURL==
+CeilometerURL==
+InfluxDBUsername==
+InfluxDBPassword==
+KeystoneUsername==
+KeystonePassword==
+KeystoneDomainName==
+KeystoneProjectName==
+CeilometerQueryPartOne==/statistics?q.field=timestamp&q.op=gt&q.value=
+CeilometerQueryPartTwo==&q.field=timestamp&q.op=lt&q.value=
+CeilometerQueryPartThree==&groupby=user_id&groupby=project_id&groupby=resource_id
