@@ -14,6 +14,14 @@ Salient Features
      $ chmod +x ./*
      $ bash install.sh xxx.xxx.xxx.xxx [IP of the machine]
 
+<b>Note</b>: Immediately change the default username & password created for Tomcat7 & InfluxDB
+
+#### Configuration
+ * CD to cyclops-udr/web/WEB-INF/configuration.txt
+ * Add the Keystone details (URL, username, password, domain name, project name), Telemetry details (URL)
+ * Add InfluxDB details (URL, username, password). As part of the installation script, InfluxDB is installed on localhost.
+ * Restart Tomcat7 [$ sudo service tomcat7 restart]
+
 #### Architecture
 <img align="middle" src="http://blog.zhaw.ch/icclab/files/2015/01/OverallArchitecture1.png" alt="CYCLOPS Architecture" height="400" width="600"></img>
 
