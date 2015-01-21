@@ -17,5 +17,7 @@ hs_err_pid*
 .idea
 
 #Configuration file
-configuration.txt
+web/WEB-INF/configuration.txt
+
+#Compiled classes
 out
