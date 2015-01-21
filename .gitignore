@@ -15,3 +15,7 @@ hs_err_pid*
 #IntelliJ files
 *.impl
 .idea
+
+#Configuration file
+configuration.txt
+out
