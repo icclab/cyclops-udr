@@ -18,11 +18,17 @@
 package ch.icclab.cyclops.persistence.client;
 
 import ch.icclab.cyclops.util.LoadConfiguration;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.restlet.Client;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
+
+import java.io.IOException;
 
 /**
  * Author: Srikanta
@@ -33,6 +39,10 @@ import org.restlet.resource.ClientResource;
  * Name        Date     Comments
  */
 public class InfluxDBClient extends ClientResource {
+    LoadConfiguration load = new LoadConfiguration();
+    String url = load.configuration.get("InfluxDBURL");
+    String username = load.configuration.get("InfluxDBUsername");
+    String password = load.configuration.get("InfluxDBPassword");
 
     /**
      * Saves the data into InfluxDB via HTTP
@@ -47,10 +57,6 @@ public class InfluxDBClient extends ClientResource {
      */
     public boolean saveData(String data){
         System.out.println("Entered the InfluxDBClient");
-        LoadConfiguration load = new LoadConfiguration();
-        String url = load.configuration.get("InfluxDBURL");
-        String username = load.configuration.get("InfluxDBUsername");
-        String password = load.configuration.get("InfluxDBPassword");
 
         data = "["+data+"]";
         Representation output;
@@ -67,5 +73,40 @@ public class InfluxDBClient extends ClientResource {
         System.out.println("Exit InfluxDBClient");
 
         return true;
+    }
+    
+    public Double getData(String from, String to, String userId, Object meterName){
+        
+        String query;
+        JSONArray resultArray, pointsArray, pointsValueArray;
+        JSONObject resultObj;
+        Representation output;
+        Double usageValue = null;
+
+        query = "select sum(usage) from "+meterName+" where time > now() - 24h and userid='"+userId+"' ";
+        Client client = new Client(Protocol.HTTP);
+        ClientResource cr = new ClientResource(url);
+
+        cr.addQueryParameter("q",query);
+        cr.addQueryParameter("u",username);
+        cr.addQueryParameter("p",password);
+        cr.get(MediaType.APPLICATION_JSON);
+        output = cr.getResponseEntity();
+        
+        try {
+            resultArray = new JSONArray(output.getText());
+            resultObj = new JSONObject();
+            resultObj = (JSONObject) resultArray.get(0);
+            pointsArray = (JSONArray) resultObj.get("points");
+            pointsValueArray = (JSONArray) pointsArray.get(0);
+            usageValue = (Double) pointsValueArray.get(1);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return usageValue;
+        
     }
 }

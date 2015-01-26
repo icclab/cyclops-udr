@@ -30,6 +30,7 @@ package ch.icclab.cyclops.application;
 import ch.icclab.cyclops.resource.impl.ExternalAppResource;
 import ch.icclab.cyclops.resource.impl.RootResource;
 import ch.icclab.cyclops.resource.impl.TelemetryResource;
+import ch.icclab.cyclops.resource.impl.UsageDataResource;
 import ch.icclab.cyclops.util.LoadConfiguration;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -57,8 +58,9 @@ public class UDRApplication extends Application{
         loadConfiguration(getContext());
         Router router = new Router(getContext());
         router.attach("/", RootResource.class);
-        router.attach("/api", TelemetryResource.class);
-        router.attach("/ext/app", ExternalAppResource.class);
+        router.attach("/api", TelemetryResource.class); //API used internally to trigger the data collection
+        router.attach("/ext/app", ExternalAppResource.class); // API used for data insertion from external PaaS/IaaS
+        router.attach("/usage", UsageDataResource.class); //API used for fetching the usage info for a user
 
         System.out.println("Finished routing");
         return router;
