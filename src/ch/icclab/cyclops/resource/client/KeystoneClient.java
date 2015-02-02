@@ -48,7 +48,7 @@ public class KeystoneClient extends ClientResource {
      * 3. Send a POST request to the Keystone client
      * 4. Extract the token info from the response header
      *
-     * @return
+     * @return token A string consisting of Keystone token
      */
     public String generateToken(){
 

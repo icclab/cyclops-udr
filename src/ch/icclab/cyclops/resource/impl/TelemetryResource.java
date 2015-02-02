@@ -62,7 +62,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
      * @return output A String output of the success or failure of the data extraction process
      */
     @Get
-    public Representation getMeterData() {
+    public Representation setMeterData() {
         System.out.println("Getting the response");
 
         boolean gaugeMeterOutput = false;
@@ -75,8 +75,8 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
         KeystoneClient kClient = new KeystoneClient();
         token = kClient.generateToken();
 
-        cumulativeMeterOutput = setCumulativeMeterData(token);
-        gaugeMeterOutput = setGaugeMeterData(token);
+        cumulativeMeterOutput = getCumulativeMeterData(token);
+        gaugeMeterOutput = getGaugeMeterData(token);
 
         response = constructResponse(cumulativeMeterOutput,gaugeMeterOutput);
         output = util.toJson(response);
@@ -130,7 +130,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
      * @throws JSONException
      * @throws IOException
      */
-    private boolean setCumulativeMeterData(String token) {
+    private boolean getCumulativeMeterData(String token) {
 
         boolean output = true;
         String response = null;
@@ -232,7 +232,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
      * @return output A String output of the success or failure of the data extraction process
      * @throws JSONException
      */
-    private boolean setGaugeMeterData(String token){
+    private boolean getGaugeMeterData(String token){
         boolean saveStatus;
         String response;
         ArrayList<String> meter = new ArrayList<String>();
@@ -286,11 +286,5 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
             return output;
         }
         return output;
-    }
-
-    //Reserved for future API extention
-    public String getMeterData(String userId)
-    {
-        return null;
     }
 }

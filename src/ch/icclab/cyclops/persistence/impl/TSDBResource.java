@@ -49,9 +49,9 @@ public class TSDBResource implements DatabaseResource{
      * 3. Convert the POJO class to a JSON obj
      * 4. Invoke the InfluxDb client to save the data
      *
-     * @param dataArr
-     * @param meterName
-     * @return
+     * @param dataArr An array list consisting of usage data
+     * @param meterName Name of the Gauge Meter
+     * @return result A boolean output as a result of saving the meter data into the db
      */
     public boolean saveGaugeMeterData(ArrayList<GaugeMeterData> dataArr, String meterName){
 
@@ -120,9 +120,9 @@ public class TSDBResource implements DatabaseResource{
      * 3. Convert the POJO class to a JSON obj
      * 4. Invoke the InfluxDb client to save the data
      *
-     * @param dataArr
-     * @param meterName
-     * @return
+     * @param dataArr An array list consisting of usage data
+     * @param meterName Name of the Gauge Meter
+     * @return result A boolean output as a result of saving the meter data into the db
      */
     public boolean saveCumulativeMeterData(ArrayList<CumulativeMeterData> dataArr, String meterName){
 
@@ -201,13 +201,14 @@ public class TSDBResource implements DatabaseResource{
      * 2. Invoke the InfluxDB client
      * 3. Save the data in to the DB
      *
-     * @param dbData
-     * @return
+     * @param dbData 
+     * @return result A boolean output as a result of saving the meter data into the db
      */
     public boolean saveExtData(TSDBData dbData) {
         InfluxDBClient dbClient = new InfluxDBClient();
         ObjectMapper mapper = new ObjectMapper();
-        String jsonData = null;
+        String jsonData;
+        boolean result = true;
 
         try {
             jsonData = mapper.writeValueAsString(dbData);
@@ -216,10 +217,10 @@ public class TSDBResource implements DatabaseResource{
         } catch (JsonProcessingException e) {
             System.out.println("Saved to TSDB : False");
             e.printStackTrace();
-            return false;
+            result = false;
+            return result;
         }
-
-        return true;
+        return result;
     }
 
     public void getData(){

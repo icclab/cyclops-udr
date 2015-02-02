@@ -32,12 +32,12 @@ public class UsageDataResource extends ServerResource implements UsageResource {
      *  3. Query the DB to get the usage data
      *  4. Construct the response and return it in the JSON format
      *    
-     * @return Representation
+     * @return userUsageResponse Response consisting of the usage data for the request userID
      */
     @Get
     public Representation getData(){
         
-        Representation udrResponse;
+        Representation userUsageResponse;
         Double usageData;
         HashMap usageDataMap;
         ArrayList<HashMap> usageArr = new ArrayList<HashMap>();
@@ -63,9 +63,9 @@ public class UsageDataResource extends ServerResource implements UsageResource {
         }
         
         //Construct the response in JSON string
-        udrResponse = constructResponse(usageArr, userId, fromDate, toDate);
+        userUsageResponse = constructResponse(usageArr, userId, fromDate, toDate);
         
-        return udrResponse;
+        return userUsageResponse;
     }
 
     /**
@@ -77,11 +77,11 @@ public class UsageDataResource extends ServerResource implements UsageResource {
      * * 3. Convert the POJO to JSON
      * * 4. Return the JSON string
      *  
-     * @param usageArr
-     * @param userId
-     * @param fromDate
-     * @param toDate
-     * @return
+     * @param usageArr An arraylist consisting of metername and corresponding usage
+     * @param userId UserID for which the usage details is to be returned.
+     * @param fromDate DateTime from usage data needs to be calculated
+     * @param toDate DateTime upto which the usage data needs to be calculated
+     * @return responseJson The response object in the JSON format
      */
     public Representation constructResponse(ArrayList usageArr, String userId, String fromDate, String toDate){
 

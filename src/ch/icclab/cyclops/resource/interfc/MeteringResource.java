@@ -30,6 +30,6 @@ import org.restlet.representation.Representation;
 
 public interface MeteringResource extends UDRResource{
 
-    public Representation getMeterData();
+    public Representation setMeterData();
 
 }

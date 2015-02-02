@@ -11,8 +11,8 @@ import java.util.ArrayList;
  * Change Log
  * Name        Date     Comments
  */
-public interface UsageResource {
-    
+public interface UsageResource extends UDRResource {
+
     public Representation getData();
     
     public Representation constructResponse(ArrayList usageArr, String userId, String fromDate, String toDate);
