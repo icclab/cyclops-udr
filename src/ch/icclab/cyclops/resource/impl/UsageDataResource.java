@@ -1,5 +1,6 @@
 package ch.icclab.cyclops.resource.impl;
 
+import ch.icclab.cyclops.model.udr.TSDBData;
 import ch.icclab.cyclops.model.udr.UserUsageResponse;
 import ch.icclab.cyclops.persistence.client.InfluxDBClient;
 import ch.icclab.cyclops.resource.interfc.UsageResource;
@@ -29,8 +30,9 @@ public class UsageDataResource extends ServerResource implements UsageResource {
      *  Pseudo Code
      *  1. Extract the QueryValues from the URL
      *  2. Add the meters name to the meter list
-     *  3. Query the DB to get the usage data
-     *  4. Construct the response and return it in the JSON format
+     *  3. Query the DB to get the usage data and add the response to an array list
+     *  4. Add the array list with its source name into a HashMap
+     *  5. Construct the response and return it in the JSON format
      *    
      * @return userUsageResponse Response consisting of the usage data for the request userID
      */
@@ -38,30 +40,43 @@ public class UsageDataResource extends ServerResource implements UsageResource {
     public Representation getData(){
         
         Representation userUsageResponse;
-        Double usageData;
-        HashMap usageDataMap;
-        ArrayList<HashMap> usageArr = new ArrayList<HashMap>();
+        TSDBData usageData;
+        HashMap usageArr = new HashMap();
+        ArrayList<TSDBData> meterDataArrList = new ArrayList<TSDBData>(); //TODO : Remove hard code
         
         String userId = getQueryValue("userid");
         String fromDate = getQueryValue("from");
         String toDate = getQueryValue("to");
 
         InfluxDBClient dbClient = new InfluxDBClient();
-        ArrayList meters = new ArrayList();
+        ArrayList cMeters = new ArrayList();
+        ArrayList gMeters = new ArrayList();
         
+        //Get data from OpenStack
+        //Get Cumulative Meters from Openstack
         //Add the time series name to fetch the total usage data
-        meters.add("network.incoming.bytes"); //TODO : Remove hard code
-        meters.add("network.outgoing.bytes");
+        cMeters.add("network.incoming.bytes"); //TODO : Remove hard code
+        cMeters.add("network.outgoing.bytes");
 
         //Get the data from the DB and create the arraylist consisting of hashmaps of meter name and usage value
-        for(int i=0;i<meters.size(); i++){
-            usageDataMap = new HashMap();
-            usageData = dbClient.getData(fromDate, toDate, userId, meters.get(i));
-            usageDataMap.put("meter",meters.get(i));
-            usageDataMap.put("value",usageData);
-            usageArr.add(usageDataMap);
+        for(int i=0;i<cMeters.size(); i++){
+            usageData = dbClient.getData(fromDate, toDate, userId, cMeters.get(i), "openstack", "cumulative");
+            meterDataArrList.add(usageData);
         }
         
+        //Get Gauge Meters from Openstack
+        gMeters.add("cpu_util"); //TODO : Remove hard code
+        gMeters.add("disk.read.bytes.rate");
+        gMeters.add("disk.write.bytes.rate");
+        gMeters.add("network.incoming.bytes.rate");
+        gMeters.add("network.outgoing.bytes.rate");
+
+        for(int i=0;i<gMeters.size(); i++){
+            usageData = dbClient.getData(fromDate, toDate, userId, gMeters.get(i), "openstack", "gauge");
+            meterDataArrList.add(usageData);
+        }
+        
+        usageArr.put("openstack",meterDataArrList);
         //Construct the response in JSON string
         userUsageResponse = constructResponse(usageArr, userId, fromDate, toDate);
         
@@ -83,7 +98,7 @@ public class UsageDataResource extends ServerResource implements UsageResource {
      * @param toDate DateTime upto which the usage data needs to be calculated
      * @return responseJson The response object in the JSON format
      */
-    public Representation constructResponse(ArrayList usageArr, String userId, String fromDate, String toDate){
+    public Representation constructResponse(HashMap usageArr, String userId, String fromDate, String toDate){
 
         String jsonStr;
         JsonRepresentation responseJson = null;

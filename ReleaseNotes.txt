@@ -1,3 +1,10 @@
+Version 0.2.2 
+Date 03/Feb/2015
+Notes
+1. Extended the user usage API endpoint response to include both the gauge and cumulative meter from OpenStack
+
+************************************************************
+
 Version 0.2.1 
 Date 02/Feb/2015
 Notes

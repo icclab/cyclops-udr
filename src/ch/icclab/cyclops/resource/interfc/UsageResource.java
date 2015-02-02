@@ -2,7 +2,7 @@ package ch.icclab.cyclops.resource.interfc;
 
 import org.restlet.representation.Representation;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Author: Srikanta
@@ -15,5 +15,5 @@ public interface UsageResource extends UDRResource {
 
     public Representation getData();
     
-    public Representation constructResponse(ArrayList usageArr, String userId, String fromDate, String toDate);
+    public Representation constructResponse(HashMap usageArr, String userId, String fromDate, String toDate);
 }

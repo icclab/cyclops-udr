@@ -1,6 +1,5 @@
 package ch.icclab.cyclops.model.udr;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -13,7 +12,7 @@ import java.util.HashMap;
 public class UserUsageResponse {
     private String userid;
     private HashMap time;
-    private ArrayList<HashMap> usage;
+    private HashMap usage;
 
     public String getUserid() {
         return userid;
@@ -31,11 +30,11 @@ public class UserUsageResponse {
         this.time = time;
     }
 
-    public ArrayList<HashMap> getUsage() {
+    public HashMap getUsage() {
         return usage;
     }
 
-    public void setUsage(ArrayList<HashMap> usage) {
+    public void setUsage(HashMap usage) {
         this.usage = usage;
     }
 }
