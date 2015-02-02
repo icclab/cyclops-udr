@@ -30,7 +30,7 @@ public class DateTimeUtil {
 
     /**
      * Generates the 1 hr time range (from and to) by computing the present server time
-     * @return
+     * @return dateTime A string consisting of from and to dateTime entries
      */
     public String[] getRange(){
         String from, to;

@@ -1,0 +1,17 @@
+Version 0.2.1 
+Date 02/Feb/2015
+Notes
+1. New API endpoint : Return user usage data
+2. Method name refactoring
+3. Addition of release notes and version
+
+*************************************************************
+
+Version 0.1.1 
+Date 16/Jan/2015
+Notes
+1. Initial release
+2. One click installation script for Sensu, InfluxDB, Grafana, Uchiwa, Apache2, Tomcat7 & UDR Service
+3. Connector for OpenStack (Keystone and Ceilometer)
+4. API for insertion of usage data from external application
+5. Clients : InfluxDB, Telemetry & Keystone (OpenStack)

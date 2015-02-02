@@ -48,7 +48,7 @@ public class TelemetryClient extends ClientResource {
      * @param token Keystone token
      * @param meterName Name of the meter in the Ceilometer
      * @param meterType Cumulative or Gauge meter
-     * @return
+     * @return jsonOutput A JSON string consisting of data from a meter
      * @throws IOException
      */
     public String getData(String token, String meterName, String meterType) throws IOException {
@@ -95,7 +95,7 @@ public class TelemetryClient extends ClientResource {
      * @param meterName Name of the meter in the Ceilometer
      * @param to Timestamp from where data needs to be collected
      * @param from Timestamp till when data needs to be collected
-     * @return
+     * @return url A String consisting of a URL and query parameters
      */
     private String generateTelemetryQuery(String meterType, String meterName, String to, String from) {
 
