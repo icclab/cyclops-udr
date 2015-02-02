@@ -17,7 +17,9 @@
 
 package ch.icclab.cyclops.persistence.client;
 
+import ch.icclab.cyclops.model.udr.TSDBData;
 import ch.icclab.cyclops.util.LoadConfiguration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,15 +77,21 @@ public class InfluxDBClient extends ClientResource {
         return true;
     }
     
-    public Double getData(String from, String to, String userId, Object meterName){
+    public TSDBData getData(String from, String to, String userId, Object meterName, String source, String type){
         
-        String query;
-        JSONArray resultArray, pointsArray, pointsValueArray;
+        String query = null;
+        JSONArray resultArray;
         JSONObject resultObj;
+        TSDBData dataObj = null;
         Representation output;
-        Double usageValue = null;
+        ObjectMapper mapper = new ObjectMapper();
 
-        query = "select sum(usage) from "+meterName+" where time > now() - 24h and userid='"+userId+"' ";
+        if(source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("cumulative")){
+            query = "select sum(usage) from "+meterName+" where time > '"+from+"' and time < '"+to+"' and userid='"+userId+"' ";
+        }else if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("gauge")){
+            query = "select avg from "+meterName+" where time > '"+from+"' and time < '"+to+"' and userid='"+userId+"' ";
+        }
+
         Client client = new Client(Protocol.HTTP);
         ClientResource cr = new ClientResource(url);
 
@@ -97,16 +105,13 @@ public class InfluxDBClient extends ClientResource {
             resultArray = new JSONArray(output.getText());
             resultObj = new JSONObject();
             resultObj = (JSONObject) resultArray.get(0);
-            pointsArray = (JSONArray) resultObj.get("points");
-            pointsValueArray = (JSONArray) pointsArray.get(0);
-            usageValue = (Double) pointsValueArray.get(1);
+            dataObj = mapper.readValue(resultObj.toString(),TSDBData.class);
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return usageValue;
-        
+        return dataObj;
     }
+
 }
