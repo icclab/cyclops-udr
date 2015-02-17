@@ -81,12 +81,13 @@ public class DateTimeUtil {
         }
         to = year+"-"+sMonth+"-"+sDay+"T"+sHour+":"+sMin+":"+sSec;
 
-        tHour = hour - 1;
+        tHour = hour - 2; // 2 hrs time interval between data collection time range
         if(tHour <= 9){
             stHour = "0" + tHour;
         }else{
             stHour = tHour + "";
         }
+        
         from = year+"-"+sMonth+"-"+sDay+"T"+stHour+":"+sMin+":"+sSec;
 
         dateTime[0] = to;
@@ -104,7 +105,7 @@ public class DateTimeUtil {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        epochValue = dateTime.getTime() / 1000;
+        epochValue = dateTime.getTime();
         return epochValue;
     }
 }
