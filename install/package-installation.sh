@@ -270,13 +270,13 @@ cat > /etc/sensu/plugins/check-udrservice.rb << EOF
 
 require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-plugin/check/cli'
-require 'rest_client'
+require 'rest-client'
 require 'json'
 
 class PingUDRService < Sensu::Plugin::Check::CLI
   def run
     begin
-      r = RestClient::Resource.new("http://localhost:8080/udr/api", :timeout => 70 ).get
+      r = RestClient::Resource.new("http://localhost:8080/udr/api", :timeout => 60 ).get
       if r.code == 200
         ok "UDR service ping was successfull"
       else
@@ -344,7 +344,7 @@ cat > /etc/tomcat7/tomcat-users.xml << EOF
   <user username="role1" password="tomcat" roles="role1"/>
 -->
 <tomcat-users>
-    <user username="admin" password="w<>150<^T*F~0B" roles="manager-gui"/>
+    <user username="admin" password="wO)150<^T*F~0B" roles="manager-gui"/>
 </tomcat-users>
 EOF
 echo "---------------------------------------------------------------------------"

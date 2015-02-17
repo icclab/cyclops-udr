@@ -17,8 +17,6 @@
 
 package ch.icclab.cyclops.model.udr;
 
-import java.util.Date;
-
 /**
  * Author: Srikanta
  * Created on: 11-Dec-14
@@ -32,7 +30,7 @@ public class CumulativeMeterData {
     private long volume;
     private long usage = 0;
     private Metadata metadata;
-    private Date timestamp, recorded_at;
+    private String timestamp, recorded_at;
 
     public class Metadata{
         private String instance_id,mac, fref, name;
@@ -167,19 +165,19 @@ public class CumulativeMeterData {
         this.metadata = metadata;
     }
 
-    public Date getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
-    public Date getRecorded_at() {
+    public String getRecorded_at() {
         return recorded_at;
     }
 
-    public void setRecorded_at(Date recorded_at) {
+    public void setRecorded_at(String recorded_at) {
         this.recorded_at = recorded_at;
     }
 }

@@ -32,6 +32,7 @@ import ch.icclab.cyclops.model.udr.GaugeMeterData;
 import ch.icclab.cyclops.model.udr.TSDBData;
 import ch.icclab.cyclops.persistence.client.InfluxDBClient;
 import ch.icclab.cyclops.resource.interfc.DatabaseResource;
+import ch.icclab.cyclops.util.DateTimeUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -61,10 +62,12 @@ public class TSDBResource implements DatabaseResource{
         ArrayList<String> strArr = new ArrayList<String>();
         ArrayList<ArrayList<Object>> objArr = new ArrayList<ArrayList<Object>>();
         InfluxDBClient dbClient = new InfluxDBClient();
+        DateTimeUtil time = new DateTimeUtil();
         ArrayList<Object> objArrNode;
         GaugeMeterData gMeterData;
         boolean result = true;
 
+        strArr.add("time");
         strArr.add("userid");
         strArr.add("resourceid");
         strArr.add("projectid");
@@ -78,6 +81,7 @@ public class TSDBResource implements DatabaseResource{
         for (int i=0; i<dataArr.size(); i++){
             gMeterData = dataArr.get(i);
             objArrNode = new ArrayList<Object>();
+            objArrNode.add(time.getEpoch(gMeterData.getPeriod_end()));
             objArrNode.add(gMeterData.getGroupby().getUser_id());
             objArrNode.add(gMeterData.getGroupby().getResource_id());
             objArrNode.add(gMeterData.getGroupby().getProject_id());
@@ -134,8 +138,10 @@ public class TSDBResource implements DatabaseResource{
         InfluxDBClient dbClient = new InfluxDBClient();
         ArrayList<Object> objArrNode;
         CumulativeMeterData cMeterData;
+        DateTimeUtil time = new DateTimeUtil();
         boolean result = true;
 
+        strArr.add("time");
         strArr.add("userid");
         strArr.add("resourceid");
         strArr.add("volume");
@@ -154,6 +160,7 @@ public class TSDBResource implements DatabaseResource{
         for (int i=0; i<dataArr.size(); i++){
             cMeterData = dataArr.get(i);
             objArrNode = new ArrayList<Object>();
+            objArrNode.add(time.getEpoch(cMeterData.getRecorded_at()));
             objArrNode.add(cMeterData.getUser_id());
             objArrNode.add(cMeterData.getResource_id());
             objArrNode.add(cMeterData.getVolume());

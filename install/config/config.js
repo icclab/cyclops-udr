@@ -10,13 +10,13 @@ define(['settings'],
                     type: 'influxdb',
                     url: "http://localhost:8086/db/udr_service",
                     username: 'admin',
-                    password: '<Yh9h-vmhGe"v~+'
+                    password: 'CYh9hvmhGev12'
                 },
                 grafana: {
                     type: 'influxdb',
                     url: "http://localhost:8086/db/grafana",
                     username: 'admin',
-                    password: '<Yh9h-vmhGe"v~+',
+                    password: 'CYh9hvmhGev12',
                     grafanaDB: true
                 },
             },

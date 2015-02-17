@@ -7,8 +7,8 @@ if [ $# -eq 0 ]
 fi
 chmod +x /var/www/html/udr/bill/index.html
 chmod +x /usr/share/grafana/v1.9.0_rc1/config.js
-sed -i s/160.85.4.49/$1/ /var/www/html/udr/bill/index.html
-sed -i s/160.85.4.49/$1/ /usr/share/grafana/v1.9.0_rc1/config.js
+sed -i s/localhost/$1/ /var/www/html/udr/bill/index.html
+sed -i s/localhost/$1/ /usr/share/grafana/v1.9.0_rc1/config.js
 rm -fR /etc/rabbitmq/ssl
 rm -fR /etc/sensu/ssl
 echo "---------------------------------------------------------------------------"
@@ -24,9 +24,10 @@ service rabbitmq-server restart
 rabbitmqctl add_vhost /sensu
 rabbitmqctl add_user sensu udrservice
 rabbitmqctl set_permissions -p /sensu sensu ".*" ".*" ".*"
-sudo service apache2 restart
+service apache2 restart
 service sensu-server restart
 service sensu-client restart
 service sensu-api restart
 service uchiwa restart
+service tomcat7 restart
 rm -fR /tmp/udrservice
