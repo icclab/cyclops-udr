@@ -19,6 +19,10 @@ package ch.icclab.cyclops.util;
 
 import org.joda.time.LocalDateTime;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Author: Srikanta
  * Created on: 24-Nov-14
@@ -89,5 +93,18 @@ public class DateTimeUtil {
         dateTime[1] = from;
 
         return dateTime;
+    }
+    
+    public long getEpoch(String date){
+        long epochValue = 0;
+        Date dateTime = null;
+        SimpleDateFormat dF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        try {
+            dateTime = dF.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        epochValue = dateTime.getTime() / 1000;
+        return epochValue;
     }
 }

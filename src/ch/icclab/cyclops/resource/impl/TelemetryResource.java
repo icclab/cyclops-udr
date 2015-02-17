@@ -104,11 +104,11 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
         }else if(gaugeMeterOutput){
             responseObj.setTimestamp(currentDateTime.toDateTime().toString());
             responseObj.setStatus("Success");
-            responseObj.setMessage("Gauge Meter was Successfully saved into the DB");
+            responseObj.setMessage("Only Gauge Meter was Successfully saved into the DB");
         }else{
             responseObj.setTimestamp(currentDateTime.toDateTime().toString());
             responseObj.setStatus("Success");
-            responseObj.setMessage("Cumulative Meter was Successfully saved into the DB");
+            responseObj.setMessage("Only Cumulative Meter was Successfully saved into the DB");
         }
 
         return  responseObj;

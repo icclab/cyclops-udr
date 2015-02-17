@@ -28,7 +28,8 @@ package ch.icclab.cyclops.model.udr;
 public class GaugeMeterData {
     private int count, period, duration;
     private float min, max, sum, avg;
-    private String duration_start, duration_end, period_end, period_start, unit;
+    private String duration_start, duration_end, period_start, unit;
+    private String period_end;
     private Groupby groupby;
 
     public class Groupby{
