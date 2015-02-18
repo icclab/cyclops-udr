@@ -1,3 +1,10 @@
+Version 0.2.3
+Date 18/Feb/2015
+Notes
+1. Upgraded to Grafana 1.9.1
+
+************************************************************
+
 Version 0.2.2 
 Date 17/Feb/2015
 Notes

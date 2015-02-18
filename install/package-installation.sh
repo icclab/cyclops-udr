@@ -59,35 +59,35 @@ echo "--------------------------------------------------------------------------
 echo "---------------------------------------------------------------------------"
 echo "| Downloading Grafana package"
 echo "---------------------------------------------------------------------------"
-wget "http://grafanarel.s3.amazonaws.com/grafana-1.9.0-rc1.tar.gz" -P /tmp/udrservice
+wget "http://grafanarel.s3.amazonaws.com/grafana-1.9.1.tar.gz" -P /tmp/udrservice
 echo "---------------------------------------------------------------------------"
 echo "| unzip Grafana package"
 echo "---------------------------------------------------------------------------"
-tar -xvzf /tmp/udrservice/grafana-1.9.0-rc1.tar.gz -C /tmp/udrservice
+tar -xvzf /tmp/udrservice/grafana-1.9.1.tar.gz -C /tmp/udrservice
 echo "---------------------------------------------------------------------------"
 echo "| Creating Grafana directory at /usr/share/"
 echo "| Creating v1.9.0_rc1 directory at /usr/share/grafana"
 echo "---------------------------------------------------------------------------"
-mkdir -p /usr/share/grafana/v1.9.0_rc1
+mkdir -p /usr/share/grafana/v1.9.1
 echo "---------------------------------------------------------------------------"
 echo "| Copying the contents of grafana package to /usr/share/grafana/v1.9.0_rc1"
 echo "---------------------------------------------------------------------------"
-cp -r /tmp/udrservice/grafana-1.9.0-rc1/* /usr/share/grafana/v1.9.0_rc1
+cp -r /tmp/udrservice/grafana-1.9.1/* /usr/share/grafana/v1.9.1
 echo "---------------------------------------------------------------------------"
 echo "| Moving the Grafana dashboard JSON file"
 echo "---------------------------------------------------------------------------"
-rm /usr/share/grafana/v1.9.0_rc1/app/dashboards/default.json
-cp ./config/default.json /usr/share/grafana/v1.9.0_rc1/app/dashboards/
+rm /usr/share/grafana/v1.9.1/app/dashboards/default.json
+cp ./config/default.json /usr/share/grafana/v1.9.1/app/dashboards/
 echo "---------------------------------------------------------------------------"
 echo "| Moving the Grafana config file at /usr/share/grafana"
 echo "---------------------------------------------------------------------------"
-cp ./config/config.js /usr/share/grafana/v1.9.0_rc1/config.js
-sed -i s/localhost/$1/ /usr/share/grafana/v1.9.0_rc1/config.js
+cp ./config/config.js /usr/share/grafana/v1.9.1/config.js
+sed -i s/localhost/$1/ /usr/share/grafana/v1.9.1/config.js
 echo "---------------------------------------------------------------------------"
 echo "| Creating an Apache config file to refer grafana at /etc/apache2/sites-enabled/"
 echo "---------------------------------------------------------------------------"
 cat > /etc/apache2/sites-enabled/grafana.conf << EOF
-alias /grafana /usr/share/grafana/v1.9.0_rc1
+alias /grafana /usr/share/grafana/v1.9.1
 EOF
 echo "---------------------------------------------------------------------------"
 echo "| Starting the process of installing Sensu"
