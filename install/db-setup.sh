@@ -3,9 +3,9 @@ echo "--------------------------------------------------------------------------
 echo "| Setting up the database "
 echo "---------------------------------------------------------------------------"
 curl -X POST 'http://localhost:8086/db?u=root&p=root' -d '{"name": "udr_service"}'
-curl -X POST 'http://localhost:8086/db/udr_service/users?u=root&p=root' -d '{"name": "admin", "password": "Yh9h-vmhGev~+"}'
+curl -X POST 'http://localhost:8086/db/udr_service/users?u=root&p=root' -d '{"name": "admin", "password": "Yh9hvmhGev"}'
 curl -X POST 'http://localhost:8086/db?u=root&p=root' -d '{"name": "grafana"}'
-curl -X POST 'http://localhost:8086/db/grafana/users?u=root&p=root' -d '{"name": "admin", "password": "Yh9h-vmhGev~+"}'
+curl -X POST 'http://localhost:8086/db/grafana/users?u=root&p=root' -d '{"name": "admin", "password": "Yh9hvmhGev"}'
 echo "---------------------------------------------------------------------------"
 echo "| Installation process is complete "
 echo "---------------------------------------------------------------------------"

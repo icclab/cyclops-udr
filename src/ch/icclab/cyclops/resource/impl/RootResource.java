@@ -27,13 +27,15 @@ package ch.icclab.cyclops.resource.impl;
  */
 
 import ch.icclab.cyclops.resource.interfc.UDRResource;
+import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 /**
  * Returns a basic response when the root API endpoint is invoked
  */
 public class RootResource extends ServerResource implements UDRResource{
-    public String RootResource(){
-        return "CYCLOPS UDR Service";
+    @Get
+    public String rootMsg(){
+        return "CYCLOPS UDR Service - v 0.2.3";
     }
 }

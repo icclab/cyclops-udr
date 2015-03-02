@@ -1,7 +1,8 @@
 Version 0.2.3
-Date 18/Feb/2015
+Date 02/Mar/2015
 Notes
-1. Upgraded to Grafana 1.9.1
+1. Updated the installation script to use Grafana v1.9.1
+2. Added a return message for the root api
 
 ************************************************************
 

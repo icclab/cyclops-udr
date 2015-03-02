@@ -101,12 +101,9 @@ public class TelemetryClient extends ClientResource {
 
         LoadConfiguration load = new LoadConfiguration();
         String url = load.configuration.get("CeilometerURL");
-        String queryPartOne = load.configuration.get("CeilometerQueryPartOne");
-        String queryPartTwo = load.configuration.get("CeilometerQueryPartTwo");
-        String queryPartThree = load.configuration.get("CeilometerQueryPartThree");
 
         if(meterType.equals("gauge")){
-            url = url+"meters/"+meterName+queryPartOne+from+queryPartTwo+to+queryPartThree;
+            url = url+"meters/"+meterName+"/statistics?q.field=timestamp&q.op=gt&q.value="+from+"&q.field=timestamp&q.op=lt&q.value="+to+"&groupby=user_id&groupby=project_id&groupby=resource_id";
         }else {
             url = url+"samples"+"?q.field=timestamp&q.op=ge&q.value="+from+"&q.field=timestamp&q.op=le&q.value="+to+"&q.field=meter&q.op=eq&q.value="+meterName;
         }
