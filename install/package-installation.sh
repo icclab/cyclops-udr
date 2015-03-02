@@ -306,7 +306,7 @@ service sensu-api restart
 service uchiwa restart
 echo "---------------------------------------------------------------------------"
 echo "| Adding a manager for Tomcat "
-echo "| user : admin ¦ password: w<>150<^T*F~0B "
+echo "| user : admin ¦ password: Yh9hvmhGeBl"
 echo "---------------------------------------------------------------------------"
 cat > /etc/tomcat7/tomcat-users.xml << EOF
 <?xml version='1.0' encoding='utf-8'?>
@@ -344,7 +344,7 @@ cat > /etc/tomcat7/tomcat-users.xml << EOF
   <user username="role1" password="tomcat" roles="role1"/>
 -->
 <tomcat-users>
-    <user username="admin" password="wO)150<^T*F~0B" roles="manager-gui"/>
+    <user username="admin" password="Yh9hvmhGeBl" roles="manager-gui"/>
 </tomcat-users>
 EOF
 echo "---------------------------------------------------------------------------"
