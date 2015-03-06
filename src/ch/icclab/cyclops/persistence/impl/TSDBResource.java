@@ -55,8 +55,6 @@ public class TSDBResource implements DatabaseResource{
      * @return result A boolean output as a result of saving the meter data into the db
      */
     public boolean saveGaugeMeterData(ArrayList<GaugeMeterData> dataArr, String meterName){
-
-        System.out.println("Saving " +meterName+ " Gauge Meter Data into InfluxDB");
         String jsonData = null;
         TSDBData dbData = new TSDBData();
         ArrayList<String> strArr = new ArrayList<String>();
@@ -129,8 +127,6 @@ public class TSDBResource implements DatabaseResource{
      * @return result A boolean output as a result of saving the meter data into the db
      */
     public boolean saveCumulativeMeterData(ArrayList<CumulativeMeterData> dataArr, String meterName){
-
-        System.out.println("Saving " +meterName+ " Cumulative Meter Data into InfluxDB");
         String jsonData = null;
         TSDBData dbData = new TSDBData();
         ArrayList<String> strArr = new ArrayList<String>();
@@ -230,8 +226,36 @@ public class TSDBResource implements DatabaseResource{
         return result;
     }
 
-    public void getData(){
-
+    public TSDBData getUsageData(String from, String to, String userId, Object meterName, String source, String type){
+        String query = null;
+        InfluxDBClient dbClient = new InfluxDBClient();
+        
+        if(source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("cumulative")){
+            query = "select sum(usage) from "+meterName+" where time > '"+from+"' and time < '"+to+"' and userid='"+userId+"' ";
+        }else if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("gauge")){
+            query = "select avg from "+meterName+" where time > '"+from+"' and time < '"+to+"' and userid='"+userId+"' ";
+        }
+        
+        return dbClient.getData(query);
     }
 
+    public TSDBData getMeterList(){
+        InfluxDBClient dbClient = new InfluxDBClient();
+        TSDBData tsdbData = new TSDBData();
+        Long epoch;
+        int indexStatus, indexMeterName, indexMeterType;
+        ArrayList<ArrayList<String>> meterList;
+        ArrayList resultList = new ArrayList();
+        
+        //Get the first entry
+        tsdbData = dbClient.getData("select * from meterselection limit 1");
+        
+        // Extract the time of the first entry
+        epoch = (Long) tsdbData.getPoints().get(0).get(0);
+        //Work around for the bug in InfluxDB v0.8.8
+        epoch = epoch - 1;
+        // Use the extracted epoch time to get all the data entry
+        tsdbData = dbClient.getData("select * from meterselection "+"where time > "+epoch);
+        return tsdbData;
+    }
 }

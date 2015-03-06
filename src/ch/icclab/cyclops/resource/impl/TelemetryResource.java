@@ -29,10 +29,14 @@ package ch.icclab.cyclops.resource.impl;
 import ch.icclab.cyclops.model.udr.CumulativeMeterData;
 import ch.icclab.cyclops.model.udr.GaugeMeterData;
 import ch.icclab.cyclops.model.udr.Response;
+import ch.icclab.cyclops.model.udr.TSDBData;
 import ch.icclab.cyclops.persistence.impl.TSDBResource;
 import ch.icclab.cyclops.resource.client.KeystoneClient;
 import ch.icclab.cyclops.resource.client.TelemetryClient;
 import ch.icclab.cyclops.resource.interfc.MeteringResource;
+import ch.icclab.cyclops.util.Constant;
+import ch.icclab.cyclops.util.Flag;
+import ch.icclab.cyclops.util.LoadConfiguration;
 import ch.icclab.cyclops.util.ResponseUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.LocalDateTime;
@@ -63,21 +67,50 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
      */
     @Get
     public Representation setMeterData() {
-        System.out.println("Getting the response");
-
         boolean gaugeMeterOutput = false;
         boolean cumulativeMeterOutput = false;
-        String token;
+        String token, nameCheck;
+        int indexStatus = -1;
+        int indexMeterName = -1;
+        int indexMeterType = -1;
         Representation output = null;
-
         Response response = null;
+        ArrayList resultList;
+        ArrayList<ArrayList<String>> masterMeterList = new ArrayList<ArrayList<String>>();
+        ArrayList meterList = new ArrayList();
         ResponseUtil util = new ResponseUtil();
-        KeystoneClient kClient = new KeystoneClient();
-        token = kClient.generateToken();
+        KeystoneClient keystoneClient = new KeystoneClient();
+        token = keystoneClient.generateToken();
+        TSDBResource tsdbResource = new TSDBResource();
+        TSDBData tsdbData = new TSDBData();
 
-        cumulativeMeterOutput = getCumulativeMeterData(token);
-        gaugeMeterOutput = getGaugeMeterData(token);
+        if(Flag.isMeterListReset()){
+            Flag.setMeterListReset(false);
+            LoadConfiguration.openStackGaugeMeterList.clear();
+            LoadConfiguration.openStackCumulativeMeterList.clear();
+            
+            // Get the meterlist and corresponding indexes of the columns
+            tsdbData = tsdbResource.getMeterList();
+            // Extract the data points
+            masterMeterList = (ArrayList) tsdbData.getPoints();
+            indexStatus = tsdbData.getColumns().indexOf("status");
+            indexMeterType = tsdbData.getColumns().indexOf("metertype");
+            indexMeterName = tsdbData.getColumns().indexOf("metername");
+            // Iterate through the list of arraylist & segregate the meters
+            for(int i=0; i < masterMeterList.size(); i++){
+                meterList = masterMeterList.get(i);
+                if((meterList.get(indexStatus).equals(Constant.OPENSTACK_METER_SELECTED))
+                        && meterList.get(indexMeterType).equals(Constant.OPENSTACK_CUMULATIVE_METER)){
+                    LoadConfiguration.openStackCumulativeMeterList.add(meterList.get(indexMeterName).toString());
+                }else if(meterList.get(indexStatus).equals(Constant.OPENSTACK_METER_SELECTED)
+                        && meterList.get(indexMeterType).equals(Constant.OPENSTACK_GAUGE_METER)){
+                    LoadConfiguration.openStackGaugeMeterList.add(meterList.get(indexMeterName).toString());
+                }
+            }
+        }
 
+        cumulativeMeterOutput = getCumulativeMeterData(LoadConfiguration.openStackCumulativeMeterList, token);
+        gaugeMeterOutput = getGaugeMeterData(LoadConfiguration.openStackGaugeMeterList,token);
         response = constructResponse(cumulativeMeterOutput,gaugeMeterOutput);
         output = util.toJson(response);
 
@@ -93,7 +126,6 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
      * @return A response object containing the details of the operation
      */
     private Response constructResponse(boolean cumulativeMeterOutput, boolean gaugeMeterOutput) {
-
         Response responseObj = new Response();
         LocalDateTime currentDateTime = new LocalDateTime();
 
@@ -130,9 +162,8 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
      * @throws JSONException
      * @throws IOException
      */
-    private boolean getCumulativeMeterData(String token) {
-
-        boolean output = true;
+    private boolean getCumulativeMeterData(ArrayList<String> meter, String token) {
+        boolean output = false;
         String response = null;
         Set keySet;
         String meterType = "cumulative";
@@ -141,14 +172,10 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
         JSONArray array = null;
 
         ObjectMapper mapper = new ObjectMapper();
-        ArrayList<String> meter = new ArrayList<String>();
         TelemetryClient tClient = new TelemetryClient();
         ArrayList<CumulativeMeterData> cMeterArr = new ArrayList<CumulativeMeterData>();
         TSDBResource dbResource = new TSDBResource();
         HashMap<String, LinkedList<CumulativeMeterData>> map = new HashMap<String, LinkedList<CumulativeMeterData>>();
-
-        meter.add("network.incoming.bytes"); //TODO : Remove hard code
-        meter.add("network.outgoing.bytes");
 
         for(int j=0; j < meter.size();j++){
             try {
@@ -183,6 +210,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
                 cMeterArr = calculateCumulativeMeterUsage(cMeterArr, linkedList);
             }
             dbResource.saveCumulativeMeterData(cMeterArr, meter.get(j));
+            output = true;
             } catch (IOException e) {
                 output = false;
                 e.printStackTrace();
@@ -210,7 +238,6 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
      * @return An arrayList of type CumulativeMeterData containing sample objects with the usage information
      */
     private ArrayList<CumulativeMeterData> calculateCumulativeMeterUsage(ArrayList<CumulativeMeterData> cMeterArr, LinkedList<CumulativeMeterData> linkedList) {
-
         long diff;
 
         for(int i=0;i<(linkedList.size()-1);i++){
@@ -232,36 +259,15 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
      * @return output A String output of the success or failure of the data extraction process
      * @throws JSONException
      */
-    private boolean getGaugeMeterData(String token){
+    private boolean getGaugeMeterData(ArrayList<String> meter, String token){
         boolean saveStatus;
         String response;
-        ArrayList<String> meter = new ArrayList<String>();
         JSONArray array ;
         ObjectMapper mapper = new ObjectMapper();
         TSDBResource dbResource = new TSDBResource();
         ArrayList<GaugeMeterData> dataArr = new ArrayList<GaugeMeterData>();
         String meterType  = "gauge";
         boolean output = true;
-
-        meter.add("cpu_util"); //TODO : Remove hard code
-        meter.add("disk.read.bytes.rate");
-        meter.add("disk.ephemeral.size");
-        meter.add("disk.read.requests.rate");
-        meter.add("disk.root.size");
-        meter.add("disk.write.bytes.rate");
-        meter.add("disk.write.requests.rate");
-        meter.add("instance");
-        meter.add("instance:m1.small");
-        meter.add("instance:m1.tiny");
-        meter.add("ip.floating");
-        meter.add("memory");
-        meter.add("network.incoming.bytes.rate");
-        meter.add("network.incoming.packets.rate");
-        meter.add("network.outgoing.bytes.rate");
-        meter.add("network.outgoing.packets.rate");
-        meter.add("port");
-        meter.add("vcpus");
-        meter.add("volume");
 
         try{
             TelemetryClient tClient = new TelemetryClient();

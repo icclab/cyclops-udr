@@ -1,8 +1,12 @@
-Version 0.2.3
-Date 02/Mar/2015
+Version 0.3.0
+Date 06/Mar/2015
 Notes
-1. Updated the installation script to use Grafana v1.9.1
+1. Installation script is updated to use Grafana v1.9.1
 2. Added a return message for the root api
+3. Added the "/meters" API endpoint to accept the meter selection status for data collection
+4. InfluxDB client code refactoring
+5. Added the flag to check for the reset of meters selected for usage data collection
+6. Added the check to refresh the usage collection meter list if it has been updated.
 
 ************************************************************
 

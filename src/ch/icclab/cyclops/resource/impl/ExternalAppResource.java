@@ -80,6 +80,7 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
             response.setStatus("Failure");
             response.setMessage("Data could not be saved into the DB");
         }
+        
         return jsonResponse;
     }
 

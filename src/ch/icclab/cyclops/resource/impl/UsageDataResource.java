@@ -2,7 +2,7 @@ package ch.icclab.cyclops.resource.impl;
 
 import ch.icclab.cyclops.model.udr.TSDBData;
 import ch.icclab.cyclops.model.udr.UserUsageResponse;
-import ch.icclab.cyclops.persistence.client.InfluxDBClient;
+import ch.icclab.cyclops.persistence.impl.TSDBResource;
 import ch.icclab.cyclops.resource.interfc.UsageResource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,7 +48,7 @@ public class UsageDataResource extends ServerResource implements UsageResource {
         String fromDate = getQueryValue("from");
         String toDate = getQueryValue("to");
 
-        InfluxDBClient dbClient = new InfluxDBClient();
+        TSDBResource dbResource = new TSDBResource();
         ArrayList cMeters = new ArrayList();
         ArrayList gMeters = new ArrayList();
         
@@ -60,7 +60,7 @@ public class UsageDataResource extends ServerResource implements UsageResource {
 
         //Get the data from the DB and create the arraylist consisting of hashmaps of meter name and usage value
         for(int i=0;i<cMeters.size(); i++){
-            usageData = dbClient.getData(fromDate, toDate, userId, cMeters.get(i), "openstack", "cumulative");
+            usageData = dbResource.getUsageData(fromDate, toDate, userId, cMeters.get(i), "openstack", "cumulative");
             meterDataArrList.add(usageData);
         }
         
@@ -72,7 +72,7 @@ public class UsageDataResource extends ServerResource implements UsageResource {
         gMeters.add("network.outgoing.bytes.rate");
 
         for(int i=0;i<gMeters.size(); i++){
-            usageData = dbClient.getData(fromDate, toDate, userId, gMeters.get(i), "openstack", "gauge");
+            usageData = dbResource.getUsageData(fromDate, toDate, userId, gMeters.get(i), "openstack", "gauge");
             meterDataArrList.add(usageData);
         }
         
