@@ -24,13 +24,11 @@ package ch.icclab.cyclops.application;
  * Also loads the configuration file at the start of the application
  *
  * Change Log
- * Name        Date     Comments
+ * Name          Date               Comments
+ * Srikanta     02-Mar-2015     Added the api to save and return info regarding selected meters *
  */
 
-import ch.icclab.cyclops.resource.impl.ExternalAppResource;
-import ch.icclab.cyclops.resource.impl.RootResource;
-import ch.icclab.cyclops.resource.impl.TelemetryResource;
-import ch.icclab.cyclops.resource.impl.UsageDataResource;
+import ch.icclab.cyclops.resource.impl.*;
 import ch.icclab.cyclops.util.LoadConfiguration;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -51,18 +49,17 @@ public class UDRApplication extends Application{
      *
      * @return router
      */
-    public Restlet createInboundRoot()
-    {
-        System.out.println("Entered the router");
-
+    public Restlet createInboundRoot(){
+        //Load the configuration files and flags 
         loadConfiguration(getContext());
+        
         Router router = new Router(getContext());
         router.attach("/", RootResource.class);
         router.attach("/api", TelemetryResource.class); //API used internally to trigger the data collection
         router.attach("/ext/app", ExternalAppResource.class); // API used for data insertion from external PaaS/IaaS
         router.attach("/usage", UsageDataResource.class); //API used for fetching the usage info for a user
-
-        System.out.println("Finished routing");
+        router.attach("/meters", MeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
+        
         return router;
     }
 
@@ -75,7 +72,7 @@ public class UDRApplication extends Application{
      *
      * @param context
      */
-    private void loadConfiguration(Context context) {
+    private void loadConfiguration(Context context){
         LoadConfiguration loadConfig = new LoadConfiguration();
         if(loadConfig.configuration == null){
             try {

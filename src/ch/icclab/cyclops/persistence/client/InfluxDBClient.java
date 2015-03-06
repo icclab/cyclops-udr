@@ -70,37 +70,27 @@ public class InfluxDBClient extends ClientResource {
 
         cr.post(data);
         output = cr.getResponseEntity();
-
-        System.out.println(output);
         System.out.println("Exit InfluxDBClient");
 
         return true;
     }
-    
-    public TSDBData getData(String from, String to, String userId, Object meterName, String source, String type){
-        
-        String query = null;
+
+    public TSDBData getData(String query){
         JSONArray resultArray;
         JSONObject resultObj;
         TSDBData dataObj = null;
         Representation output;
         ObjectMapper mapper = new ObjectMapper();
-
-        if(source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("cumulative")){
-            query = "select sum(usage) from "+meterName+" where time > '"+from+"' and time < '"+to+"' and userid='"+userId+"' ";
-        }else if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("gauge")){
-            query = "select avg from "+meterName+" where time > '"+from+"' and time < '"+to+"' and userid='"+userId+"' ";
-        }
-
+        
         Client client = new Client(Protocol.HTTP);
         ClientResource cr = new ClientResource(url);
-
+        
         cr.addQueryParameter("q",query);
         cr.addQueryParameter("u",username);
         cr.addQueryParameter("p",password);
         cr.get(MediaType.APPLICATION_JSON);
         output = cr.getResponseEntity();
-        
+
         try {
             resultArray = new JSONArray(output.getText());
             resultObj = new JSONObject();
@@ -113,5 +103,4 @@ public class InfluxDBClient extends ClientResource {
         }
         return dataObj;
     }
-
 }

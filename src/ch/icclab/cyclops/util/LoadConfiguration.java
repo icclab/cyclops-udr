@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -41,7 +42,10 @@ import java.util.HashMap;
 public class LoadConfiguration extends ClientResource {
 
     //Instantiating the Instance variable for saving the config details
-    public static HashMap<String,String> configuration ;
+    public static HashMap<String,String> configuration;
+    public static ArrayList<String> openStackCumulativeMeterList = new ArrayList<String>();
+    public static ArrayList<String> openStackGaugeMeterList = new ArrayList<String>();
+    public static ArrayList<String> otherMeterList = new ArrayList<String>();
 
     /**
      * Loads the configuration file
@@ -55,9 +59,6 @@ public class LoadConfiguration extends ClientResource {
      * @throws IOException
      */
     public void run(Context context) throws IOException {
-
-        System.out.println("Entered the config loading class");
-
         configuration = new HashMap();
         String nextLine;
 
