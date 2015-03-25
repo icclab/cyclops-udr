@@ -4,6 +4,7 @@ import ch.icclab.cyclops.model.udr.TSDBData;
 import ch.icclab.cyclops.model.udr.UserUsageResponse;
 import ch.icclab.cyclops.persistence.impl.TSDBResource;
 import ch.icclab.cyclops.resource.interfc.UsageResource;
+import ch.icclab.cyclops.util.Load;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.restlet.ext.json.JsonRepresentation;
@@ -42,40 +43,32 @@ public class UsageDataResource extends ServerResource implements UsageResource {
         Representation userUsageResponse;
         TSDBData usageData;
         HashMap usageArr = new HashMap();
-        ArrayList<TSDBData> meterDataArrList = new ArrayList<TSDBData>(); //TODO : Remove hard code
-        
+        ArrayList<TSDBData> meterDataArrList = new ArrayList<TSDBData>();
+        TSDBResource dbResource = new TSDBResource();
+        Load load = new Load();
+
         String userId = getQueryValue("userid");
         String fromDate = getQueryValue("from");
         String toDate = getQueryValue("to");
+        ArrayList cMeters = Load.openStackCumulativeMeterList;
+        ArrayList gMeters = Load.openStackGaugeMeterList;
 
-        TSDBResource dbResource = new TSDBResource();
-        ArrayList cMeters = new ArrayList();
-        ArrayList gMeters = new ArrayList();
-        
-        //Get data from OpenStack
-        //Get Cumulative Meters from Openstack
-        //Add the time series name to fetch the total usage data
-        cMeters.add("network.incoming.bytes"); //TODO : Remove hard code
-        cMeters.add("network.outgoing.bytes");
-
-        //Get the data from the DB and create the arraylist consisting of hashmaps of meter name and usage value
+        //Load the meter list
+        load.meterList();
+        //Get the data for the OpenStack Cumulative Meters from the DB and create the arraylist consisting of hashmaps of meter name and usage value
         for(int i=0;i<cMeters.size(); i++){
             usageData = dbResource.getUsageData(fromDate, toDate, userId, cMeters.get(i), "openstack", "cumulative");
-            meterDataArrList.add(usageData);
+            if(usageData.getPoints().size() != 0){
+                meterDataArrList.add(usageData);
+            }
         }
-        
-        //Get Gauge Meters from Openstack
-        gMeters.add("cpu_util"); //TODO : Remove hard code
-        gMeters.add("disk.read.bytes.rate");
-        gMeters.add("disk.write.bytes.rate");
-        gMeters.add("network.incoming.bytes.rate");
-        gMeters.add("network.outgoing.bytes.rate");
-
+        //Get the data for the OpenStack Gauge Meters from the DB and create the arraylist consisting of hashmaps of meter name and usage value
         for(int i=0;i<gMeters.size(); i++){
             usageData = dbResource.getUsageData(fromDate, toDate, userId, gMeters.get(i), "openstack", "gauge");
-            meterDataArrList.add(usageData);
+            if(usageData.getPoints().size() != 0){
+                meterDataArrList.add(usageData);
+            }
         }
-        
         usageArr.put("openstack",meterDataArrList);
         //Construct the response in JSON string
         userUsageResponse = constructResponse(usageArr, userId, fromDate, toDate);

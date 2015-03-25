@@ -17,6 +17,8 @@
 
 package ch.icclab.cyclops.util;
 
+import ch.icclab.cyclops.model.udr.TSDBData;
+import ch.icclab.cyclops.persistence.impl.TSDBResource;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.representation.FileRepresentation;
@@ -39,7 +41,7 @@ import java.util.HashMap;
  * Change Log
  * Name        Date     Comments
  */
-public class LoadConfiguration extends ClientResource {
+public class Load extends ClientResource {
 
     //Instantiating the Instance variable for saving the config details
     public static HashMap<String,String> configuration;
@@ -58,7 +60,7 @@ public class LoadConfiguration extends ClientResource {
      * @param context
      * @throws IOException
      */
-    public void run(Context context) throws IOException {
+    public void configuration(Context context) throws IOException {
         configuration = new HashMap();
         String nextLine;
 
@@ -81,6 +83,41 @@ public class LoadConfiguration extends ClientResource {
         } catch (IOException e) {
             System.out.println("Failed to load the Config file");
             e.printStackTrace();
+        }
+    }
+
+    public void meterList(){
+        TSDBResource tsdbResource = new TSDBResource();
+        TSDBData tsdbData;
+        ArrayList<ArrayList<String>> masterMeterList;
+        ArrayList meterList;
+        int indexStatus = -1;
+        int indexMeterName = -1;
+        int indexMeterType = -1;
+
+        if(Flag.isMeterListReset()){
+            Flag.setMeterListReset(false);
+            Load.openStackGaugeMeterList.clear();
+            Load.openStackCumulativeMeterList.clear();
+
+            // Get the meterlist and corresponding indexes of the columns
+            tsdbData = tsdbResource.getMeterList();
+            // Extract the data points
+            masterMeterList = (ArrayList) tsdbData.getPoints();
+            indexStatus = tsdbData.getColumns().indexOf("status");
+            indexMeterType = tsdbData.getColumns().indexOf("metertype");
+            indexMeterName = tsdbData.getColumns().indexOf("metername");
+            // Iterate through the list of arraylist & segregate the meters
+            for(int i=0; i < masterMeterList.size(); i++){
+                meterList = masterMeterList.get(i);
+                if((meterList.get(indexStatus).equals(Constant.OPENSTACK_METER_SELECTED))
+                        && meterList.get(indexMeterType).equals(Constant.OPENSTACK_CUMULATIVE_METER)){
+                    Load.openStackCumulativeMeterList.add(meterList.get(indexMeterName).toString());
+                }else if(meterList.get(indexStatus).equals(Constant.OPENSTACK_METER_SELECTED)
+                        && meterList.get(indexMeterType).equals(Constant.OPENSTACK_GAUGE_METER)){
+                    Load.openStackGaugeMeterList.add(meterList.get(indexMeterName).toString());
+                }
+            }
         }
     }
 }

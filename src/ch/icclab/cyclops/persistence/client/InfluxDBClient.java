@@ -18,7 +18,7 @@
 package ch.icclab.cyclops.persistence.client;
 
 import ch.icclab.cyclops.model.udr.TSDBData;
-import ch.icclab.cyclops.util.LoadConfiguration;
+import ch.icclab.cyclops.util.Load;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,7 +41,7 @@ import java.io.IOException;
  * Name        Date     Comments
  */
 public class InfluxDBClient extends ClientResource {
-    LoadConfiguration load = new LoadConfiguration();
+    Load load = new Load();
     String url = load.configuration.get("InfluxDBURL");
     String username = load.configuration.get("InfluxDBUsername");
     String password = load.configuration.get("InfluxDBPassword");
@@ -81,10 +81,10 @@ public class InfluxDBClient extends ClientResource {
         TSDBData dataObj = null;
         Representation output;
         ObjectMapper mapper = new ObjectMapper();
-        
+
         Client client = new Client(Protocol.HTTP);
         ClientResource cr = new ClientResource(url);
-        
+
         cr.addQueryParameter("q",query);
         cr.addQueryParameter("u",username);
         cr.addQueryParameter("p",password);

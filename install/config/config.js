@@ -1,6 +1,6 @@
 // == Configuration
 // config.js is where you will find the core Grafana configuration. This file contains parameter that
-// must be set before Grafana is run for the first time.
+// must be set before Grafana is configuration for the first time.
 
 define(['settings'],
     function (Settings) {

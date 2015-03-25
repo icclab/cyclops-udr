@@ -29,7 +29,7 @@ package ch.icclab.cyclops.application;
  */
 
 import ch.icclab.cyclops.resource.impl.*;
-import ch.icclab.cyclops.util.LoadConfiguration;
+import ch.icclab.cyclops.util.Load;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Restlet;
@@ -73,10 +73,10 @@ public class UDRApplication extends Application{
      * @param context
      */
     private void loadConfiguration(Context context){
-        LoadConfiguration loadConfig = new LoadConfiguration();
+        Load loadConfig = new Load();
         if(loadConfig.configuration == null){
             try {
-                loadConfig.run(getContext());
+                loadConfig.configuration(getContext());
             } catch (IOException e) {
                 e.printStackTrace();
             }
