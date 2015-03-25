@@ -34,7 +34,7 @@ public class CumulativeMeterData {
 
     public class Metadata{
         private String instance_id,mac, fref, name;
-        private int instance_type;
+        private String instance_type;
 
         public String getInstance_id() {
             return instance_id;
@@ -68,11 +68,11 @@ public class CumulativeMeterData {
             this.name = name;
         }
 
-        public int getInstance_type() {
+        public String getInstance_type() {
             return instance_type;
         }
 
-        public void setInstance_type(int instance_type) {
+        public void setInstance_type(String instance_type) {
             this.instance_type = instance_type;
         }
     }
