@@ -18,7 +18,7 @@
 
 package ch.icclab.cyclops.resource.client;
 
-import ch.icclab.cyclops.util.LoadConfiguration;
+import ch.icclab.cyclops.util.Load;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.restlet.Client;
@@ -55,13 +55,13 @@ public class KeystoneClient extends ClientResource {
         System.out.println("Generating the Token");
 
         Client client = new Client(Protocol.HTTP);
-        LoadConfiguration load = new LoadConfiguration();
+        Load load = new Load();
         String keystoneURL = load.configuration.get("KeystoneURL");
         String keystoneUsername = load.configuration.get("KeystoneUsername");
         String keystonePassword = load.configuration.get("KeystonePassword");
         String keystoneDomain = load.configuration.get("KeystoneDomainName");
         String keystoneProject = load.configuration.get("KeystoneProjectName");
-        String reqBody = "{\"auth\": {\"identity\": {\"methods\": [\"password\"],\"password\": {\"user\": {\"domain\":{\"name\":\""+keystoneDomain+"\"},\"name\": \""+keystoneUsername+"\",\"password\": \""+keystonePassword+"\"}}},\"scope\": {\"project\": {\"domain\": {\"name\": \""+keystoneDomain+"\"},\"name\": \""+keystoneProject+"\"}}}}";
+        String reqBody = "{\"auth\":{\"identity\":{\"methods\":[\"password\"],\"password\":{\"user\":{\"domain\":{\"name\":\"default\"},\"name\":\""+keystoneUsername+"\",\"password\":\""+keystonePassword+"\"}}}}}";
         ClientResource cr = new ClientResource(keystoneURL);
         JSONObject jsonObj = null;
         Series<Header> reqHeader = new Series<Header>(Header.class);

@@ -27,7 +27,7 @@ package ch.icclab.cyclops.resource.client;
  */
 
 import ch.icclab.cyclops.util.DateTimeUtil;
-import ch.icclab.cyclops.util.LoadConfiguration;
+import ch.icclab.cyclops.util.Load;
 import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.data.MediaType;
@@ -83,8 +83,6 @@ public class TelemetryClient extends ClientResource {
         cr.get(MediaType.APPLICATION_JSON);
         Representation output = cr.getResponseEntity();
         jsonOutput  = output.getText();
-        System.out.println(jsonOutput);
-
         return jsonOutput;
     }
 
@@ -99,7 +97,7 @@ public class TelemetryClient extends ClientResource {
      */
     private String generateTelemetryQuery(String meterType, String meterName, String to, String from) {
 
-        LoadConfiguration load = new LoadConfiguration();
+        Load load = new Load();
         String url = load.configuration.get("CeilometerURL");
 
         if(meterType.equals("gauge")){
