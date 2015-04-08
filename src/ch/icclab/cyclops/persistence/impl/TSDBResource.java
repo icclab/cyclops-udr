@@ -69,6 +69,7 @@ public class TSDBResource implements DatabaseResource{
         strArr.add("userid");
         strArr.add("resourceid");
         strArr.add("projectid");
+        strArr.add("type");
         strArr.add("min");
         strArr.add("max");
         strArr.add("sum");
@@ -83,6 +84,7 @@ public class TSDBResource implements DatabaseResource{
             objArrNode.add(gMeterData.getGroupby().getUser_id());
             objArrNode.add(gMeterData.getGroupby().getResource_id());
             objArrNode.add(gMeterData.getGroupby().getProject_id());
+            objArrNode.add("gauge");
             objArrNode.add(gMeterData.getMin());
             objArrNode.add(gMeterData.getMax());
             objArrNode.add(gMeterData.getSum());
@@ -100,7 +102,6 @@ public class TSDBResource implements DatabaseResource{
 
         try {
             jsonData = mapper.writeValueAsString(dbData);
-            System.out.println(jsonData.toString());
             dbClient.saveData(jsonData);
         } catch (JsonProcessingException e) {
             System.out.println("Saved to TSDB : False");
@@ -183,7 +184,6 @@ public class TSDBResource implements DatabaseResource{
 
         try {
             jsonData = mapper.writeValueAsString(dbData);
-            System.out.println(jsonData.toString());
             dbClient.saveData(jsonData);
         } catch (JsonProcessingException e) {
             System.out.println("Saved to TSDB : False");
@@ -215,7 +215,6 @@ public class TSDBResource implements DatabaseResource{
 
         try {
             jsonData = mapper.writeValueAsString(dbData);
-            System.out.println(jsonData.toString());
             dbClient.saveData(jsonData);
         } catch (JsonProcessingException e) {
             System.out.println("Saved to TSDB : False");
@@ -231,9 +230,9 @@ public class TSDBResource implements DatabaseResource{
         InfluxDBClient dbClient = new InfluxDBClient();
         
         if(source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("cumulative")){
-            query = "SELECT sum(usage) FROM "+meterName+" WHERE time > '"+from+"' AND time < '"+to+"' AND userid='"+userId+"' ";
+            query = "SELECT usage,unit,type FROM "+meterName+" WHERE time > '"+from+"' AND time < '"+to+"' AND userid='"+userId+"' ";
         }else if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("gauge")){
-            query = "SELECT avg FROM "+meterName+" WHERE time > '"+from+"' AND time < '"+to+"' AND userid='"+userId+"' ";
+            query = "SELECT avg,unit,type FROM "+meterName+" WHERE time > '"+from+"' AND time < '"+to+"' AND userid='"+userId+"' ";
         }
         
         return dbClient.getData(query);

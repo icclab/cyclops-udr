@@ -23,8 +23,11 @@ import java.util.HashMap;
  * Change Log
  * Name        Date     Comments
  */
-public class UsageDataResource extends ServerResource implements UsageResource {
-
+public class UserUsageResource extends ServerResource implements UsageResource {
+    private String userId;
+    public void doInit() {
+        userId = (String) getRequestAttributes().get("userid");
+    }
     /**
      *  Get the usage data for the userID mentioned in the URL string
      *  
@@ -47,7 +50,6 @@ public class UsageDataResource extends ServerResource implements UsageResource {
         TSDBResource dbResource = new TSDBResource();
         Load load = new Load();
 
-        String userId = getQueryValue("userid");
         String fromDate = getQueryValue("from");
         String toDate = getQueryValue("to");
         ArrayList cMeters = Load.openStackCumulativeMeterList;
@@ -58,14 +60,14 @@ public class UsageDataResource extends ServerResource implements UsageResource {
         //Get the data for the OpenStack Cumulative Meters from the DB and create the arraylist consisting of hashmaps of meter name and usage value
         for(int i=0;i<cMeters.size(); i++){
             usageData = dbResource.getUsageData(fromDate, toDate, userId, cMeters.get(i), "openstack", "cumulative");
-            if(usageData.getPoints().size() != 0){
+            if(usageData != null && usageData.getPoints().size() != 0){
                 meterDataArrList.add(usageData);
             }
         }
         //Get the data for the OpenStack Gauge Meters from the DB and create the arraylist consisting of hashmaps of meter name and usage value
         for(int i=0;i<gMeters.size(); i++){
             usageData = dbResource.getUsageData(fromDate, toDate, userId, gMeters.get(i), "openstack", "gauge");
-            if(usageData.getPoints().size() != 0){
+            if(usageData != null && usageData.getPoints().size() != 0){
                 meterDataArrList.add(usageData);
             }
         }

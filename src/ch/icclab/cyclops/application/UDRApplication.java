@@ -57,7 +57,8 @@ public class UDRApplication extends Application{
         router.attach("/", RootResource.class);
         router.attach("/api", TelemetryResource.class); //API used internally to trigger the data collection
         router.attach("/ext/app", ExternalAppResource.class); // API used for data insertion from external PaaS/IaaS
-        router.attach("/usage", UsageDataResource.class); //API used for fetching the usage info for a user
+        router.attach("/usage/users/{userid}", UserUsageResource.class); //API used for fetching the usage info for a user
+        router.attach("/usage/resources/{resourceid}", ResourceUsage.class);
         router.attach("/meters", MeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
         
         return router;

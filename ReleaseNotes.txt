@@ -1,9 +1,11 @@
 Version 0.3.1
-Date 25/Mar/2015
+Date 08/Apr/2015
 Notes
-1. Upgraded the "/usage" API to read/update the selected resource list dynamically
-2. Updated the the keystone query URL
-3. Bug fixes
+1. New API endpoints "/usage/users/{userid}" & "/usage/resources/{resourceid}".
+2. Upgraded the "/usage" API to read/update the selected resource list dynamically
+3. Updated the usage response for a user to include the non aggregated data for cilumulative meters from OpenStack
+4. Updated the the keystone query URL
+5. Bug fixes
 
 ************************************************************
 
