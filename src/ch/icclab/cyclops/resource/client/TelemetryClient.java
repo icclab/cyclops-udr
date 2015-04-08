@@ -68,9 +68,7 @@ public class TelemetryClient extends ClientResource {
         from = range[1];
 
         url = generateTelemetryQuery(meterType, meterName, to, from);
-
         System.out.println("Ceilometer URL "+url);
-
         client = new Client(Protocol.HTTP);
         cr = new ClientResource(url);
         req = cr.getRequest();
