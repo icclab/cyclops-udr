@@ -3,7 +3,7 @@ Date 08/Apr/2015
 Notes
 1. New API endpoints "/usage/users/{user_id}" & "/usage/resources/{resource_id}".
 2. Upgraded the "/usage" API to read/update the selected resource list dynamically
-3. Updated the usage response for a user to include the non aggregated data for cilumulative meters from OpenStack
+3. Updated the usage response for a user to include the non aggregated data for cumulative meters from OpenStack
 4. Updated the the keystone query URL
 5. Bug fixes
 
