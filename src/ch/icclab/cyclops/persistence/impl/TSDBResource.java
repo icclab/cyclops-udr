@@ -55,10 +55,10 @@ public class TSDBResource implements DatabaseResource{
      * @return result A boolean output as a result of saving the meter data into the db
      */
     public boolean saveGaugeMeterData(ArrayList<GaugeMeterData> dataArr, String meterName){
-        String jsonData = null;
+        String jsonData;
         TSDBData dbData = new TSDBData();
         ArrayList<String> strArr = new ArrayList<String>();
-        ArrayList<ArrayList<Object>> objArr = new ArrayList<ArrayList<Object>>();
+        ArrayList<ArrayList<Object>> samplesConsolidatedArr = new ArrayList<ArrayList<Object>>();
         InfluxDBClient dbClient = new InfluxDBClient();
         DateTimeUtil time = new DateTimeUtil();
         ArrayList<Object> objArrNode;
@@ -92,11 +92,11 @@ public class TSDBResource implements DatabaseResource{
             objArrNode.add(gMeterData.getUnit());
             objArrNode.add(gMeterData.getCount());
 
-            objArr.add(objArrNode);
+            samplesConsolidatedArr.add(objArrNode);
         }
         dbData.setName(meterName);
         dbData.setColumns(strArr);
-        dbData.setPoints(objArr);
+        dbData.setPoints(samplesConsolidatedArr);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -128,62 +128,63 @@ public class TSDBResource implements DatabaseResource{
      * @return result A boolean output as a result of saving the meter data into the db
      */
     public boolean saveCumulativeMeterData(ArrayList<CumulativeMeterData> dataArr, String meterName){
-        String jsonData = null;
-        TSDBData dbData = new TSDBData();
-        ArrayList<String> strArr = new ArrayList<String>();
-        ArrayList<ArrayList<Object>> objArr = new ArrayList<ArrayList<Object>>();
-        InfluxDBClient dbClient = new InfluxDBClient();
-        ArrayList<Object> objArrNode;
+        String jsonData;
+        boolean result = true;
+        ArrayList<Object> samplesArr;
         CumulativeMeterData cMeterData;
         DateTimeUtil time = new DateTimeUtil();
-        boolean result = true;
-
-        strArr.add("time");
-        strArr.add("userid");
-        strArr.add("resourceid");
-        strArr.add("volume");
-        strArr.add("usage");
-        strArr.add("source");
-        strArr.add("project_id");
-        strArr.add("type");
-        strArr.add("id");
-        strArr.add("unit");
-        strArr.add("instance_id");
-        strArr.add("instance_type");
-        strArr.add("mac");
-        strArr.add("fref");
-        strArr.add("name");
-
+        TSDBData dbData = new TSDBData();
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayList<String> columnNameArr = new ArrayList<String>();
+        ArrayList<ArrayList<Object>> samplesConsolidatedArr = new ArrayList<ArrayList<Object>>();
+        InfluxDBClient dbClient = new InfluxDBClient();
+        
+        // Build the array with column names for the time series
+        columnNameArr.add("time");
+        columnNameArr.add("userid");
+        columnNameArr.add("resourceid");
+        columnNameArr.add("volume");
+        columnNameArr.add("usage");
+        columnNameArr.add("source");
+        columnNameArr.add("project_id");
+        columnNameArr.add("type");
+        columnNameArr.add("id");
+        columnNameArr.add("unit");
+        columnNameArr.add("instance_id");
+        columnNameArr.add("instance_type");
+        columnNameArr.add("mac");
+        columnNameArr.add("fref");
+        columnNameArr.add("name");
+        //Build an array consisting of samples
         for (int i=0; i<dataArr.size(); i++){
             cMeterData = dataArr.get(i);
-            objArrNode = new ArrayList<Object>();
-            objArrNode.add(time.getEpoch(cMeterData.getRecorded_at()));
-            objArrNode.add(cMeterData.getUser_id());
-            objArrNode.add(cMeterData.getResource_id());
-            objArrNode.add(cMeterData.getVolume());
-            objArrNode.add(cMeterData.getUsage());
-            objArrNode.add(cMeterData.getSource());
-            objArrNode.add(cMeterData.getProject_id());
-            objArrNode.add(cMeterData.getType());
-            objArrNode.add(cMeterData.getId());
-            objArrNode.add(cMeterData.getUnit());
-            objArrNode.add(cMeterData.getMetadata().getInstance_id());
-            objArrNode.add(cMeterData.getMetadata().getInstance_type());
-            objArrNode.add(cMeterData.getMetadata().getMac());
-            objArrNode.add(cMeterData.getMetadata().getFref());
-            objArrNode.add(cMeterData.getMetadata().getName());
-
-            objArr.add(objArrNode);
+            samplesArr = new ArrayList<Object>();
+            samplesArr.add(time.getEpoch(cMeterData.getRecorded_at()));
+            samplesArr.add(cMeterData.getUser_id());
+            samplesArr.add(cMeterData.getResource_id());
+            samplesArr.add(cMeterData.getVolume());
+            samplesArr.add(cMeterData.getUsage());
+            samplesArr.add(cMeterData.getSource());
+            samplesArr.add(cMeterData.getProject_id());
+            samplesArr.add(cMeterData.getType());
+            samplesArr.add(cMeterData.getId());
+            samplesArr.add(cMeterData.getUnit());
+            samplesArr.add(cMeterData.getMetadata().getInstance_id());
+            samplesArr.add(cMeterData.getMetadata().getInstance_type());
+            samplesArr.add(cMeterData.getMetadata().getMac());
+            samplesArr.add(cMeterData.getMetadata().getFref());
+            samplesArr.add(cMeterData.getMetadata().getName());
+            // Build an array which contains all the sample arrays.
+            samplesConsolidatedArr.add(samplesArr);
         }
-
+        // Set the data object to be converted into a JSON request string
         dbData.setName(meterName);
-        dbData.setColumns(strArr);
-        dbData.setPoints(objArr);
-
-        ObjectMapper mapper = new ObjectMapper();
-
+        dbData.setColumns(columnNameArr);
+        dbData.setPoints(samplesConsolidatedArr);
+        // Convert the data object into a JSON string
         try {
             jsonData = mapper.writeValueAsString(dbData);
+            // Write the JSON string to the DB
             dbClient.saveData(jsonData);
         } catch (JsonProcessingException e) {
             System.out.println("Saved to TSDB : False");

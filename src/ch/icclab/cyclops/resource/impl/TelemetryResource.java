@@ -242,13 +242,14 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
         JSONArray array ;
         ObjectMapper mapper = new ObjectMapper();
         TSDBResource dbResource = new TSDBResource();
-        ArrayList<GaugeMeterData> dataArr = new ArrayList<GaugeMeterData>();
+        ArrayList<GaugeMeterData> dataArr;
         String meterType  = "gauge";
         boolean output = true;
 
         try{
             TelemetryClient tClient = new TelemetryClient();
             for (int i = 0; i < meter.size(); i++) {
+                dataArr = new ArrayList<GaugeMeterData>();
                 response = tClient.getData(token, meter.get(i), meterType);
                 array = new JSONArray(response);
                 if (response.toString() != "[]") {
