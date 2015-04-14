@@ -20,6 +20,7 @@ package ch.icclab.cyclops.resource.impl;
 import ch.icclab.cyclops.model.udr.ResourceUsageResponse;
 import ch.icclab.cyclops.model.udr.TSDBData;
 import ch.icclab.cyclops.persistence.client.InfluxDBClient;
+import ch.icclab.cyclops.util.Load;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.restlet.engine.local.Entity;
@@ -45,7 +46,7 @@ public class ResourceUsage extends ServerResource{
     }
     @Get
     public Representation getResourceUsage(Entity entity){
-        String query;
+        String query = null;
         String jsonStr;
         JsonRepresentation responseJson = null;
         TSDBData tsdbData;
@@ -59,21 +60,24 @@ public class ResourceUsage extends ServerResource{
         time.put("from",fromDate);
         time.put("to",toDate);
 
-        query = "SELECT mean(avg) FROM "+resourceId+" WHERE time > '"+fromDate+"' AND time < '"+toDate+"' GROUP BY userid";
+        if(Load.openStackCumulativeMeterList.contains(resourceId)){
+            query = "SELECT SUM(usage) FROM "+resourceId+" WHERE time > '"+fromDate+"' AND time < '"+toDate+"' GROUP BY userid";
+        }else if (Load.openStackGaugeMeterList.contains(resourceId)){
+            query = "SELECT MEAN(avg) FROM "+resourceId+" WHERE time > '"+fromDate+"' AND time < '"+toDate+"' GROUP BY userid";
+        }else {
+            // TODO: Add a general fallback option
+        }
         tsdbData = dbClient.getData(query);
-
         resourceUsageResponse.setResourceid(resourceId);
         resourceUsageResponse.setTime(time);
         resourceUsageResponse.setColumn(tsdbData.getColumns());
         resourceUsageResponse.setUsage(tsdbData.getPoints());
-
         try {
             jsonStr = mapper.writeValueAsString(resourceUsageResponse);
             responseJson = new JsonRepresentation(jsonStr);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-
         return responseJson;
     }
 }
