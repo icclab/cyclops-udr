@@ -74,10 +74,11 @@ public class UDRApplication extends Application{
      * @param context
      */
     private void loadConfiguration(Context context){
-        Load loadConfig = new Load();
-        if(loadConfig.configuration == null){
+        Load load = new Load();
+        if(load.configuration == null){
             try {
-                loadConfig.configuration(getContext());
+                load.configuration(getContext());
+                load.meterList();
             } catch (IOException e) {
                 e.printStackTrace();
             }
