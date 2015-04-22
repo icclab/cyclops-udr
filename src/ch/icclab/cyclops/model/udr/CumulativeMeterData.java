@@ -17,6 +17,8 @@
 
 package ch.icclab.cyclops.model.udr;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Author: Srikanta
  * Created on: 11-Dec-14
@@ -32,6 +34,7 @@ public class CumulativeMeterData {
     private Metadata metadata;
     private String timestamp, recorded_at;
 
+    @JsonIgnoreProperties(ignoreUnknown=true)
     public class Metadata{
         private String instance_id,mac, fref, name;
         private String instance_type;
