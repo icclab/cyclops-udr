@@ -1,12 +1,13 @@
 Version 0.3.1
-Date 13/Apr/2015
+Date 22/Apr/2015
 Notes
 1. New API endpoints "/usage/users/{user_id}" & "/usage/resources/{resource_id}".
 2. Upgraded the "/usage" API to read/update the selected resource list dynamically
 3. Updated the usage response for a user to include the non aggregated data for cumulative meters from OpenStack
 4. Updated the the keystone query URL
-5. Upgraded the usage API for resources to handle gauge and cumulative meters from openstack
-6. Bug fixes
+5. Upgraded the usage API for resources to handle gauge and cumulative meters from OpenStack
+6. Updated the Cumulative Meter (OpenStack) model class to handle the additional tags such as stack_id.
+7. Bug fixes
 
 ************************************************************
 
