@@ -145,11 +145,13 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
 
         ObjectMapper mapper = new ObjectMapper();
         TelemetryClient tClient = new TelemetryClient();
-        ArrayList<CumulativeMeterData> cMeterArr = new ArrayList<CumulativeMeterData>();
+        ArrayList<CumulativeMeterData> cMeterArr;
         TSDBResource dbResource = new TSDBResource();
-        HashMap<String, LinkedList<CumulativeMeterData>> map = new HashMap<String, LinkedList<CumulativeMeterData>>();
+        HashMap<String, LinkedList<CumulativeMeterData>> map;
 
         for(int j=0; j < meter.size();j++){
+            cMeterArr = new ArrayList<CumulativeMeterData>();
+            map = new HashMap<String, LinkedList<CumulativeMeterData>>();
             try {
                 response = tClient.getData(token, meter.get(j), meterType);
                 array = new JSONArray(response);
