@@ -1,3 +1,10 @@
+Version 0.3.2
+Date 27/Apr/2015
+Notes
+1. Bug fix related to data collection and transformation flow, specifically for Cumulative Meters of OpenStack.
+
+************************************************************
+
 Version 0.3.1
 Date 22/Apr/2015
 Notes
