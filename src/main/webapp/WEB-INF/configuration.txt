@@ -1,0 +1,8 @@
+KeystoneURL==
+InfluxDBURL==
+CeilometerURL==
+InfluxDBUsername==
+InfluxDBPassword==
+KeystoneUsername==
+KeystonePassword==
+KeystoneDomainName==
