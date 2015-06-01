@@ -21,9 +21,9 @@ echo "--------------------------------------------------------------------------
 gem install sensu-plugin
 gem install rest_client
 echo "---------------------------------------------------------------------------"
-echo "| Installing Ant and Git"
+echo "| Installing Maven and Git"
 echo "---------------------------------------------------------------------------"
-apt-get install -y ant
+apt-get install -y maven2
 apt-get install -y git-core
 echo "---------------------------------------------------------------------------"
 echo "| Installing curl"
@@ -47,7 +47,7 @@ echo "--------------------------------------------------------------------------
 echo "| Installing the latest release of InfluxDB"
 echo "---------------------------------------------------------------------------"
 mkdir -p /tmp/udrservice
-wget http://s3.amazonaws.com/influxdb/influxdb_latest_amd64.deb -P /tmp/udrservice
+wget http://get.influxdb.org/influxdb_0.8.8_amd64.deb -P /tmp/udrservice
 echo "---------------------------------------------------------------------------"
 echo "| Decompressing the package"
 echo "---------------------------------------------------------------------------"
@@ -232,14 +232,14 @@ cat > /etc/sensu/conf.d/client.json << EOF
 }
 EOF
 echo "---------------------------------------------------------------------------"
-echo "| Creating the Ceilometer check config file - Interval 60 mins"
+echo "| Creating the Ceilometer check config file - Interval 10 mins"
 echo "---------------------------------------------------------------------------"
 cat > /etc/sensu/conf.d/check_udrservice.json << EOF
 {
   "checks": {
     "udrservice_check": {
       "command": "/etc/sensu/plugins/check-udrservice.rb",
-      "interval": 60,
+      "interval": 600,
       "subscribers": [ "ALL" ]
     }
   }
@@ -352,12 +352,12 @@ echo "| Triggering the build for UDR Service and creation of WAR file "
 echo "---------------------------------------------------------------------------"
 cd ${CURRDIR}
 cd ..
-ant
+mvn clean install
 echo "---------------------------------------------------------------------------"
 echo "| Deploying the WAR file to the Tomcat "
 echo "---------------------------------------------------------------------------"
-cd out
-cp udr.war /var/lib/tomcat7/webapps
+cd target
+cp udr*.war /var/lib/tomcat7/webapps/udr.war
 echo "---------------------------------------------------------------------------"
 echo "| Restarting Tomcat "
 echo "---------------------------------------------------------------------------"
