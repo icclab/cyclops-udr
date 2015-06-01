@@ -1,3 +1,12 @@
+Version 0.4.0
+Date 01/June/2015
+Notes
+1. Updated the micro service to a Maven project
+2. Updated the external app API (/ext/app) to include another field called the "metername"
+3. Updated the installation script for maven build
+
+************************************************************
+
 Version 0.3.2
 Date 27/Apr/2015
 Notes

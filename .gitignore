@@ -1,4 +1,3 @@
-(9 sloc)  0.189 kb RawBlameHistory
 *.class
 
 # Mobile Tools for Java (J2ME)
@@ -18,5 +17,6 @@ hs_err_pid*
 #Configuration file
 web/WEB-INF/configuration.txt
 
-#Compiled classes
-out
+#Compiled classes & config file
+src/main/webapp/WEB-INF/configuration.txt
+target
