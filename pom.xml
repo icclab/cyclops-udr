@@ -105,8 +105,4 @@
             <version>2.5</version>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-        </plugins>
-    </build>
 </project>
