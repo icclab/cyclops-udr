@@ -4,16 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ch.icclab.cyclops</groupId>
+    <groupId>ch.icclab.cyclops.udrservice</groupId>
     <artifactId>udr</artifactId>
-    <version>0.4.0</version>
     <packaging>war</packaging>
-
+    <version>0.4.0</version>
+    <name>Usage Data Records Micro Service</name>
 
     <repositories>
-        <!-- TODO remove this once maven central replicates the jboss repository -->
-        <!-- Included so the examples sources in the distribution zip build out-of-the-box with maven -->
-
         <repository>
             <id>maven-repo</id>
             <name>Public online Maven repository</name>
@@ -25,6 +22,7 @@
             <url>http://maven.restlet.com</url>
         </repository>
     </repositories>
+
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -107,5 +105,8 @@
             <version>2.5</version>
         </dependency>
     </dependencies>
-
+    <build>
+        <plugins>
+        </plugins>
+    </build>
 </project>
