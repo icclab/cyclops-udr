@@ -51,7 +51,7 @@ wget http://get.influxdb.org/influxdb_0.8.8_amd64.deb -P /tmp/udrservice
 echo "---------------------------------------------------------------------------"
 echo "| Decompressing the package"
 echo "---------------------------------------------------------------------------"
-dpkg -i /tmp/udrservice/influxdb_latest_amd64.deb
+dpkg -i /tmp/udrservice/influxdb_0.8.8_amd64.deb
 echo "---------------------------------------------------------------------------"
 echo "| Starting InfluxDB"
 echo "---------------------------------------------------------------------------"
