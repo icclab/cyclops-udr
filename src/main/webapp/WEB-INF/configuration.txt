@@ -1,8 +1,8 @@
-KeystoneURL==http://160.85.4.18:5000/v3/auth/tokens
-InfluxDBURL==http://86.119.35.234:8086/db/udr_service/series
-CeilometerURL==http://160.85.4.18:8777/v2/
-InfluxDBUsername==root
-InfluxDBPassword==icclab
-KeystoneUsername==cyclops
-KeystonePassword==pEBFKvKuBkvv968E
-KeystoneDomainName==default
+KeystoneURL==
+InfluxDBURL==
+CeilometerURL==
+InfluxDBUsername==
+InfluxDBPassword==
+KeystoneUsername==
+KeystonePassword==
+KeystoneDomainName==
