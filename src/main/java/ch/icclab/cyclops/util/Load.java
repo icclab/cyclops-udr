@@ -38,8 +38,6 @@ import java.util.HashMap;
  * Created on: 17-Nov-14
  * Description: Loads the configuration file into a static object
  *
- * Change Log
- * Name        Date     Comments
  */
 public class Load extends ClientResource {
 
@@ -47,7 +45,7 @@ public class Load extends ClientResource {
     public static HashMap<String,String> configuration;
     public static ArrayList<String> openStackCumulativeMeterList = new ArrayList<String>();
     public static ArrayList<String> openStackGaugeMeterList = new ArrayList<String>();
-    public static ArrayList<String> otherMeterList = new ArrayList<String>();
+    public static ArrayList<String> externalMeterList = new ArrayList<String>();
 
     /**
      * Loads the configuration file
@@ -91,6 +89,7 @@ public class Load extends ClientResource {
         int indexStatus = -1;
         int indexMeterName = -1;
         int indexMeterType = -1;
+        int indexMeterSource = -1;
 
         if(Flag.isMeterListReset()){
             Flag.setMeterListReset(false);
@@ -104,15 +103,21 @@ public class Load extends ClientResource {
             indexStatus = tsdbData.getColumns().indexOf("status");
             indexMeterType = tsdbData.getColumns().indexOf("metertype");
             indexMeterName = tsdbData.getColumns().indexOf("metername");
+            indexMeterSource = tsdbData.getColumns().indexOf("metersource");
             // Iterate through the list of arraylist & segregate the meters
             for(int i=0; i < masterMeterList.size(); i++){
                 meterList = masterMeterList.get(i);
-                if((meterList.get(indexStatus).equals(Constant.OPENSTACK_METER_SELECTED))
+                if((meterList.get(indexStatus).equals(Constant.METER_SELECTED))
+                        && (meterList.get(indexMeterSource).equals(Constant.OPENSTACK))
                         && meterList.get(indexMeterType).equals(Constant.OPENSTACK_CUMULATIVE_METER)){
                     Load.openStackCumulativeMeterList.add(meterList.get(indexMeterName).toString());
-                }else if(meterList.get(indexStatus).equals(Constant.OPENSTACK_METER_SELECTED)
+                }else if(meterList.get(indexStatus).equals(Constant.METER_SELECTED)
+                        && (meterList.get(indexMeterSource).equals(Constant.OPENSTACK))
                         && meterList.get(indexMeterType).equals(Constant.OPENSTACK_GAUGE_METER)){
                     Load.openStackGaugeMeterList.add(meterList.get(indexMeterName).toString());
+                } else if((meterList.get(indexStatus).equals(Constant.METER_SELECTED))
+                        && !(meterList.get(indexMeterSource).equals(Constant.OPENSTACK))){
+                    Load.externalMeterList.add(meterList.get(indexMeterName).toString());
                 }
             }
         }

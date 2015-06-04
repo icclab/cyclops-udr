@@ -26,10 +26,8 @@ import org.restlet.representation.Representation;
 /**
  * Author: Srikanta
  * Created on: 16-Jan-15
- * Description: Util class for doing oberation on response object
+ * Description: Util class for doing operation on response object
  *
- * Change Log
- * Name        Date     Comments
  */
 public class ResponseUtil {
 
