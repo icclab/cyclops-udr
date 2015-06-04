@@ -44,7 +44,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
         Representation userUsageResponse;
         TSDBData usageData = null;
         HashMap usageArr = new HashMap();
-        ArrayList<TSDBData> meterDataArrList = new ArrayList<TSDBData>();
+        ArrayList<TSDBData> meterDataArrList;
         TSDBResource dbResource = new TSDBResource();
         Load load = new Load();
 
@@ -52,6 +52,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
         String toDate = getQueryValue("to");
 
         if(Load.openStackCumulativeMeterList.size() != 0 || Load.openStackGaugeMeterList.size() != 0){
+            meterDataArrList = new ArrayList<TSDBData>();
             //Get the data for the OpenStack Cumulative Meters from the DB and create the arraylist consisting of hashmaps of meter name and usage value
             for(int i=0;i<Load.openStackCumulativeMeterList.size(); i++){
                 usageData = dbResource.getUsageData(fromDate, toDate, userId, Load.openStackCumulativeMeterList.get(i), "openstack", "cumulative");
@@ -73,13 +74,16 @@ public class UserUsageResource extends ServerResource implements UsageResource {
         }
 
         if(Load.externalMeterList.size() != 0){
+            meterDataArrList = new ArrayList<TSDBData>();
             for(int i=0;i<Load.externalMeterList.size(); i++){
                 usageData = dbResource.getUsageData(fromDate, toDate, userId, Load.externalMeterList.get(i), "", "");
                 if(usageData != null && usageData.getPoints().size() != 0){
                     meterDataArrList.add(usageData);
                 }
             }
-            usageArr.put("External",meterDataArrList);
+            if(meterDataArrList.size() != 0){
+                usageArr.put("External",meterDataArrList);
+            }
         }
 
         //Construct the response in JSON string
