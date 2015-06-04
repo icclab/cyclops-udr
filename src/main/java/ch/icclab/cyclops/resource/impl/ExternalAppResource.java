@@ -21,6 +21,7 @@ import ch.icclab.cyclops.model.udr.Response;
 import ch.icclab.cyclops.model.udr.TSDBData;
 import ch.icclab.cyclops.persistence.impl.TSDBResource;
 import ch.icclab.cyclops.resource.interfc.ExternalDataResource;
+import ch.icclab.cyclops.util.ResponseUtil;
 import org.joda.time.LocalDateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,13 +57,13 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
     @Post("json:json")
     public Representation receiveRequest(JsonRepresentation entity) {
 
-        JSONObject jsonObj;
         JSONArray jsonArr = null;
         boolean output = true;
 
         LocalDateTime currentDateTime = new LocalDateTime();
         Response response = new Response();
         Representation jsonResponse = new JsonRepresentation(response);
+        ResponseUtil util = new ResponseUtil();
 
         try {
             jsonArr = entity.getJsonArray();
@@ -79,7 +80,7 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
             response.setStatus("Failure");
             response.setMessage("Data could not be saved into the DB");
         }
-        
+        jsonResponse = util.toJson(response);
         return jsonResponse;
     }
 
@@ -98,6 +99,7 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
     public boolean saveData(JSONArray jsonArr) {
 
         JSONObject jsonObj, metadata,usageData;
+        String metername = null;
         String source;
         TSDBResource dbResource = new TSDBResource();
         JSONArray dataArr;
@@ -107,7 +109,7 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
         ArrayList<String> columnNameArr = new ArrayList<String>();
         columnNameArr.add("timestamp");
         columnNameArr.add("userid");
-        columnNameArr.add("metername");
+        columnNameArr.add("source");
         columnNameArr.add("usage");
 
         try {
@@ -120,13 +122,14 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
                 for(int j=0; j<dataArr.length(); j++){
                     objArrNode = new ArrayList<Object>();
                     usageData = (JSONObject) dataArr.get(j);
+                    metername = (String) usageData.get("metername");
                     objArrNode.add(usageData.get("timestamp"));
                     objArrNode.add(usageData.get("userid"));
-                    objArrNode.add(usageData.get("metername"));
+                    objArrNode.add(source);
                     objArrNode.add(usageData.get("usage"));
                     objArr.add(objArrNode);
                 }
-                dbData.setName(source);
+                dbData.setName(metername);
                 dbData.setColumns(columnNameArr);
                 dbData.setPoints(objArr);
 

@@ -234,6 +234,8 @@ public class TSDBResource implements DatabaseResource{
             query = "SELECT usage,unit,type FROM "+meterName+" WHERE time > '"+from+"' AND time < '"+to+"' AND userid='"+userId+"' ";
         }else if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("gauge")){
             query = "SELECT avg,unit,type FROM "+meterName+" WHERE time > '"+from+"' AND time < '"+to+"' AND userid='"+userId+"' ";
+        } else {
+            query = "SELECT timestamp,usage FROM "+meterName+" WHERE time > '"+from+"' AND time < '"+to+"' AND userid='"+userId+"' ";
         }
         
         return dbClient.getData(query);

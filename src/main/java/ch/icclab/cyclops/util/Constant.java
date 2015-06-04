@@ -11,6 +11,7 @@ package ch.icclab.cyclops.util;
 public class Constant {
     public static final String OPENSTACK_CUMULATIVE_METER = "cumulative";
     public static final String OPENSTACK_GAUGE_METER = "gauge";
+    public static final String OPENSTACK = "openstack";
 
-    public static final int OPENSTACK_METER_SELECTED = 1;
+    public static final int METER_SELECTED = 1;
     }

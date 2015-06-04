@@ -31,10 +31,6 @@ echo "| Dependent packages - libc6 libcurl3 zlib1g "
 echo "---------------------------------------------------------------------------"
 apt-get install -y curl
 echo "---------------------------------------------------------------------------"
-echo "| Installing Apache Server"
-echo "---------------------------------------------------------------------------"
-apt-get install -y apache2
-echo "---------------------------------------------------------------------------"
 echo "| Installing Redis"
 echo "---------------------------------------------------------------------------"
 apt-get -y install redis-server
@@ -44,51 +40,18 @@ echo "--------------------------------------------------------------------------
 apt-get install -y tomcat7
 apt-get install -y tomcat7-admin
 echo "---------------------------------------------------------------------------"
-echo "| Installing the latest release of InfluxDB"
+echo "| Installing the v0.8.8 release of InfluxDB"
 echo "---------------------------------------------------------------------------"
 mkdir -p /tmp/udrservice
 wget http://get.influxdb.org/influxdb_0.8.8_amd64.deb -P /tmp/udrservice
 echo "---------------------------------------------------------------------------"
-echo "| Decompressing the package"
+echo "| Decompressing the InfluxDB package"
 echo "---------------------------------------------------------------------------"
 dpkg -i /tmp/udrservice/influxdb_0.8.8_amd64.deb
 echo "---------------------------------------------------------------------------"
 echo "| Starting InfluxDB"
 echo "---------------------------------------------------------------------------"
 /etc/init.d/influxdb restart
-echo "---------------------------------------------------------------------------"
-echo "| Downloading Grafana package"
-echo "---------------------------------------------------------------------------"
-wget "http://grafanarel.s3.amazonaws.com/grafana-1.9.1.tar.gz" -P /tmp/udrservice
-echo "---------------------------------------------------------------------------"
-echo "| unzip Grafana package"
-echo "---------------------------------------------------------------------------"
-tar -xvzf /tmp/udrservice/grafana-1.9.1.tar.gz -C /tmp/udrservice
-echo "---------------------------------------------------------------------------"
-echo "| Creating Grafana directory at /usr/share/"
-echo "| Creating v1.9.0_rc1 directory at /usr/share/grafana"
-echo "---------------------------------------------------------------------------"
-mkdir -p /usr/share/grafana/v1.9.1
-echo "---------------------------------------------------------------------------"
-echo "| Copying the contents of grafana package to /usr/share/grafana/v1.9.0_rc1"
-echo "---------------------------------------------------------------------------"
-cp -r /tmp/udrservice/grafana-1.9.1/* /usr/share/grafana/v1.9.1
-echo "---------------------------------------------------------------------------"
-echo "| Moving the Grafana dashboard JSON file"
-echo "---------------------------------------------------------------------------"
-rm /usr/share/grafana/v1.9.1/app/dashboards/default.json
-cp ./config/default.json /usr/share/grafana/v1.9.1/app/dashboards/
-echo "---------------------------------------------------------------------------"
-echo "| Moving the Grafana config file at /usr/share/grafana"
-echo "---------------------------------------------------------------------------"
-cp ./config/config.js /usr/share/grafana/v1.9.1/config.js
-sed -i s/localhost/$1/ /usr/share/grafana/v1.9.1/config.js
-echo "---------------------------------------------------------------------------"
-echo "| Creating an Apache config file to refer grafana at /etc/apache2/sites-enabled/"
-echo "---------------------------------------------------------------------------"
-cat > /etc/apache2/sites-enabled/grafana.conf << EOF
-alias /grafana /usr/share/grafana/v1.9.1
-EOF
 echo "---------------------------------------------------------------------------"
 echo "| Starting the process of installing Sensu"
 echo "---------------------------------------------------------------------------"
@@ -362,17 +325,6 @@ echo "--------------------------------------------------------------------------
 echo "| Restarting Tomcat "
 echo "---------------------------------------------------------------------------"
 service tomcat7 restart
-echo "---------------------------------------------------------------------------"
-echo "| Copying the bill generation project to Apache "
-echo "---------------------------------------------------------------------------"
-cd ..
-mkdir -p /var/www/html/udr/bill
-cp -r bill/* /var/www/html/udr/bill
-sed -i s/localhost/$1/ /var/www/html/udr/bill/index.html
-echo "---------------------------------------------------------------------------"
-echo "| Starting the Apache Server"
-echo "---------------------------------------------------------------------------"
-service apache2 restart
 echo "---------------------------------------------------------------------------"
 echo "| Starting Redis"
 echo "---------------------------------------------------------------------------"

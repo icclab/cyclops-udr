@@ -35,9 +35,7 @@ import java.util.HashMap;
  * Author: Srikanta
  * Created on: 01-Apr-15
  * Description:
- * <p/>
- * Change Log
- * Name        Date     Comments
+ *
  */
 public class ResourceUsage extends ServerResource{
     private String resourceId;
@@ -64,14 +62,22 @@ public class ResourceUsage extends ServerResource{
             query = "SELECT SUM(usage) FROM "+resourceId+" WHERE time > '"+fromDate+"' AND time < '"+toDate+"' GROUP BY userid";
         }else if (Load.openStackGaugeMeterList.contains(resourceId)){
             query = "SELECT MEAN(avg) FROM "+resourceId+" WHERE time > '"+fromDate+"' AND time < '"+toDate+"' GROUP BY userid";
-        }else {
-            // TODO: Add a general fallback option
+        }else if(Load.externalMeterList.contains(resourceId)){
+            query = "SELECT SUM(usage) FROM "+resourceId+" WHERE time > '"+fromDate+"' AND time < '"+toDate+"' GROUP BY userid";
+        }else{
+            // Fall back response TODO
         }
         tsdbData = dbClient.getData(query);
         resourceUsageResponse.setResourceid(resourceId);
         resourceUsageResponse.setTime(time);
-        resourceUsageResponse.setColumn(tsdbData.getColumns());
-        resourceUsageResponse.setUsage(tsdbData.getPoints());
+        if(tsdbData != null){
+            resourceUsageResponse.setColumn(tsdbData.getColumns());
+            resourceUsageResponse.setUsage(tsdbData.getPoints());
+        }else{
+            resourceUsageResponse.setColumn(null);
+            resourceUsageResponse.setUsage(null);
+        }
+
         try {
             jsonStr = mapper.writeValueAsString(resourceUsageResponse);
             responseJson = new JsonRepresentation(jsonStr);

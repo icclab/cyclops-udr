@@ -20,8 +20,6 @@ import java.util.HashMap;
  * Created on: 21-Jan-15
  * Description:  Services the API GET request coming in for usage data for a given user ID.
  *
- * Change Log
- * Name        Date     Comments
  */
 public class UserUsageResource extends ServerResource implements UsageResource {
     private String userId;
@@ -44,7 +42,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
     public Representation getData(){
         
         Representation userUsageResponse;
-        TSDBData usageData;
+        TSDBData usageData = null;
         HashMap usageArr = new HashMap();
         ArrayList<TSDBData> meterDataArrList = new ArrayList<TSDBData>();
         TSDBResource dbResource = new TSDBResource();
@@ -52,26 +50,38 @@ public class UserUsageResource extends ServerResource implements UsageResource {
 
         String fromDate = getQueryValue("from");
         String toDate = getQueryValue("to");
-        ArrayList cMeters = Load.openStackCumulativeMeterList;
-        ArrayList gMeters = Load.openStackGaugeMeterList;
 
-        //Load the meter list
-        load.meterList();
-        //Get the data for the OpenStack Cumulative Meters from the DB and create the arraylist consisting of hashmaps of meter name and usage value
-        for(int i=0;i<cMeters.size(); i++){
-            usageData = dbResource.getUsageData(fromDate, toDate, userId, cMeters.get(i), "openstack", "cumulative");
-            if(usageData != null && usageData.getPoints().size() != 0){
-                meterDataArrList.add(usageData);
+        if(Load.openStackCumulativeMeterList.size() != 0 || Load.openStackGaugeMeterList.size() != 0){
+            //Get the data for the OpenStack Cumulative Meters from the DB and create the arraylist consisting of hashmaps of meter name and usage value
+            for(int i=0;i<Load.openStackCumulativeMeterList.size(); i++){
+                usageData = dbResource.getUsageData(fromDate, toDate, userId, Load.openStackCumulativeMeterList.get(i), "openstack", "cumulative");
+                if(usageData != null && usageData.getPoints().size() != 0){
+                    meterDataArrList.add(usageData);
+                }
             }
-        }
-        //Get the data for the OpenStack Gauge Meters from the DB and create the arraylist consisting of hashmaps of meter name and usage value
-        for(int i=0;i<gMeters.size(); i++){
-            usageData = dbResource.getUsageData(fromDate, toDate, userId, gMeters.get(i), "openstack", "gauge");
-            if(usageData != null && usageData.getPoints().size() != 0){
-                meterDataArrList.add(usageData);
+            //Get the data for the OpenStack Gauge Meters from the DB and create the arraylist consisting of hashmaps of meter name and usage value
+            for(int i=0;i<Load.openStackGaugeMeterList.size(); i++){
+                usageData = dbResource.getUsageData(fromDate, toDate, userId, Load.openStackGaugeMeterList.get(i), "openstack", "gauge");
+                if(usageData != null && usageData.getPoints().size() != 0){
+                    meterDataArrList.add(usageData);
+                }
             }
+            if(meterDataArrList.size() != 0){
+                usageArr.put("OpenStack",meterDataArrList);
+            }
+
         }
-        usageArr.put("openstack",meterDataArrList);
+
+        if(Load.externalMeterList.size() != 0){
+            for(int i=0;i<Load.externalMeterList.size(); i++){
+                usageData = dbResource.getUsageData(fromDate, toDate, userId, Load.externalMeterList.get(i), "", "");
+                if(usageData != null && usageData.getPoints().size() != 0){
+                    meterDataArrList.add(usageData);
+                }
+            }
+            usageArr.put("External",meterDataArrList);
+        }
+
         //Construct the response in JSON string
         userUsageResponse = constructResponse(usageArr, userId, fromDate, toDate);
         
