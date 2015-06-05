@@ -93,9 +93,11 @@ public class InfluxDBClient extends ClientResource {
 
         try {
             resultArray = new JSONArray(output.getText());
-            resultObj = new JSONObject();
-            resultObj = (JSONObject) resultArray.get(0);
-            dataObj = mapper.readValue(resultObj.toString(),TSDBData.class);
+            if(!resultArray.isNull(0)){
+                resultObj = new JSONObject();
+                resultObj = (JSONObject) resultArray.get(0);
+                dataObj = mapper.readValue(resultObj.toString(),TSDBData.class);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
