@@ -22,10 +22,12 @@ Salient Features
  * Add InfluxDB details (URL, username, password). As part of the installation script, InfluxDB is installed on localhost.
  * Restart Tomcat7 [$ sudo service tomcat7 restart]
 
-#### Architecture
-<img align="middle" src="http://blog.zhaw.ch/icclab/files/2015/01/OverallArchitecture1.png" alt="CYCLOPS Architecture" height="400" width="600"></img>
+### Architecture
+#### CYCLOPS Rating Charging & Billing Framework
+<img align="middle" src="http://blog.zhaw.ch/icclab/files/2013/05/overall_architecture.png" alt="CYCLOPS Architecture" height="400" width="600"></img>
 
-<img align="middle" src="http://blog.zhaw.ch/icclab/files/2015/01/UDRGeneratorService1.png" alt="UDR Service Architecture" height="400" width="700"></img>
+#### Usage Data Record Micro Service
+<img align="middle" src="http://blog.zhaw.ch/icclab/files/2015/06/UDRGeneratorService.png" alt="UDR Service Architecture" height="400" width="700"></img>
 
 
 #### Full documentation
