@@ -24,7 +24,7 @@ Salient Features
 
 ### Architecture
 #### * CYCLOPS Rating Charging & Billing Framework
-<img align="middle" src="http://blog.zhaw.ch/icclab/files/2013/05/overall_architecture.png" alt="CYCLOPS Architecture" height="400" width="600"></img>
+<img align="middle" src="http://blog.zhaw.ch/icclab/files/2013/05/overall_architecture.png" alt="CYCLOPS Architecture" height="500" width="600"></img>
 
 #### * Usage Data Record Micro Service
 <img align="middle" src="http://blog.zhaw.ch/icclab/files/2015/06/UDRGeneratorService.png" alt="UDR Service Architecture" height="400" width="700"></img>
