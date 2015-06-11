@@ -23,10 +23,10 @@ Salient Features
  * Restart Tomcat7 [$ sudo service tomcat7 restart]
 
 ### Architecture
-#### CYCLOPS Rating Charging & Billing Framework
+#### * CYCLOPS Rating Charging & Billing Framework
 <img align="middle" src="http://blog.zhaw.ch/icclab/files/2013/05/overall_architecture.png" alt="CYCLOPS Architecture" height="400" width="600"></img>
 
-#### Usage Data Record Micro Service
+#### * Usage Data Record Micro Service
 <img align="middle" src="http://blog.zhaw.ch/icclab/files/2015/06/UDRGeneratorService.png" alt="UDR Service Architecture" height="400" width="700"></img>
 
 
