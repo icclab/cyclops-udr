@@ -5,3 +5,4 @@
 #Compiled classes & config file
 src/main/webapp/WEB-INF/configuration.txt
 target
+*.iml
