@@ -47,7 +47,7 @@ public class UDRApplication extends Application{
      * 2. Attach the api end points and their respective resource class for request handling
      * 3. Return the router
      *
-     * @return router
+     * @return Restlet
      */
     public Restlet createInboundRoot(){
         //Load the configuration files and flags 

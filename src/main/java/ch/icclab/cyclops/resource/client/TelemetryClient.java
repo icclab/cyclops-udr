@@ -22,8 +22,6 @@ package ch.icclab.cyclops.resource.client;
  * Created on: 06-Oct-14
  * Description: Client class for Telemetry. Connects to the telemetry to get the usage data
  *
- * Change Log
- * Name        Date     Comments
  */
 
 import ch.icclab.cyclops.util.DateTimeUtil;

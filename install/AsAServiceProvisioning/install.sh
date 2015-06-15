@@ -1,14 +1,4 @@
 #!/bin/bash
-if [ $# -eq 0 ]
-  then
-    echo "No arguments supplied, expected public IP of this node"
-    echo "Usage sudo ./install.sh {public IP}"
-    exit 1
-fi
-chmod +x /var/www/html/udr/bill/index.html
-chmod +x /usr/share/grafana/v1.9.0_rc1/config.js
-sed -i s/localhost/$1/ /var/www/html/udr/bill/index.html
-sed -i s/localhost/$1/ /usr/share/grafana/v1.9.0_rc1/config.js
 rm -fR /etc/rabbitmq/ssl
 rm -fR /etc/sensu/ssl
 echo "---------------------------------------------------------------------------"
@@ -24,10 +14,10 @@ service rabbitmq-server restart
 rabbitmqctl add_vhost /sensu
 rabbitmqctl add_user sensu udrservice
 rabbitmqctl set_permissions -p /sensu sensu ".*" ".*" ".*"
-service apache2 restart
 service sensu-server restart
 service sensu-client restart
 service sensu-api restart
 service uchiwa restart
+echo -e "127.0.0.1 $(hostname)" | sudo tee -a /etc/hosts
 service tomcat7 restart
 rm -fR /tmp/udrservice
