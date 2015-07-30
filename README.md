@@ -10,9 +10,10 @@ Salient Features
 ### Getting started
 #### Installation
      $ git clone https://github.com/icclab/cyclops-udr.git
+     $ vi cyclops-udr/src/main/webapp/WEB-INF/configuration.txt
      $ cd cyclops-udr/install
      $ chmod +x ./*
-     $ bash install.sh xxx.xxx.xxx.xxx [IP of the machine]
+     $ bash install.sh
 
 <b>Note</b>: Immediately change the default username & password created for Tomcat7 & InfluxDB
 
