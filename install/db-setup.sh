@@ -6,6 +6,7 @@ curl -X POST 'http://localhost:8086/db?u=root&p=root' -d '{"name": "udr_service"
 curl -X POST 'http://localhost:8086/db/udr_service/users?u=root&p=root' -d '{"name": "admin", "password": "Yh9hvmhGev"}'
 curl -X POST 'http://localhost:8086/db?u=root&p=root' -d '{"name": "grafana"}'
 curl -X POST 'http://localhost:8086/db/grafana/users?u=root&p=root' -d '{"name": "admin", "password": "Yh9hvmhGev"}'
+curl -X POST 'http://localhost:8086/db/grafana/users?u=root&p=root' -d '{"name":"meterselection","columns":["time","source","metersource","metertype","metername","status"],"points":[[1427101641000,"cyclops-ui","openstack","gauge","cpu_util",1]]}'
 echo "---------------------------------------------------------------------------"
 echo "| Installation process is complete "
 echo "---------------------------------------------------------------------------"
