@@ -28,7 +28,7 @@ package ch.icclab.cyclops.application;
  * Srikanta     02-Mar-2015     Added the api to save and return info regarding selected meters *
  */
 
-import ch.icclab.cyclops.resource.impl.*;
+import ch.icclab.cyclops.services.iaas.openstack.resource.impl.*;
 import ch.icclab.cyclops.util.Load;
 import org.restlet.Application;
 import org.restlet.Context;

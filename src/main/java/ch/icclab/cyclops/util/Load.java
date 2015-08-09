@@ -17,8 +17,8 @@
 
 package ch.icclab.cyclops.util;
 
-import ch.icclab.cyclops.model.udr.TSDBData;
-import ch.icclab.cyclops.persistence.impl.TSDBResource;
+import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
+import ch.icclab.cyclops.services.iaas.openstack.persistence.impl.TSDBResource;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.representation.FileRepresentation;
@@ -79,6 +79,10 @@ public class Load extends ClientResource {
             System.out.println("Failed to load the Config file");
             e.printStackTrace();
         }
+
+        //System.out.println("Binding to the Rabbitmq Queue");
+        //RabbitmqClient queueThread = new RabbitmqClient();
+        //queueThread.start();
     }
 
     public void meterList(){
