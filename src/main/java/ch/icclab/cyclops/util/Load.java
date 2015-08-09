@@ -18,7 +18,7 @@
 package ch.icclab.cyclops.util;
 
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
-import ch.icclab.cyclops.services.iaas.openstack.persistence.impl.TSDBResource;
+import ch.icclab.cyclops.services.iaas.openstack.persistence.TSDBResource;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.representation.FileRepresentation;

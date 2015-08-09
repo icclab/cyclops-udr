@@ -15,7 +15,7 @@
  *     under the License.
  */
 
-package ch.icclab.cyclops.services.iaas.openstack.persistence.impl;
+package ch.icclab.cyclops.services.iaas.openstack.persistence;
 
 /**
  * Author: Srikanta
@@ -30,7 +30,7 @@ package ch.icclab.cyclops.services.iaas.openstack.persistence.impl;
 import ch.icclab.cyclops.services.iaas.openstack.model.CumulativeMeterData;
 import ch.icclab.cyclops.services.iaas.openstack.model.GaugeMeterData;
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
-import ch.icclab.cyclops.services.iaas.openstack.persistence.client.InfluxDBClient;
+import ch.icclab.cyclops.support.database.influxdb.client.InfluxDBClient;
 import ch.icclab.cyclops.services.iaas.openstack.resource.interfc.DatabaseResource;
 import ch.icclab.cyclops.util.DateTimeUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;

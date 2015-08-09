@@ -15,7 +15,7 @@
  *     under the License.
  */
 
-package ch.icclab.cyclops.services.iaas.openstack.persistence.client;
+package ch.icclab.cyclops.support.database.influxdb.client;
 
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.util.Load;
