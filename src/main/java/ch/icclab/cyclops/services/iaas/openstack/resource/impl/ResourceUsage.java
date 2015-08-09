@@ -19,7 +19,7 @@ package ch.icclab.cyclops.services.iaas.openstack.resource.impl;
 
 import ch.icclab.cyclops.services.iaas.openstack.model.ResourceUsageResponse;
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
-import ch.icclab.cyclops.services.iaas.openstack.persistence.client.InfluxDBClient;
+import ch.icclab.cyclops.support.database.influxdb.client.InfluxDBClient;
 import ch.icclab.cyclops.util.Load;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

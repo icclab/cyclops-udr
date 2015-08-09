@@ -26,7 +26,7 @@ package ch.icclab.cyclops.services.iaas.openstack.resource.impl;
 import ch.icclab.cyclops.services.iaas.openstack.model.CumulativeMeterData;
 import ch.icclab.cyclops.services.iaas.openstack.model.GaugeMeterData;
 import ch.icclab.cyclops.services.iaas.openstack.model.Response;
-import ch.icclab.cyclops.services.iaas.openstack.persistence.impl.TSDBResource;
+import ch.icclab.cyclops.services.iaas.openstack.persistence.TSDBResource;
 import ch.icclab.cyclops.services.iaas.openstack.client.KeystoneClient;
 import ch.icclab.cyclops.services.iaas.openstack.client.TelemetryClient;
 import ch.icclab.cyclops.services.iaas.openstack.resource.interfc.MeteringResource;

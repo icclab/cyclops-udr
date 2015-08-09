@@ -2,7 +2,7 @@ package ch.icclab.cyclops.services.iaas.openstack.resource.impl;
 
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.services.iaas.openstack.model.UserUsageResponse;
-import ch.icclab.cyclops.services.iaas.openstack.persistence.impl.TSDBResource;
+import ch.icclab.cyclops.services.iaas.openstack.persistence.TSDBResource;
 import ch.icclab.cyclops.services.iaas.openstack.resource.interfc.UsageResource;
 import ch.icclab.cyclops.util.Load;
 import com.fasterxml.jackson.core.JsonProcessingException;
