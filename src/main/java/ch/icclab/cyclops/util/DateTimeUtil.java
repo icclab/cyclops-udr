@@ -81,7 +81,7 @@ public class DateTimeUtil {
         }
         to = year+"-"+sMonth+"-"+sDay+"T"+sHour+":"+sMin+":"+sSec;
 
-        tHour = hour - 3; // 2 hrs time interval between data collection time range
+        tHour = hour - 5; // 2 hrs time interval between data collection time range
         if(tHour <= 9){
             stHour = "0" + tHour;
         }else{

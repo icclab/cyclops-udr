@@ -17,7 +17,7 @@
 
 package ch.icclab.cyclops.util;
 
-import ch.icclab.cyclops.model.udr.Response;
+import ch.icclab.cyclops.services.iaas.openstack.model.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.restlet.ext.json.JsonRepresentation;
