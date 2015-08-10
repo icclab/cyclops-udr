@@ -19,15 +19,10 @@
 package ch.icclab.cyclops.services.iaas.openstack.client;
 
 import ch.icclab.cyclops.util.Load;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.restlet.Client;
-import org.restlet.Request;
-import org.restlet.data.Header;
-import org.restlet.data.Protocol;
-import org.restlet.engine.header.HeaderConstants;
+import org.openstack4j.api.OSClient;
+import org.openstack4j.model.identity.Token;
+import org.openstack4j.openstack.OSFactory;
 import org.restlet.resource.ClientResource;
-import org.restlet.util.Series;
 
 /**
  * Author: Srikanta
@@ -51,41 +46,19 @@ public class KeystoneClient extends ClientResource {
      * @return token A string consisting of Keystone token
      */
     public String generateToken(){
-
         System.out.println("Generating the Token");
-
-        Client client = new Client(Protocol.HTTP);
         Load load = new Load();
         String keystoneURL = load.configuration.get("KeystoneURL");
         String keystoneUsername = load.configuration.get("KeystoneUsername");
         String keystonePassword = load.configuration.get("KeystonePassword");
-        String keystoneDomain = load.configuration.get("KeystoneDomainName");
-        String keystoneProject = load.configuration.get("KeystoneProjectName");
-        String reqBody = "{\"auth\":{\"identity\":{\"methods\":[\"password\"],\"password\":{\"user\":{\"domain\":{\"name\":\"default\"},\"name\":\""+keystoneUsername+"\",\"password\":\""+keystonePassword+"\"}}}}}";
-        ClientResource cr = new ClientResource(keystoneURL);
-        JSONObject jsonObj = null;
-        Series<Header> reqHeader = new Series<Header>(Header.class);
-        Series<Header> responseHeader ;
-        String token;
-
-        try {
-            jsonObj= new JSONObject(reqBody);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Request req = cr.getRequest();
-        req.getAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, reqHeader);
-        reqHeader.add("Accept", "application/json");
-        reqHeader.add("Content-Type", "application/json");
-        reqHeader.add("Content-Length", "10000");
-
-        cr.post(jsonObj);
-
-        responseHeader = (Series<Header>) cr.getResponse().getAttributes().get("org.restlet.http.headers");
-        token = responseHeader.getFirst("X-Subject-Token").getValue();
-        System.out.println("Auth Token " + responseHeader.getFirst("X-Subject-Token").getValue());
-
-        return token;
+        String keystoneTenantName = load.configuration.get("KeystoneTenantName");
+        OSClient os = OSFactory.builder()
+                .endpoint(keystoneURL)
+                .credentials(keystoneUsername, keystonePassword)
+                .tenantName(keystoneTenantName)
+                .authenticate();
+        Token token = os.getToken();
+        System.out.println(token.getId());
+        return token.getId();
     }
 }

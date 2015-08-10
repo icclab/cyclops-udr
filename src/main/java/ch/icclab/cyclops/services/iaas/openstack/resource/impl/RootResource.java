@@ -33,7 +33,7 @@ import org.restlet.resource.ServerResource;
 public class RootResource extends ServerResource implements UDRResource{
     @Get
     public String rootMsg(){
-        String response = "CYCLOPS UDR Service - v 0.5.0";
+        String response = "CYCLOPS UDR Service - v 0.5.1";
         return response;
     }
 }

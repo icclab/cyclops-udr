@@ -5,4 +5,4 @@ InfluxDBUsername==
 InfluxDBPassword==
 KeystoneUsername==
 KeystonePassword==
-KeystoneDomainName==
+KeystoneTenantName==

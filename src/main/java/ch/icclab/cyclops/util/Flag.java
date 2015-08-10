@@ -3,10 +3,9 @@ package ch.icclab.cyclops.util;
 /**
  * Author: Srikanta
  * Created on: 03-Mar-15
- * Description:
+ * Description: This class is used to check if there has been any changes done to the meterlist. If yes, then it
+ * will trigger the logic to query the db for the latest list of selected meters.
  *
- * Change Log
- * Name        Date     Comments
  */
 public class Flag {
     private static boolean meterListReset = true;
