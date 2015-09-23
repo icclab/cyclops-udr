@@ -1,0 +1,9 @@
+{
+  "checks": {
+    "udrservice_check": {
+      "command": "/etc/sensu/plugins/check-udrservice.rb",
+      "interval": 600,
+      "subscribers": [ "ALL" ]
+    }
+  }
+}
