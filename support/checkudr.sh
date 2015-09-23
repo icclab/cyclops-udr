@@ -22,7 +22,7 @@
 # are working properly or not. Make sure that Gatekeeper has been srated before
 # runnig this test script. Change APIPATH to appropriate value.
 
-APIPATH="http://160.85.4.237:8080/udr/api"
+APIPATH="http://localhost:8080/udr/api"
 function jsonValue() {
 	KEY=$1
 	num=$2
