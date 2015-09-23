@@ -1,0 +1,90 @@
+Version 0.6
+Date 23/Sep/2015
+Notes
+1. Migrated to influxdb 0.9.3
+
+************************************************************
+
+Version 0.5.1
+Date 10/Aug/2015
+Notes
+1. Updated the Keystone client to use OpenStack4j library
+
+************************************************************
+
+Version 0.5.0
+Date 10/Aug/2015
+Notes
+1. Package reorganization
+2. Dependency version upgrade & optimization
+
+************************************************************
+
+Version 0.4.0
+Date 04/June/2015
+Notes
+1. Updated the micro service to a Maven project
+2. Updated the external app API (/ext/app) to include another field called the "metername"
+3. Updated the installation script for maven build
+4. Updated the logic for "usage/users" & "usage/resources" APIs to factor in the data sent by the external application
+
+************************************************************
+
+Version 0.3.2
+Date 27/Apr/2015
+Notes
+1. Bug fix related to data collection and transformation flow, specifically for Cumulative Meters of OpenStack.
+
+************************************************************
+
+Version 0.3.1
+Date 22/Apr/2015
+Notes
+1. New API endpoints "/usage/users/{user_id}" & "/usage/resources/{resource_id}".
+2. Upgraded the "/usage" API to read/update the selected resource list dynamically
+3. Updated the usage response for a user to include the non aggregated data for cumulative meters from OpenStack
+4. Updated the the keystone query URL
+5. Upgraded the usage API for resources to handle gauge and cumulative meters from OpenStack
+6. Updated the Cumulative Meter (OpenStack) model class to handle the additional tags such as stack_id.
+7. Bug fixes
+
+************************************************************
+
+Version 0.3.0
+Date 06/Mar/2015
+Notes
+1. Installation script is updated to use Grafana v1.9.1
+2. Added a return message for the root api
+3. Added the "/meters" API endpoint to accept the meter selection status for data collection
+4. InfluxDB client code refactoring
+5. Added the flag to check for the reset of meters selected for usage data collection
+6. Added the check to refresh the usage collection meter list if it has been updated.
+
+************************************************************
+
+Version 0.2.2 
+Date 17/Feb/2015
+Notes
+1. Extended the user usage API endpoint response to include both the gauge and cumulative meter from OpenStack
+2. The time of collection of the usage data from the openstack meter (gauge and cumulative) is same as the time of data entry into the db
+3. Updated the installation file
+
+************************************************************
+
+Version 0.2.1
+Date 02/Feb/2015
+Notes
+1. New API endpoint : Return user usage data
+2. Method name refactoring
+3. Addition of release notes and version
+
+*************************************************************
+
+Version 0.1.1 
+Date 16/Jan/2015
+Notes
+1. Initial release
+2. One click installation script for Sensu, InfluxDB, Grafana, Uchiwa, Apache2, Tomcat7 & UDR Service
+3. Connector for OpenStack (Keystone and Ceilometer)
+4. API for insertion of usage data from external application
+5. Clients : InfluxDB, Telemetry & Keystone (OpenStack)
