@@ -1,0 +1,9 @@
+{
+  "checks": {
+    "udrservice_check": {
+      "command": "/etc/sensu/plugins/checkudr.sh",
+      "interval": 300,
+      "subscribers": [ "test" ]
+    }
+  }
+}
