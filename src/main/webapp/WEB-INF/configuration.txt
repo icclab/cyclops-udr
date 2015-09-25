@@ -1,0 +1,10 @@
+KeystoneURL==http://openstack-ip:5000/v2.0
+InfluxDBURL==http://localhost:8086
+CeilometerURL==http://openstack-ip:8777/v2/
+InfluxDBUsername==
+InfluxDBPassword==
+KeystoneUsername==
+KeystonePassword==
+KeystoneTenantName==
+dbName==udr_service
+sensuFrequency==300
