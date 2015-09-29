@@ -7,7 +7,7 @@
     <groupId>ch.icclab.cyclops.udrservice</groupId>
     <artifactId>udr</artifactId>
     <packaging>war</packaging>
-    <version>0.5.1</version>
+    <version>0.6.0</version>
     <name>Usage Data Records Micro Service</name>
 
     <prerequisites>

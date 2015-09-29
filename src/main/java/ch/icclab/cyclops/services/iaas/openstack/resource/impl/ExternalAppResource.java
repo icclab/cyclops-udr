@@ -39,7 +39,7 @@ import java.util.ArrayList;
  * Author: Srikanta
  * Created on: 13-Jan-15
  * Description: Receives the data sent by an external application
- *
+ * <p/>
  * Change Log
  * Name        Date     Comments
  */
@@ -48,7 +48,7 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
 
     /**
      * Receives the JSON data sent by an external application
-     *
+     * <p/>
      * Pseudo Code
      * 1. Receive the data
      * 2. Extract the JSON array
@@ -77,10 +77,10 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
             e.printStackTrace();
         }
         response.setTimestamp(currentDateTime.toDateTime().toString());
-        if(output){
+        if (output) {
             response.setStatus("Success");
             response.setMessage("Data saved into the DB");
-        }else {
+        } else {
             response.setStatus("Failure");
             response.setMessage("Data could not be saved into the DB");
         }
@@ -91,7 +91,7 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
 
     /**
      * Receives the JSON array, transforms it and send it to the db resource to persist it into InfluxDB
-     *
+     * <p/>
      * Pseudo Code
      * 1. Iterate through the JSONArray to get the JSON obj
      * 2. Iterate through the JSON Obj to get the usage details
@@ -103,7 +103,7 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
      */
     public boolean saveData(JSONArray jsonArr) {
         logger.trace("BEGIN boolean saveData(JSONArray jsonArr)");
-        JSONObject jsonObj, metadata,usageData;
+        JSONObject jsonObj, metadata, usageData;
         String metername = null;
         String source;
         TSDBResource dbResource = new TSDBResource();
@@ -118,13 +118,13 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
         columnNameArr.add("usage");
 
         try {
-            for(int i=0; i<jsonArr.length(); i++){
+            for (int i = 0; i < jsonArr.length(); i++) {
                 jsonObj = (JSONObject) jsonArr.get(i);
                 metadata = (JSONObject) jsonObj.get("metadata");
                 source = (String) metadata.get("source");
                 dataArr = (JSONArray) jsonObj.get("usage");
 
-                for(int j=0; j<dataArr.length(); j++){
+                for (int j = 0; j < dataArr.length(); j++) {
                     objArrNode = new ArrayList<Object>();
                     usageData = (JSONObject) dataArr.get(j);
                     metername = (String) usageData.get("metername");

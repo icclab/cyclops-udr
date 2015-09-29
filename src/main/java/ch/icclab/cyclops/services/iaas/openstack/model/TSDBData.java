@@ -23,7 +23,7 @@ import java.util.ArrayList;
  * Author: Srikanta
  * Created on: 15-Oct-14
  * Description: A POJO class for InfluxDB
- *
+ * <p/>
  * Change Log
  * Name        Date     Comments
  */

@@ -37,17 +37,17 @@ import java.util.HashMap;
  * Author: Srikanta
  * Created on: 01-Apr-15
  * Description:
- *
  */
-public class ResourceUsage extends ServerResource{
+public class ResourceUsage extends ServerResource {
     final static Logger logger = LogManager.getLogger(ResourceUsage.class.getName());
     private String resourceId;
+
     public void doInit() {
         resourceId = (String) getRequestAttributes().get("resourceid");
     }
 
     @Get
-    public Representation getResourceUsage(Entity entity){
+    public Representation getResourceUsage(Entity entity) {
         logger.trace("BEGIN Representation getResourceUsage(Entity entity)");
         String query = null;
         String jsonStr;
@@ -60,26 +60,26 @@ public class ResourceUsage extends ServerResource{
 
         String fromDate = getQueryValue("from");
         String toDate = getQueryValue("to");
-        time.put("from",fromDate);
-        time.put("to",toDate);
+        time.put("from", fromDate);
+        time.put("to", toDate);
 
-        if(Load.openStackCumulativeMeterList.contains(resourceId)){
-            query = "SELECT SUM(usage) FROM "+resourceId+" WHERE time > '"+fromDate+"' AND time < '"+toDate+"' GROUP BY userid";
-        }else if (Load.openStackGaugeMeterList.contains(resourceId)){
-            query = "SELECT MEAN(avg) FROM "+resourceId+" WHERE time > '"+fromDate+"' AND time < '"+toDate+"' GROUP BY userid";
-        }else if(Load.externalMeterList.contains(resourceId)){
-            query = "SELECT SUM(usage) FROM "+resourceId+" WHERE time > '"+fromDate+"' AND time < '"+toDate+"' GROUP BY userid";
-        }else{
+        if (Load.openStackCumulativeMeterList.contains(resourceId)) {
+            query = "SELECT SUM(usage) FROM " + resourceId + " WHERE time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userid";
+        } else if (Load.openStackGaugeMeterList.contains(resourceId)) {
+            query = "SELECT MEAN(avg) FROM " + resourceId + " WHERE time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userid";
+        } else if (Load.externalMeterList.contains(resourceId)) {
+            query = "SELECT SUM(usage) FROM " + resourceId + " WHERE time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userid";
+        } else {
             // Fall back response TODO
             logger.debug("DEBUG Representation getResourceUsage(Entity entity): No Meter List specified");
         }
         tsdbData = dbClient.getData(query);
         resourceUsageResponse.setResourceid(resourceId);
         resourceUsageResponse.setTime(time);
-        if(tsdbData != null){
+        if (tsdbData != null) {
             resourceUsageResponse.setColumn(tsdbData.getColumns());
             resourceUsageResponse.setUsage(tsdbData.getPoints());
-        }else{
+        } else {
             logger.debug("DEBUG Representation getResourceUsage(Entity entity): tsdbData is null");
             resourceUsageResponse.setColumn(null);
             resourceUsageResponse.setUsage(null);

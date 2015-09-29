@@ -30,7 +30,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.restlet.Client;
-import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Protocol;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
@@ -39,12 +38,14 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * Author: Srikanta
  * Created on: 15-Oct-14
+ * Upgraded by: Manu
+ * Upgraded on: 23-Sep-15
  * Description: Client class for InfluxDB
  * <p/>
  * Change Log
@@ -96,7 +97,7 @@ public class InfluxDBClient extends ClientResource {
             else if (columns[i].equals("status"))
                 statusIndex = i;
         }
-        logger.debug("Obtained indexes from the columns: Metername: "+meternameIndex+" Time: "+timeIndex+" Source: "+sourceIndex+"Metersource: "+metersourceIndex+" Metertype: "+metersourceIndex+"Status: "+statusIndex);
+        logger.debug("Obtained indexes from the columns: Metername: " + meternameIndex + " Time: " + timeIndex + " Source: " + sourceIndex + "Metersource: " + metersourceIndex + " Metertype: " + metersourceIndex + "Status: " + statusIndex);
         for (int i = 0; i < points.size(); i++) {
             logger.debug("Attempting to build the Point: " + points.get(i)[meternameIndex]);
             Point point = Point.measurement(data.split("name\":\"")[1].split("\"")[0])
@@ -107,7 +108,7 @@ public class InfluxDBClient extends ClientResource {
                     .tag("metername", points.get(i)[meternameIndex].substring(1, points.get(i)[meternameIndex].length() - 1))
                     .field("status", points.get(i)[statusIndex])
                     .build();
-            logger.debug("Attempting to write the Point ("+ points.get(i)[meternameIndex] + ") in the db:" +dbName);
+            logger.debug("Attempting to write the Point (" + points.get(i)[meternameIndex] + ") in the db:" + dbName);
             influxDB.write(dbName, "default", point);
             logger.debug("Point successfully written.");
         }
@@ -123,13 +124,14 @@ public class InfluxDBClient extends ClientResource {
         Representation output;
         ObjectMapper mapper = new ObjectMapper();
         int timeIndex = -1;
+        int usageIndex = -1;
         Client client = new Client(Protocol.HTTP);
         ClientResource cr = new ClientResource(url);
         Query query = new Query(parameterQuery, dbName);
         try {
-            logger.debug("Attempting to execute the query: "+parameterQuery+" into the db: "+dbName);
+            logger.debug("Attempting to execute the query: " + parameterQuery + " into the db: " + dbName);
             resultArray = new JSONArray(influxDB.query(query).getResults());
-            logger.debug("Obtained results: "+resultArray.toString());
+            logger.debug("Obtained results: " + resultArray.toString());
             if (!resultArray.isNull(0)) {
                 if (resultArray.toString().equals("[{}]")) {
                     TSDBData data = new TSDBData();
@@ -140,10 +142,38 @@ public class InfluxDBClient extends ClientResource {
                     JSONObject obj = (JSONObject) resultArray.get(0);
                     JSONArray series = (JSONArray) obj.get("series");
                     String response = series.get(0).toString();
-                    response.replaceFirst("values", "points");
                     response = response.split("values")[0] + "points" + response.split("values")[1];
                     series.put(0, new JSONObject(response));
                     dataObj = mapper.readValue(series.toString(), TSDBData[].class);
+                    /**
+                     *
+                     */
+                    for(int i = 0 ; i<dataObj.length ; i++){
+                        for(int o = 0 ; o<dataObj[0].getColumns().size(); o++) {
+                            if (dataObj[0].getColumns().get(o).equalsIgnoreCase("time"))
+                                timeIndex = o;
+                            if(dataObj[0].getColumns().get(o).equalsIgnoreCase("usage") || dataObj[0].getColumns().get(o).equalsIgnoreCase("avg"))
+                                usageIndex = o;
+                        }
+                        if(usageIndex>-1) {
+                            TreeMap<String, ArrayList> points = new TreeMap<String, ArrayList>();
+                            for (ArrayList point : dataObj[0].getPoints()) {
+                                if (points.containsKey(point.get(timeIndex))) {
+                                    String time = (String) point.get(timeIndex);
+                                    Double usage = Double.parseDouble(points.get(time).get(usageIndex).toString());
+                                    usage = Double.parseDouble(point.get(usageIndex).toString()) + usage;
+                                    point.set(usageIndex, usage);
+                                }
+                                points.put((String) point.get(timeIndex), point);
+                            }
+                            ArrayList<ArrayList<Object>> result = new ArrayList<ArrayList<Object>>();
+                            for (String key : points.keySet()) {
+                                result.add(points.get(key));
+                            }
+                            dataObj[0].setPoints(result);
+                        }
+                    }
+
                 }
             }
         } catch (JSONException e) {

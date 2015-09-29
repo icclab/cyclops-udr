@@ -20,6 +20,8 @@ package ch.icclab.cyclops.services.iaas.openstack.persistence;
 /**
  * Author: Srikanta
  * Created on: 06-Oct-14
+ * Upgraded by: Manu
+ * Upgraded on: 23-Sep-15
  * Description: A RESTLET resource class for handling usage data transformation and
  * persisting into InfluxDB
  * <p/>
@@ -41,6 +43,7 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,12 +78,10 @@ public class TSDBResource implements DatabaseResource {
         try {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             format.setTimeZone(TimeZone.getTimeZone("UTC"));
-            logger.debug("Data Array length before writing points: "+dataArr.size());
+            logger.debug("Data Array length before writing points: " + dataArr.size());
             for (int i = 0; i < dataArr.size(); i++) {
                 gMeterData = dataArr.get(i);
                 Date date = format.parse(gMeterData.getPeriod_end());
-                // initialize the date as utc so we can convert it to a milliseconds or timestamp
-                // Change also in all the meters if the date is coming in UTC
                 long timeMillisec = date.getTime();
                 logger.debug("Attempting to build a Point for: " + meterName);
                 Point point = Point.measurement(meterName)
@@ -96,16 +97,14 @@ public class TSDBResource implements DatabaseResource {
                         .tag("unit", gMeterData.getUnit())
                         .field("count", gMeterData.getCount())
                         .build();
-                logger.debug("Attempting to write the Point (" + meterName+")");
+                logger.debug("Attempting to write the Point (" + meterName + ")");
                 influxDB.write(dbname, "default", point);
                 logger.debug("Point successfully written.");
             }
         } catch (Exception e) {
-            //System.out.println("Caught a Exception while building the point. Saved to TSDB : False");
             e.printStackTrace();
             return false;
         }
-        //System.out.println("Saved to TSDB " + result);
         return result;
     }
 
@@ -158,12 +157,9 @@ public class TSDBResource implements DatabaseResource {
                 logger.debug("Point successfully written.");
             }
         } catch (Exception e) {
-            //System.out.println("Caught a Exception while building the point. Saved to TSDB : False");
             e.printStackTrace();
             return false;
         }
-
-        //System.out.println("Saved to TSDB " + result);
         return result;
     }
 
@@ -189,7 +185,6 @@ public class TSDBResource implements DatabaseResource {
             jsonData = mapper.writeValueAsString(dbData);
             dbClient.saveData(jsonData);
         } catch (JsonProcessingException e) {
-            //System.out.println("Saved to TSDB : False");
             e.printStackTrace();
             result = false;
             return result;
@@ -249,5 +244,30 @@ public class TSDBResource implements DatabaseResource {
         String day = date.split(" ")[0];
         String hour = date.split(" ")[1];
         return day + "T" + hour + ":00Z";
+    }
+
+    /**
+     * This method retrieves the last volume value inserted in the DB for a user and a resource.
+     *
+     * @param metername
+     * @param resource_id
+     * @param user_id
+     * @return
+     * @author Manu
+     */
+    public long getLastVolume(String metername, String resource_id, String user_id) {
+        InfluxDBClient dbClient = new InfluxDBClient();
+        TSDBData tsdbData = null;
+        ObjectMapper mapper = new ObjectMapper();
+
+        //Get the last entry
+        tsdbData = dbClient.getData("SELECT volume FROM \"" + metername + "\" WHERE resourceid='" + resource_id + "' AND userid='" + user_id + "' order by time desc limit 1");
+        if (tsdbData.getPoints().size() == 0)
+            return 0;
+        else {
+            int volumeIndex = tsdbData.getColumns().indexOf("volume");
+            String volume = tsdbData.getPoints().get(0).get(volumeIndex).toString();
+            return new BigDecimal(volume).longValue();
+        }
     }
 }

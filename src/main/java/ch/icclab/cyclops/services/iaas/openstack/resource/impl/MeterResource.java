@@ -41,18 +41,18 @@ import java.io.IOException;
 /**
  * Author: Srikanta
  * Created on: 02-Mar-15
- * Description: Services the GET and POST request regarding the information of meters that are selected 
- * 
+ * Description: Services the GET and POST request regarding the information of meters that are selected
+ * <p/>
  * Change Log
  * Name        Date     Comments
  */
 public class MeterResource extends ServerResource implements UDRResource {
 
     final static Logger logger = LogManager.getLogger(MeterResource.class.getName());
-    
+
     /**
      * Receives the JSON data consisting of meter selection status
-     *
+     * <p/>
      * Pseudo Code
      * 1. Receive the data
      * 2. Extract the JSON array
@@ -62,7 +62,7 @@ public class MeterResource extends ServerResource implements UDRResource {
      * @return Representation A JSON response containing the status of the request serviced
      */
     @Post("json:json")
-    public Representation setMeterList(Representation entity){
+    public Representation setMeterList(Representation entity) {
         logger.trace("BEGIN Representation setMeterList(Representation entity)");
         boolean output = true;
         ObjectMapper mapper = new ObjectMapper();
@@ -92,10 +92,10 @@ public class MeterResource extends ServerResource implements UDRResource {
         // Set the time stamp
         response.setTimestamp(currentDateTime.toDateTime().toString());
         // Set the status and message
-        if(output){
+        if (output) {
             response.setStatus("Success");
             response.setMessage("Data saved into the DB");
-        }else {
+        } else {
             logger.debug("DEBUG Representation setMeterList(Representation entity): Data could not be saved into the DB");
             response.setStatus("Failure");
             response.setMessage("Data could not be saved into the DB");
@@ -114,7 +114,7 @@ public class MeterResource extends ServerResource implements UDRResource {
 
     /**
      * Invoke the db client to persist the data
-     *
+     * <p/>
      * Pseudo Code
      * 1. Receive the data
      * 2. Save the data using the InfluxDB client
@@ -126,7 +126,7 @@ public class MeterResource extends ServerResource implements UDRResource {
         logger.trace("BEGIN boolean saveData(JSONObject jsonObj)");
         InfluxDBClient dbClient = new InfluxDBClient();
         boolean status = false;
-        
+
         status = dbClient.saveData(jsonObj.toString());
         logger.trace("END boolean saveData(JSONObject jsonObj)");
         return status;
@@ -134,7 +134,7 @@ public class MeterResource extends ServerResource implements UDRResource {
 
     /**
      * Returns the last persisted list of meters
-     *
+     * <p/>
      * Pseudo Code
      * 1. Receive the request for the list of meters
      * 2. Query the DB to get the list
@@ -143,7 +143,7 @@ public class MeterResource extends ServerResource implements UDRResource {
      * @return Representation A JSON response containing the list of meters
      */
     @Get
-    public Representation getMeterList(){
+    public Representation getMeterList() {
         logger.trace("BEGIN Representation getMeterList()");
         String jsonStr;
         JsonRepresentation responseJson = null;

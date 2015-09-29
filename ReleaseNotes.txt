@@ -2,6 +2,7 @@ Version 0.6
 Date 23/Sep/2015
 Notes
 1. Migrated to influxdb 0.9.3
+2. Aggregated data for instances fixed
 
 ************************************************************
 

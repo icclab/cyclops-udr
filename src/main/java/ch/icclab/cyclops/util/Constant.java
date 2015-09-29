@@ -14,4 +14,4 @@ public class Constant {
     public static final String OPENSTACK = "openstack";
 
     public static final int METER_SELECTED = 1;
-    }
+}

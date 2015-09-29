@@ -116,7 +116,7 @@ public class DateTimeUtil {
         return dateTime;
     }
 
-    public String getString(Date date){
+    public String getString(Date date) {
         SimpleDateFormat dF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         dF.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dF.format(date);

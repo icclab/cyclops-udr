@@ -32,11 +32,11 @@ import org.restlet.resource.ServerResource;
 /**
  * Returns a basic response when the root API endpoint is invoked
  */
-public class RootResource extends ServerResource implements UDRResource{
+public class RootResource extends ServerResource implements UDRResource {
     final static Logger logger = LogManager.getLogger(RootResource.class.getName());
 
     @Get
-    public String rootMsg(){
+    public String rootMsg() {
         logger.trace("BEGIN String rootMsg()");
         String response = "CYCLOPS UDR Service - v 0.5.1";
         logger.trace("END String rootMsg()");

@@ -35,6 +35,8 @@ import ch.icclab.cyclops.util.ResponseUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.influxdb.InfluxDB;
+import org.influxdb.InfluxDBFactory;
 import org.joda.time.LocalDateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,17 +50,18 @@ import java.util.*;
 
 public class TelemetryResource extends ServerResource implements MeteringResource {
     final static Logger logger = LogManager.getLogger(TelemetryResource.class.getName());
+    private InfluxDB influxDB = InfluxDBFactory.connect(Load.configuration.get("InfluxDBURL"), "root", "root");
 
     /**
      * This method calls the private classes to get the data from the Cumulative and Gauge meters
      * of the Ceilometer. This method is called periodically by a scheduler
-     *
+     * <p/>
      * Pseudo Code
-     *  1. Create a Keystone client
-     *  2. Generate a token
-     *  3. Get the data from Cumulative Meters by passing the token
-     *  4. Get the data from Gauge Meters by passing the token
-     *  5. Display the output from step 3 and 4.
+     * 1. Create a Keystone client
+     * 2. Generate a token
+     * 3. Get the data from Cumulative Meters by passing the token
+     * 4. Get the data from Gauge Meters by passing the token
+     * 5. Display the output from step 3 and 4.
      *
      * @return output A String output of the success or failure of the data extraction process
      */
@@ -78,18 +81,18 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
 
         //Load the meter list
         load.meterList();
-        for(String meter : Load.openStackCumulativeMeterList) {
+        for (String meter : Load.openStackCumulativeMeterList) {
             logger.debug("Cumulative Meter: " + meter);
         }
-        for(String meter : Load.openStackGaugeMeterList) {
+        for (String meter : Load.openStackGaugeMeterList) {
             logger.debug("Gauge Meter: " + meter);
         }
         //Get the usage data for the selected OpenStack Cumulative Meters
         cumulativeMeterOutput = getCumulativeMeterData(Load.openStackCumulativeMeterList, token);
         //Get the usage data for the selected OpenStack Gauge Meters
-        gaugeMeterOutput = getGaugeMeterData(Load.openStackGaugeMeterList,token);
+        gaugeMeterOutput = getGaugeMeterData(Load.openStackGaugeMeterList, token);
         //Construct the response of the data collection process
-        response = constructResponse(cumulativeMeterOutput,gaugeMeterOutput);
+        response = constructResponse(cumulativeMeterOutput, gaugeMeterOutput);
         //Return the response in the JSON format
         output = util.toJson(response);
         logger.trace("END Representation setMeterData()");
@@ -101,7 +104,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
      * response object accordingly
      *
      * @param cumulativeMeterOutput A boolean which indicates the outcome of the operation to save the Cumulative Meter data
-     * @param gaugeMeterOutput A boolean which indicates the outcome of the operation to save the Gauge Meter data
+     * @param gaugeMeterOutput      A boolean which indicates the outcome of the operation to save the Gauge Meter data
      * @return A response object containing the details of the operation
      */
     private Response constructResponse(boolean cumulativeMeterOutput, boolean gaugeMeterOutput) {
@@ -109,28 +112,28 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
         Response responseObj = new Response();
         LocalDateTime currentDateTime = new LocalDateTime();
 
-        if(cumulativeMeterOutput && gaugeMeterOutput){
+        if (cumulativeMeterOutput && gaugeMeterOutput) {
             responseObj.setTimestamp(currentDateTime.toDateTime().toString());
             responseObj.setStatus("Success");
             responseObj.setMessage("Cumulative & Gauge Meters were Successfully saved into the DB");
-        }else if(gaugeMeterOutput){
+        } else if (gaugeMeterOutput) {
             responseObj.setTimestamp(currentDateTime.toDateTime().toString());
             responseObj.setStatus("Success");
             responseObj.setMessage("Only Gauge Meter was Successfully saved into the DB");
             logger.debug("DEBUG Response constructResponse(boolean cumulativeMeterOutput, boolean gaugeMeterOutput) - Only Gauge Meter was Successfully saved into the DB");
-        }else{
+        } else {
             responseObj.setTimestamp(currentDateTime.toDateTime().toString());
             responseObj.setStatus("Success");
             responseObj.setMessage("Only Cumulative Meter was Successfully saved into the DB");
             logger.debug("DEBUG Response constructResponse(boolean cumulativeMeterOutput, boolean gaugeMeterOutput) - Only Cumulative Meter was Successfully saved into the DB");
         }
         logger.trace("END Response constructResponse(boolean cumulativeMeterOutput, boolean gaugeMeterOutput)");
-        return  responseObj;
+        return responseObj;
     }
 
     /**
      * In this method, the usage metrics from the cumulative meters are extracted
-     *
+     * <p/>
      * Pseudo Code
      * 1. Query the sample api of Telemetry
      * 2. Receive the ungrouped samples but already sorted for timestamp
@@ -160,42 +163,42 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
         TSDBResource dbResource = new TSDBResource();
         HashMap<String, LinkedList<CumulativeMeterData>> map;
 
-        for(int j=0; j < meter.size();j++){
+        for (int j = 0; j < meter.size(); j++) {
             cMeterArr = new ArrayList<CumulativeMeterData>();
             map = new HashMap<String, LinkedList<CumulativeMeterData>>();
             try {
                 response = tClient.getData(token, meter.get(j), meterType);
                 array = new JSONArray(response);
 
-            //Builds an array of samples and a hashmap of resourceID as key and a linkedlist of samples as values.
-            for (int i=0; i< array.length(); i++){
-                JSONObject obj = null;
-                obj = array.getJSONObject(i);
-                data = mapper.readValue(obj.toString(),CumulativeMeterData.class);
+                //Builds an array of samples and a hashmap of resourceID as key and a linkedlist of samples as values.
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject obj = null;
+                    obj = array.getJSONObject(i);
+                    data = mapper.readValue(obj.toString(), CumulativeMeterData.class);
 
-                if(map.containsKey(data.getResource_id())){
-                    linkedList = map.get(data.getResource_id());
-                    linkedList.add(data);
-                    map.remove(data.getResource_id());
-                    map.put(data.getResource_id(), linkedList);
-                }else{
-                    linkedList = new LinkedList<CumulativeMeterData>();
-                    linkedList.add(data);
-                    map.put(data.getResource_id(), linkedList);
+                    if (map.containsKey(data.getResource_id())) {
+                        linkedList = map.get(data.getResource_id());
+                        linkedList.add(data);
+                        map.remove(data.getResource_id());
+                        map.put(data.getResource_id(), linkedList);
+                    } else {
+                        linkedList = new LinkedList<CumulativeMeterData>();
+                        linkedList.add(data);
+                        map.put(data.getResource_id(), linkedList);
+                    }
                 }
-            }
 
-            //Get the Set of keys
-            keySet = map.keySet();
-            Iterator setIterator = keySet.iterator();
+                //Get the Set of keys
+                keySet = map.keySet();
+                Iterator setIterator = keySet.iterator();
 
-            //Iterate through the Set to extract the LinkedList
-            while (setIterator.hasNext()){
-                linkedList = map.get(setIterator.next());
-                cMeterArr = calculateCumulativeMeterUsage(cMeterArr, linkedList);
-            }
-            dbResource.saveCumulativeMeterData(cMeterArr, meter.get(j));
-            output = true;
+                //Iterate through the Set to extract the LinkedList
+                while (setIterator.hasNext()) {
+                    linkedList = map.get(setIterator.next());
+                    cMeterArr = calculateCumulativeMeterUsage(cMeterArr, linkedList);
+                }
+                dbResource.saveCumulativeMeterData(cMeterArr, meter.get(j));
+                output = true;
             } catch (IOException e) {
                 logger.error("EXCEPTION IOEXCEPTION getCumulativeMeterData(ArrayList<String> meter, String token)");
                 output = false;
@@ -214,14 +217,14 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
 
     /**
      * In this method, usage made is calculated on per resource basis in the cumulative meters
-     *
+     * <p/>
      * Pseudo Code
      * 1. Traverse through the linkedlist
      * 2. Subtract the volumes of i and (i+1) samples
      * 3. Set the difference into the i sample object
      * 4. Add the updates sample object into an arraylist
      *
-     * @param cMeterArr This is an arrayList of type CumulativeMeterData containing sample object with the usage information
+     * @param cMeterArr  This is an arrayList of type CumulativeMeterData containing sample object with the usage information
      * @param linkedList This is a Linked List of type CumulativeMeterData containing elements from a particular resource
      * @return An arrayList of type CumulativeMeterData containing sample objects with the usage information
      */
@@ -230,17 +233,44 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
         long diff;
         //BigInteger maxMeterValue ;
 
-        for(int i=0;i<(linkedList.size()-1);i++){
-            if((i+1) <= linkedList.size()) {
+        long oldVolume = 0;
+        long newVolume;
+        long lastUsage = 0;
+        TSDBResource dbResource = new TSDBResource();
+        for (int i = 0; i < linkedList.size(); i++) {
+            if (i == 0) {
+                //First point Treatment
+                oldVolume = dbResource.getLastVolume(linkedList.get(i).getMeter(), linkedList.get(i).getResource_id(), linkedList.get(i).getUser_id());
+            } else
+                //N point Treatment
+                oldVolume = lastUsage;
+            newVolume = linkedList.get(i).getVolume();
+            if (newVolume >= oldVolume) {
+                //Normal use case where the new usage is greater or equals than the last inserted point.
+                lastUsage = newVolume - oldVolume;
+            } else {
+                //TODO: if the volume is lower than the lastInserted get the maximum for that meter and operate on it.
+                /*long value = oldVolume;
+                while (value > -1)
+                    value++;
+                lastUsage = (value - oldVolume) + newVolume;*/
+                lastUsage = newVolume;
+            }
+            linkedList.get(i).setUsage(lastUsage);
+            cMeterArr.add(linkedList.get(i));
+        }
+
+        /*for (int i = 0; i < (linkedList.size() - 1); i++) {
+            if ((i + 1) <= linkedList.size()) {
                 diff = linkedList.get(i).getVolume() - linkedList.get(i + 1).getVolume();
-                if(diff < 0){
+                if (diff < 0) {
                     linkedList.get(i).setUsage(0); //TODO: Update the negative difference usecase
-                }else{
+                } else {
                     linkedList.get(i).setUsage(diff);
                 }
                 cMeterArr.add(linkedList.get(i));
             }
-        }
+        }*/
         cMeterArr.add(linkedList.getLast());
         logger.trace("END ArrayList<CumulativeMeterData> calculateCumulativeMeterUsage(ArrayList<CumulativeMeterData> cMeterArr, LinkedList<CumulativeMeterData> linkedList)");
         return cMeterArr;
@@ -253,32 +283,31 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
      * @return output A String output of the success or failure of the data extraction process
      * @throws JSONException
      */
-    private boolean getGaugeMeterData(ArrayList<String> meter, String token){
+    private boolean getGaugeMeterData(ArrayList<String> meter, String token) {
         logger.trace("BEGIN boolean getGaugeMeterData(ArrayList<String> meter, String token)");
         String response;
-        JSONArray array ;
+        JSONArray array;
         ObjectMapper mapper = new ObjectMapper();
         TSDBResource dbResource = new TSDBResource();
         ArrayList<GaugeMeterData> dataArr;
-        String meterType  = "gauge";
+        String meterType = "gauge";
         boolean output = true;
 
-        try{
+        try {
             TelemetryClient tClient = new TelemetryClient();
             for (int i = 0; i < meter.size(); i++) {
                 dataArr = new ArrayList<GaugeMeterData>();
                 response = tClient.getData(token, meter.get(i), meterType);
                 array = new JSONArray(response);
-                logger.debug("Array Size: "+array.length());
+                logger.debug("Array Size: " + array.length());
                 if (response.toString() != "[]") {
-                    for (int j=0; j< array.length(); j++){
+                    for (int j = 0; j < array.length(); j++) {
                         JSONObject obj = array.getJSONObject(j);
-                        GaugeMeterData data = mapper.readValue(obj.toString(),GaugeMeterData.class);
+                        GaugeMeterData data = mapper.readValue(obj.toString(), GaugeMeterData.class);
                         dataArr.add(data);
                     }
                     dbResource.saveGaugeMeterData(dataArr, meter.get(i));
                 } else {
-                    //System.out.println("Ceilometer returned empty response for " + meter.get(i));
                 }
             }
 
