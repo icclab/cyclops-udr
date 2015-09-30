@@ -145,9 +145,8 @@ public class InfluxDBClient extends ClientResource {
                     response = response.split("values")[0] + "points" + response.split("values")[1];
                     series.put(0, new JSONObject(response));
                     dataObj = mapper.readValue(series.toString(), TSDBData[].class);
-                    /**
-                     *
-                     */
+
+                    //Filter the points for repeated timestamps and add their usage/avg value
                     for(int i = 0 ; i<dataObj.length ; i++){
                         for(int o = 0 ; o<dataObj[0].getColumns().size(); o++) {
                             if (dataObj[0].getColumns().get(o).equalsIgnoreCase("time"))
@@ -156,6 +155,7 @@ public class InfluxDBClient extends ClientResource {
                                 usageIndex = o;
                         }
                         if(usageIndex>-1) {
+                            //If the json belongs to a meter point, filter and add to another if necessary.
                             TreeMap<String, ArrayList> points = new TreeMap<String, ArrayList>();
                             for (ArrayList point : dataObj[0].getPoints()) {
                                 if (points.containsKey(point.get(timeIndex))) {
@@ -210,7 +210,7 @@ public class InfluxDBClient extends ClientResource {
         ArrayList<String[]> result = new ArrayList<String[]>();
         String[] split = json.split(":\\[")[2].split("],\\[");
         split[0] = split[0].substring(1);
-        split[split.length - 1] = split[split.length - 1].substring(0, split.length - 2);
+        split[split.length - 1] = split[split.length - 1].substring(0,  split[split.length - 1].length() - 3);
         for (int i = 0; i < split.length; i++) {
             result.add(split[i].split(","));
         }
