@@ -43,7 +43,7 @@ import java.io.IOException;
 
 public class TelemetryClient extends ClientResource {
     final static Logger logger = LogManager.getLogger(TelemetryClient.class.getName());
-
+    //TODO: consider Singleton connection.
     /**
      * Queries the ceilometer to get the usage data
      *

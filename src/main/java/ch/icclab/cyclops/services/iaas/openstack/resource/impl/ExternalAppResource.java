@@ -49,10 +49,10 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
     /**
      * Receives the JSON data sent by an external application
      * <p/>
-     * Pseudo Code
-     * 1. Receive the data
-     * 2. Extract the JSON array
-     * 3. Send the JSON array to saveData() for further processing
+     * Pseudo Code<br/>
+     * 1. Receive the data<br/>
+     * 2. Extract the JSON array<br/>
+     * 3. Send the JSON array to saveData() for further processing<br/>
      *
      * @param entity
      * @return Representation A JSON response is returned
@@ -92,10 +92,10 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
     /**
      * Receives the JSON array, transforms it and send it to the db resource to persist it into InfluxDB
      * <p/>
-     * Pseudo Code
-     * 1. Iterate through the JSONArray to get the JSON obj
-     * 2. Iterate through the JSON Obj to get the usage details
-     * 3. Build the TSDB POJO
+     * Pseudo Code<br/>
+     * 1. Iterate through the JSONArray to get the JSON obj<br/>
+     * 2. Iterate through the JSON Obj to get the usage details<br/>
+     * 3. Build the TSDB POJO<br/>
      * 4. Pass this POJO obj to the TSDB resource for persisting it into the DB
      *
      * @param jsonArr An array containing the usage data as part of JSON Objects

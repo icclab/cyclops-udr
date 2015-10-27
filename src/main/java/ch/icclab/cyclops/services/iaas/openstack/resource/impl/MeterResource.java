@@ -53,9 +53,9 @@ public class MeterResource extends ServerResource implements UDRResource {
     /**
      * Receives the JSON data consisting of meter selection status
      * <p/>
-     * Pseudo Code
-     * 1. Receive the data
-     * 2. Extract the JSON array
+     * Pseudo Code<br>
+     * 1. Receive the data<br>
+     * 2. Extract the JSON array<br>
      * 3. Send the JSON array to saveData() for persistence into the DB
      *
      * @param entity The body of the POST request
@@ -79,7 +79,7 @@ public class MeterResource extends ServerResource implements UDRResource {
             logger.error("EXCEPTION IOEXCEPTION Representation setMeterList(Representation entity)");
             e.printStackTrace();
         }
-        //Set the isMeterListReset to TRUE
+        //Tells to UDR that need to reload the meter list in Load
         Flag.setMeterListReset(true);
         // Process the incoming request
         try {
@@ -100,6 +100,7 @@ public class MeterResource extends ServerResource implements UDRResource {
             response.setStatus("Failure");
             response.setMessage("Data could not be saved into the DB");
         }
+        //TODO: jsonMapper method. reusable in all the classes.
         // Convert the Java object to a JSON string
         try {
             jsonData = mapper.writeValueAsString(response);
@@ -115,8 +116,8 @@ public class MeterResource extends ServerResource implements UDRResource {
     /**
      * Invoke the db client to persist the data
      * <p/>
-     * Pseudo Code
-     * 1. Receive the data
+     * Pseudo Code<br>
+     * 1. Receive the data<br>
      * 2. Save the data using the InfluxDB client
      *
      * @param jsonObj The JSON object that needs to be persisted into the DB
@@ -135,9 +136,9 @@ public class MeterResource extends ServerResource implements UDRResource {
     /**
      * Returns the last persisted list of meters
      * <p/>
-     * Pseudo Code
-     * 1. Receive the request for the list of meters
-     * 2. Query the DB to get the list
+     * Pseudo Code<br>
+     * 1. Receive the request for the list of meters<br>
+     * 2. Query the DB to get the list<br>
      * 3. Return the list of meters
      *
      * @return Representation A JSON response containing the list of meters

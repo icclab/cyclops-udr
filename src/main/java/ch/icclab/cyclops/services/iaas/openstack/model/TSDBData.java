@@ -17,13 +17,17 @@
 
 package ch.icclab.cyclops.services.iaas.openstack.model;
 
-import java.util.ArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.*;
 
 /**
+ * <b>POJO Object</b><p/>
  * Author: Srikanta
  * Created on: 15-Oct-14
  * Description: A POJO class for InfluxDB
- * <p/>
+ *
  * Change Log
  * Name        Date     Comments
  */
@@ -31,7 +35,9 @@ public class TSDBData {
     private String name;
     private ArrayList<String> columns;
     private ArrayList<ArrayList<Object>> points;
+    private HashMap tags;
 
+    final static Logger logger = LogManager.getLogger(TSDBData.class.getName());
     public String getName() {
         return name;
     }
@@ -55,4 +61,49 @@ public class TSDBData {
     public void setPoints(ArrayList<ArrayList<Object>> points) {
         this.points = points;
     }
+
+    public HashMap getTags() {
+        return tags;
+    }
+
+    public void setTags(HashMap tags) {
+        this.tags = tags;
+    }
+
+//    public String toString() {
+//        //logger.trace("BEGIN toString()");
+//        StringBuilder buf = new StringBuilder(new String(""));
+//        //logger.trace("DATA toString(): buf="+buf);
+//        buf = buf.append("name: "+this.getName()+"\n ");
+//        //logger.trace("DATA toString(): buf="+buf);
+//        for (String column : this.getColumns()){
+//            buf = buf.append("column: "+column+"\n ");
+//            //logger.trace("DATA toString(): buf="+buf);
+//        }
+//        for (ArrayList<Object> point : this.getPoints()){
+//            buf = buf.append("point: ");
+//            for (Object value : point) {
+//                buf = buf.append(value.toString() + " ");
+//            }
+//            buf = buf.append("\n ");
+//            //logger.trace("DATA toString(): buf="+buf);
+//        }
+//        //logger.trace("DATA toString(): buf="+buf);
+//        /*HashMap mp = this.getTags();
+//        //logger.trace("DATA toString(): mp=" + mp.toString());
+//        Iterator it = mp.entrySet().iterator();
+//        while (it.hasNext()) {
+//            Map.Entry pair = (Map.Entry)it.next();
+//            buf = buf.append(pair.getKey().toString() + " : " + pair.getValue().toString()+"\n ");
+//            //logger.trace("DATA toString(): buf=" + buf);
+//            it.remove(); // avoids a ConcurrentModificationException
+//        }*/
+//        buf = buf.append(this.getTags()+"\n ");
+//
+//        String result = buf.toString();
+//        //logger.trace("DATA toString(): result"+result);
+//        //logger.trace("END toString()");
+//        return result;
+//    }
+
 }

@@ -94,6 +94,9 @@ public class Load extends ClientResource {
         influxDB.createDatabase(configuration.get("dbName"));
     }
 
+    /**
+     * This method formats the meters and inserts them in the Cumulative and Gauge meter lists.
+     */
     public void meterList() {
         TSDBResource tsdbResource = new TSDBResource();
         TSDBData tsdbData;

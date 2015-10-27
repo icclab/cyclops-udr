@@ -12,7 +12,7 @@
     <!--</Routing>-->
     <!--Logger Levels: FATAL>ERROR>WARN>INFO>DEBUG>TRACE>ALL-->
     <Loggers>
-        <Logger name="org.apache.log4j.xml" additivity="false" level="INFO"/>
+        <Logger name="org.apache.log4j.xml" additivity="false" level="debug"/>
         <!--<Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.ExternalAppResource" additivity="false" level="INFO">-->
             <!--<AppenderRef ref="udr"/>-->
         <!--</Logger>-->
@@ -34,7 +34,7 @@
         <!--<Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.client.TelemetryClient" additivity="false" level="INFO">-->
             <!--<AppenderRef ref="udr"/>-->
         <!--</Logger>-->
-        <Root level="INFO">
+        <Root level="debug">
             <AppenderRef ref="udr"/>
         </Root>
     </Loggers>

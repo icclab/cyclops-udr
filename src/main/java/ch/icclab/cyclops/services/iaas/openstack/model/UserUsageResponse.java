@@ -3,6 +3,7 @@ package ch.icclab.cyclops.services.iaas.openstack.model;
 import java.util.HashMap;
 
 /**
+ * <b>POJO Object</b><p/>
  * Author: Srikanta
  * Created on: 26-Jan-15
  * Description:

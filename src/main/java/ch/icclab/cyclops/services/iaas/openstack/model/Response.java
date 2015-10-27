@@ -18,6 +18,7 @@
 package ch.icclab.cyclops.services.iaas.openstack.model;
 
 /**
+ * <b>POJO Object</b><p/>
  * Author: Srikanta
  * Created on: 16-Jan-15
  * Description: POJO class for representing the response for an incoming api request

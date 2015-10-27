@@ -38,7 +38,7 @@ public class RootResource extends ServerResource implements UDRResource {
     @Get
     public String rootMsg() {
         logger.trace("BEGIN String rootMsg()");
-        String response = "CYCLOPS UDR Service - v 0.5.1";
+        String response = "CYCLOPS UDR Service - v 0.6.0";
         logger.trace("END String rootMsg()");
         return response;
     }

@@ -18,6 +18,7 @@
 package ch.icclab.cyclops.services.iaas.openstack.model;
 
 /**
+ * <b>POJO Object</b><p/>
  * Author: Srikanta
  * Created on: 21-Oct-14
  * Description: A POJO class for Gauge Meters from OpenStack's Ceilometer

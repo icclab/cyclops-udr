@@ -167,9 +167,9 @@ public class TSDBResource implements DatabaseResource {
      * Receives the transformed usage data from an external application in terms of an TSDBData POJO.
      * POJO is converted into a json object and the InfluxDB client is invoked to persist the data.
      * <p/>
-     * Pseudo Code
-     * 1. Convert the TSDB POJO consisting of the usage data into a JSON Obj
-     * 2. Invoke the InfluxDB client
+     * Pseudo Code<br/>
+     * 1. Convert the TSDB POJO consisting of the usage data into a JSON Obj<br/>
+     * 2. Invoke the InfluxDB client<br/>
      * 3. Save the data in to the DB
      *
      * @param dbData
@@ -183,7 +183,7 @@ public class TSDBResource implements DatabaseResource {
 
         try {
             jsonData = mapper.writeValueAsString(dbData);
-            dbClient.saveData(jsonData);
+            dbClient.saveExtData(jsonData);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             result = false;
@@ -192,6 +192,17 @@ public class TSDBResource implements DatabaseResource {
         return result;
     }
 
+    /**
+     * Ask for data into the DB by a SQL SELECT Query
+     *
+     * @param from
+     * @param to
+     * @param userId
+     * @param meterName
+     * @param source
+     * @param type
+     * @return
+     */
     public TSDBData getUsageData(String from, String to, String userId, Object meterName, String source, String type) {
         String query = null;
         InfluxDBClient dbClient = new InfluxDBClient();
@@ -202,7 +213,7 @@ public class TSDBResource implements DatabaseResource {
         } else if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("gauge")) {
             query = "SELECT avg,unit,type FROM \"" + meterName + "\" WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND userid='" + userId + "' ";
         } else {
-            query = "SELECT timestamp,usage FROM \"" + meterName + "\" WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND userid='" + userId + "' ";
+            query = "SELECT time,usage FROM \"" + meterName + "\" WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND userid='" + userId + "' ";
         }
 
         return dbClient.getData(query);
@@ -213,15 +224,8 @@ public class TSDBResource implements DatabaseResource {
         TSDBData tsdbData = null;
         Long epoch;
 
-        //Get the first entry
-        tsdbData = dbClient.getData("select * from meterselection limit 1");
-        // Extract the time of the first entry
-        if (tsdbData.getPoints().size() != 0) {
-            Date date = this.formatDate((String) tsdbData.getPoints().get(0).get(0));
-            epoch = date.getTime();
-            // Use the extracted epoch time to get all the data entry
-            tsdbData = dbClient.getData("select * from meterselection " + "where time > " + epoch + "ms");
-        }
+        //TODO: does this have sense? check if we can use select * from meterselection
+        tsdbData = dbClient.getData("select * from meterselection");
         return tsdbData;
     }
 

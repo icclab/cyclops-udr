@@ -20,6 +20,7 @@ package ch.icclab.cyclops.services.iaas.openstack.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
+ * <b>POJO Object</b><p/>
  * Author: Srikanta
  * Created on: 11-Dec-14
  * Description: A POJO class for CumulativeMeters from OpenStack's Ceilometer

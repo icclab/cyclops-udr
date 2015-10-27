@@ -33,11 +33,11 @@ public class UserUsageResource extends ServerResource implements UsageResource {
     /**
      * Get the usage data for the userID mentioned in the URL string
      * <p/>
-     * Pseudo Code
-     * 1. Extract the QueryValues from the URL
-     * 2. Add the meters name to the meter list
-     * 3. Query the DB to get the usage data and add the response to an array list
-     * 4. Add the array list with its source name into a HashMap
+     * Pseudo Code<br/>
+     * 1. Extract the QueryValues from the URL<br/>
+     * 2. Add the meters name to the meter list<br/>
+     * 3. Query the DB to get the usage data and add the response to an array list<br/>
+     * 4. Add the array list with its source name into a HashMap<br/>
      * 5. Construct the response and return it in the JSON format
      *
      * @return userUsageResponse Response consisting of the usage data for the request userID
@@ -99,10 +99,10 @@ public class UserUsageResource extends ServerResource implements UsageResource {
     /**
      * * Construct the JSON response consisting of the meter and the usage values
      * *
-     * * Pseudo Code
-     * * 1. Create the HasMap consisting of time range
-     * * 2. Create the response POJO
-     * * 3. Convert the POJO to JSON
+     * * Pseudo Code<br/>
+     * * 1. Create the HasMap consisting of time range<br/>
+     * * 2. Create the response POJO<br/>
+     * * 3. Convert the POJO to JSON<br/>
      * * 4. Return the JSON string
      *
      * @param usageArr An arraylist consisting of metername and corresponding usage
@@ -112,7 +112,6 @@ public class UserUsageResource extends ServerResource implements UsageResource {
      * @return responseJson The response object in the JSON format
      */
     public Representation constructResponse(HashMap usageArr, String userId, String fromDate, String toDate) {
-
         String jsonStr;
         JsonRepresentation responseJson = null;
 

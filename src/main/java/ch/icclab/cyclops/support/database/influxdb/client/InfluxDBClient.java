@@ -63,9 +63,9 @@ public class InfluxDBClient extends ClientResource {
     /**
      * Saves the data into InfluxDB via HTTP
      * <p/>
-     * Pseudo Code
-     * 1. Load the login credentials from the configuration object
-     * 2. Create a client instance and set the HTTP protocol, url and auth details
+     * Pseudo Code<br/>
+     * 1. Load the login credentials from the configuration object<br/>
+     * 2. Create a client instance and set the HTTP protocol, url and auth details<br/>
      * 3. Send the data
      *
      * @param data - a JSON representation of the data
@@ -115,18 +115,71 @@ public class InfluxDBClient extends ClientResource {
         return true;
     }
 
+    /**
+     * Saves the data into InfluxDB via HTTP
+     * <p/>
+     * Pseudo Code<br/>
+     * 1. Load the login credentials from the configuration object<br/>
+     * 2. Create a client instance and set the HTTP protocol, url and auth details<br/>
+     * 3. Send the data
+     *
+     * @param data - a JSON representation of the data
+     * @return boolean
+     */
+
+    public boolean saveExtData(String data) {
+        InfluxDB influxDB = InfluxDBFactory.connect(load.configuration.get("InfluxDBURL"), "root", "root");
+        Representation output;
+        String[] columns = getColumns(data);
+        ArrayList<String[]> points = getPoints(data);
+        int meternameIndex = -1;
+        int timeIndex = -1;
+        int sourceIndex = -1;
+        int usageIndex = -1;
+        int useridIndex = -1;
+        for (int i = 0; i < columns.length; i++) {
+            if (columns[i].equals("timestamp"))
+                timeIndex = i;
+            else if (columns[i].equals("source"))
+                sourceIndex = i;
+            else if (columns[i].equals("usage"))
+                usageIndex = i;
+            else if (columns[i].equals("userid"))
+                useridIndex = i;
+        }
+        logger.debug("Obtained indexes from the columns: Metername: " + meternameIndex + " Time: " + timeIndex + " Source: " + sourceIndex);
+        for (int i = 0; i < points.size(); i++) {
+            //logger.debug("Attempting to build the Point: " + points.get(i)[meternameIndex]);
+            String metername = data.split("name\":")[1];
+            metername = metername.split("\"")[1];
+            Point point = Point.measurement(metername)
+                    .tag("time", points.get(i)[timeIndex])
+                    .tag("source", points.get(i)[sourceIndex].substring(1, points.get(i)[sourceIndex].length() - 1))
+                    .tag("userid", points.get(i)[useridIndex].substring(1, points.get(i)[useridIndex].length() - 1))
+                    .field("usage", points.get(i)[usageIndex].substring(0,points.get(i)[usageIndex].length() - 2))
+                    .build();
+            //logger.debug("Attempting to write the Point (" + points.get(i)[meternameIndex] + ") in the db:" + dbName);
+            influxDB.write(dbName, "default", point);
+            logger.debug("Point successfully written.");
+        }
+        return true;
+    }
+
+    /**
+     * This method gets the data from the database for a parametrized Query, format it and send it back as a TSDBData.
+     *
+     * @param parameterQuery
+     * @return
+     */
     public TSDBData getData(String parameterQuery) {
+        //TODO: check the sense of the TSDBData[] and simplify/split the code
         logger.debug("Attempting to get Data");
         InfluxDB influxDB = InfluxDBFactory.connect(load.configuration.get("InfluxDBURL"), "root", "root");
         JSONArray resultArray;
-        JSONObject resultObj;
         TSDBData[] dataObj = null;
-        Representation output;
         ObjectMapper mapper = new ObjectMapper();
         int timeIndex = -1;
         int usageIndex = -1;
-        Client client = new Client(Protocol.HTTP);
-        ClientResource cr = new ClientResource(url);
         Query query = new Query(parameterQuery, dbName);
         try {
             logger.debug("Attempting to execute the query: " + parameterQuery + " into the db: " + dbName);
@@ -137,27 +190,30 @@ public class InfluxDBClient extends ClientResource {
                     TSDBData data = new TSDBData();
                     data.setColumns(new ArrayList<String>());
                     data.setPoints(new ArrayList<ArrayList<Object>>());
+                    data.setTags(new HashMap());
                     return data;
                 } else {
                     JSONObject obj = (JSONObject) resultArray.get(0);
                     JSONArray series = (JSONArray) obj.get("series");
-                    String response = series.get(0).toString();
-                    response = response.split("values")[0] + "points" + response.split("values")[1];
-                    series.put(0, new JSONObject(response));
+                    for (int i = 0; i < series.length(); i++) {
+                        String response = series.get(i).toString();
+                        response = response.split("values")[0] + "points" + response.split("values")[1];
+                        series.put(i, new JSONObject(response));
+                    }
                     dataObj = mapper.readValue(series.toString(), TSDBData[].class);
 
                     //Filter the points for repeated timestamps and add their usage/avg value
-                    for(int i = 0 ; i<dataObj.length ; i++){
-                        for(int o = 0 ; o<dataObj[0].getColumns().size(); o++) {
-                            if (dataObj[0].getColumns().get(o).equalsIgnoreCase("time"))
+                    for (int i = 0; i < dataObj.length; i++) {
+                        for (int o = 0; o < dataObj[i].getColumns().size(); o++) {
+                            if (dataObj[i].getColumns().get(o).equalsIgnoreCase("time"))
                                 timeIndex = o;
-                            if(dataObj[0].getColumns().get(o).equalsIgnoreCase("usage") || dataObj[0].getColumns().get(o).equalsIgnoreCase("avg"))
+                            if (dataObj[i].getColumns().get(o).equalsIgnoreCase("usage") || dataObj[i].getColumns().get(o).equalsIgnoreCase("avg"))
                                 usageIndex = o;
                         }
-                        if(usageIndex>-1) {
+                        if (usageIndex > -1) {
                             //If the json belongs to a meter point, filter and add to another if necessary.
                             TreeMap<String, ArrayList> points = new TreeMap<String, ArrayList>();
-                            for (ArrayList point : dataObj[0].getPoints()) {
+                            for (ArrayList point : dataObj[i].getPoints()) {
                                 if (points.containsKey(point.get(timeIndex))) {
                                     String time = (String) point.get(timeIndex);
                                     Double usage = Double.parseDouble(points.get(time).get(usageIndex).toString());
@@ -170,7 +226,7 @@ public class InfluxDBClient extends ClientResource {
                             for (String key : points.keySet()) {
                                 result.add(points.get(key));
                             }
-                            dataObj[0].setPoints(result);
+                            dataObj[i].setPoints(result);
                         }
                     }
 
@@ -210,10 +266,50 @@ public class InfluxDBClient extends ClientResource {
         ArrayList<String[]> result = new ArrayList<String[]>();
         String[] split = json.split(":\\[")[2].split("],\\[");
         split[0] = split[0].substring(1);
-        split[split.length - 1] = split[split.length - 1].substring(0,  split[split.length - 1].length() - 3);
+        split[split.length - 1] = split[split.length - 1].substring(0, split[split.length - 1].length() - 3);
         for (int i = 0; i < split.length; i++) {
             result.add(split[i].split(","));
         }
         return result;
+    }
+
+    public TSDBData [] getCDRData(String parameterQuery) {
+        logger.debug("Attempting to get CDR Data");
+        InfluxDB influxDB = InfluxDBFactory.connect(load.configuration.get("InfluxDBURL"), "root", "root");
+        JSONArray resultArray;
+        TSDBData[] dataObj = null;
+        ObjectMapper mapper = new ObjectMapper();
+        int timeIndex = -1;
+        int usageIndex = -1;
+        Query query = new Query(parameterQuery, dbName);
+        try {
+            logger.debug("Attempting to execute the query: " + parameterQuery + " into the db: " + dbName);
+            resultArray = new JSONArray(influxDB.query(query).getResults());
+            logger.debug("Obtained results: " + resultArray.toString());
+            if (!resultArray.isNull(0)) {
+                if (resultArray.toString().equals("[{}]")) {
+                    TSDBData data = new TSDBData();
+                    data.setColumns(new ArrayList<String>());
+                    data.setPoints(new ArrayList<ArrayList<Object>>());
+                    data.setTags(new HashMap());
+                    dataObj[0] = data;
+                    return dataObj;
+                } else {
+                    JSONObject obj = (JSONObject) resultArray.get(0);
+                    JSONArray series = (JSONArray) obj.get("series");
+                    for (int i = 0; i < series.length(); i++) {
+                        String response = series.get(i).toString();
+                        response = response.split("values")[0] + "points" + response.split("values")[1];
+                        series.put(i, new JSONObject(response));
+                    }
+                    dataObj = mapper.readValue(series.toString(), TSDBData[].class);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return dataObj;
     }
 }

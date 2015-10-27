@@ -79,7 +79,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
         KeystoneClient keystoneClient = new KeystoneClient();
         token = keystoneClient.generateToken();
 
-        //Load the meter list
+        //Load the meter list into the openStackCumulativeMeterList and openStackGaugeMeterList
         load.meterList();
         for (String meter : Load.openStackCumulativeMeterList) {
             logger.debug("Cumulative Meter: " + meter);
@@ -111,7 +111,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
         logger.trace("BEGIN Response constructResponse(boolean cumulativeMeterOutput, boolean gaugeMeterOutput)");
         Response responseObj = new Response();
         LocalDateTime currentDateTime = new LocalDateTime();
-
+        //TODO: response for no usagedata saved.
         if (cumulativeMeterOutput && gaugeMeterOutput) {
             responseObj.setTimestamp(currentDateTime.toDateTime().toString());
             responseObj.setStatus("Success");
@@ -175,7 +175,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
                     JSONObject obj = null;
                     obj = array.getJSONObject(i);
                     data = mapper.readValue(obj.toString(), CumulativeMeterData.class);
-
+                    //This Adds all the data for the instances using the meter
                     if (map.containsKey(data.getResource_id())) {
                         linkedList = map.get(data.getResource_id());
                         linkedList.add(data);
@@ -188,7 +188,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
                     }
                 }
 
-                //Get the Set of keys
+                //Get the Set of keys (meters)
                 keySet = map.keySet();
                 Iterator setIterator = keySet.iterator();
 
@@ -218,10 +218,10 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
     /**
      * In this method, usage made is calculated on per resource basis in the cumulative meters
      * <p/>
-     * Pseudo Code
-     * 1. Traverse through the linkedlist
-     * 2. Subtract the volumes of i and (i+1) samples
-     * 3. Set the difference into the i sample object
+     * Pseudo Code<br/>
+     * 1. Traverse through the linkedlist<br/>
+     * 2. Treat the first point subtracting the last inserted value to the current point one.<br/>
+     * 3. Treat the N points with the last volumes.<br/>
      * 4. Add the updates sample object into an arraylist
      *
      * @param cMeterArr  This is an arrayList of type CumulativeMeterData containing sample object with the usage information
@@ -247,30 +247,15 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
             newVolume = linkedList.get(i).getVolume();
             if (newVolume >= oldVolume) {
                 //Normal use case where the new usage is greater or equals than the last inserted point.
+                //TODO: what if the value is higher but it's coz the counter reset and get higher? (if we have message queues or event based and they advise before reset, that's solved
                 lastUsage = newVolume - oldVolume;
             } else {
                 //TODO: if the volume is lower than the lastInserted get the maximum for that meter and operate on it.
-                /*long value = oldVolume;
-                while (value > -1)
-                    value++;
-                lastUsage = (value - oldVolume) + newVolume;*/
                 lastUsage = newVolume;
             }
             linkedList.get(i).setUsage(lastUsage);
             cMeterArr.add(linkedList.get(i));
         }
-
-        /*for (int i = 0; i < (linkedList.size() - 1); i++) {
-            if ((i + 1) <= linkedList.size()) {
-                diff = linkedList.get(i).getVolume() - linkedList.get(i + 1).getVolume();
-                if (diff < 0) {
-                    linkedList.get(i).setUsage(0); //TODO: Update the negative difference usecase
-                } else {
-                    linkedList.get(i).setUsage(diff);
-                }
-                cMeterArr.add(linkedList.get(i));
-            }
-        }*/
         cMeterArr.add(linkedList.getLast());
         logger.trace("END ArrayList<CumulativeMeterData> calculateCumulativeMeterUsage(ArrayList<CumulativeMeterData> cMeterArr, LinkedList<CumulativeMeterData> linkedList)");
         return cMeterArr;
@@ -300,7 +285,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
                 response = tClient.getData(token, meter.get(i), meterType);
                 array = new JSONArray(response);
                 logger.debug("Array Size: " + array.length());
-                if (response.toString() != "[]") {
+                if (!response.equals("[]")) {
                     for (int j = 0; j < array.length(); j++) {
                         JSONObject obj = array.getJSONObject(j);
                         GaugeMeterData data = mapper.readValue(obj.toString(), GaugeMeterData.class);
