@@ -31,6 +31,7 @@ package ch.icclab.cyclops.application;
  */
 
 import ch.icclab.cyclops.services.iaas.openstack.resource.impl.*;
+import ch.icclab.cyclops.util.APICallCounter;
 import ch.icclab.cyclops.util.Load;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -58,14 +59,28 @@ public class UDRApplication extends Application {
         logger.trace("BEGIN Restlet createInboundRoot()");
         //Load the configuration files and flags
         loadConfiguration(getContext());
+        APICallCounter counter = APICallCounter.getInstance();
 
         Router router = new Router(getContext());
         router.attach("/", RootResource.class);
+        counter.registerEndpoint("/");
+
+
         router.attach("/api", TelemetryResource.class); //API used internally to trigger the data collection
+        counter.registerEndpoint("/api");
+
         router.attach("/ext/app", ExternalAppResource.class); // API used for data insertion from external PaaS/IaaS
+        counter.registerEndpoint("/ext/app");
+
         router.attach("/usage/users/{userid}", UserUsageResource.class); //API used for fetching the usage info for a user
+        counter.registerEndpoint("/usage/users");
+
         router.attach("/usage/resources/{resourceid}", ResourceUsage.class);
+        counter.registerEndpoint("/usage/resources");
+
         router.attach("/meters", MeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
+        counter.registerEndpoint("/meters");
+
         logger.trace("END Restlet createInboundRoot()");
         return router;
     }

@@ -4,6 +4,7 @@ import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.services.iaas.openstack.model.UserUsageResponse;
 import ch.icclab.cyclops.services.iaas.openstack.persistence.TSDBResource;
 import ch.icclab.cyclops.services.iaas.openstack.resource.interfc.UsageResource;
+import ch.icclab.cyclops.util.APICallCounter;
 import ch.icclab.cyclops.util.Load;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +26,8 @@ import java.util.HashMap;
 public class UserUsageResource extends ServerResource implements UsageResource {
     final static Logger logger = LogManager.getLogger(UserUsageResource.class.getName());
     private String userId;
+    private String endpoint = "/usage/users";
+    private APICallCounter counter = APICallCounter.getInstance();
 
     public void doInit() {
         userId = (String) getRequestAttributes().get("userid");
@@ -32,7 +35,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
 
     /**
      * Get the usage data for the userID mentioned in the URL string
-     * <p/>
+     * <p>
      * Pseudo Code<br/>
      * 1. Extract the QueryValues from the URL<br/>
      * 2. Add the meters name to the meter list<br/>
@@ -44,6 +47,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
      */
     @Get
     public Representation getData() {
+        counter.increment(endpoint);
         logger.trace("BEGIN Representation getData()");
         Representation userUsageResponse;
         TSDBData usageData = null;

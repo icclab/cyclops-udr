@@ -20,6 +20,7 @@ package ch.icclab.cyclops.services.iaas.openstack.resource.impl;
 import ch.icclab.cyclops.services.iaas.openstack.model.ResourceUsageResponse;
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.support.database.influxdb.client.InfluxDBClient;
+import ch.icclab.cyclops.util.APICallCounter;
 import ch.icclab.cyclops.util.Load;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,6 +46,8 @@ import java.util.HashMap;
 public class ResourceUsage extends ServerResource {
     final static Logger logger = LogManager.getLogger(ResourceUsage.class.getName());
     private String resourceId;
+    private String endpoint = "/usage/resources";
+    private APICallCounter counter = APICallCounter.getInstance();
 
     public void doInit() {
         resourceId = (String) getRequestAttributes().get("resourceid");
@@ -52,6 +55,7 @@ public class ResourceUsage extends ServerResource {
 
     @Get
     public Representation getResourceUsage(Entity entity) {
+        counter.increment(endpoint);
         logger.trace("BEGIN Representation getResourceUsage(Entity entity)");
         String query = null;
         String jsonStr;
@@ -121,7 +125,7 @@ public class ResourceUsage extends ServerResource {
 
     /**
      * This method sums all the values of the gotten points from the external meter data and sums their values.
-     *<br/>
+     * <br/>
      * Pseudo Code:
      * <br/>
      * 1. Get the column indexes <br/>
@@ -139,10 +143,10 @@ public class ResourceUsage extends ServerResource {
             int usageIndex = tsdbData[i].getColumns().indexOf("usage");
             int timeIndex = tsdbData[i].getColumns().indexOf("time");
 
-            for (int o = 0; o<tsdbData[i].getPoints().size(); o++){
-                usage = usage + Integer.parseInt((String)tsdbData[i].getPoints().get(o).get(usageIndex));
-                if(o == tsdbData[i].getPoints().size() -1) {
-                    String time = (String)tsdbData[i].getPoints().get(o).get(timeIndex);
+            for (int o = 0; o < tsdbData[i].getPoints().size(); o++) {
+                usage = usage + Integer.parseInt((String) tsdbData[i].getPoints().get(o).get(usageIndex));
+                if (o == tsdbData[i].getPoints().size() - 1) {
+                    String time = (String) tsdbData[i].getPoints().get(o).get(timeIndex);
                     finalPoint.add(timeIndex, time);
                     finalPoint.add(usageIndex, String.valueOf(usage));
                 }
@@ -153,8 +157,8 @@ public class ResourceUsage extends ServerResource {
         return result;
     }
 
-    private String formatDate(String date){
+    private String formatDate(String date) {
         String result = date.split("T")[0].concat(" ").concat(date.split("T")[1]);
-        return result.substring(1, result.length()-1);
+        return result.substring(1, result.length() - 1);
     }
 }

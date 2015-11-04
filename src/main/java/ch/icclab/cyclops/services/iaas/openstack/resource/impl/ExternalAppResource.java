@@ -21,6 +21,7 @@ import ch.icclab.cyclops.services.iaas.openstack.model.Response;
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.services.iaas.openstack.persistence.TSDBResource;
 import ch.icclab.cyclops.services.iaas.openstack.resource.interfc.ExternalDataResource;
+import ch.icclab.cyclops.util.APICallCounter;
 import ch.icclab.cyclops.util.ResponseUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,7 +46,8 @@ import java.util.ArrayList;
  */
 public class ExternalAppResource extends ServerResource implements ExternalDataResource {
     final static Logger logger = LogManager.getLogger(ExternalAppResource.class.getName());
-
+    private String endpoint = "/ext/app";
+    private APICallCounter counter = APICallCounter.getInstance();
     /**
      * Receives the JSON data sent by an external application
      * <p/>
@@ -59,6 +61,7 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
      */
     @Post("json:json")
     public Representation receiveRequest(JsonRepresentation entity) {
+        counter.increment(endpoint);
         logger.trace("BEGIN Representation receiveRequest(JsonRepresentation entity)");
         JSONArray jsonArr = null;
         boolean output = true;

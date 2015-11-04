@@ -22,6 +22,7 @@ import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.support.database.influxdb.client.InfluxDBClient;
 import ch.icclab.cyclops.services.iaas.openstack.persistence.TSDBResource;
 import ch.icclab.cyclops.services.iaas.openstack.resource.interfc.UDRResource;
+import ch.icclab.cyclops.util.APICallCounter;
 import ch.icclab.cyclops.util.Flag;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,7 +50,8 @@ import java.io.IOException;
 public class MeterResource extends ServerResource implements UDRResource {
 
     final static Logger logger = LogManager.getLogger(MeterResource.class.getName());
-
+    private String endpoint = "/meters";
+    private APICallCounter counter = APICallCounter.getInstance();
     /**
      * Receives the JSON data consisting of meter selection status
      * <p/>
@@ -63,6 +65,7 @@ public class MeterResource extends ServerResource implements UDRResource {
      */
     @Post("json:json")
     public Representation setMeterList(Representation entity) {
+        counter.increment(endpoint);
         logger.trace("BEGIN Representation setMeterList(Representation entity)");
         boolean output = true;
         ObjectMapper mapper = new ObjectMapper();
@@ -145,6 +148,7 @@ public class MeterResource extends ServerResource implements UDRResource {
      */
     @Get
     public Representation getMeterList() {
+        counter.increment(endpoint);
         logger.trace("BEGIN Representation getMeterList()");
         String jsonStr;
         JsonRepresentation responseJson = null;

@@ -30,6 +30,7 @@ import ch.icclab.cyclops.services.iaas.openstack.persistence.TSDBResource;
 import ch.icclab.cyclops.services.iaas.openstack.client.KeystoneClient;
 import ch.icclab.cyclops.services.iaas.openstack.client.TelemetryClient;
 import ch.icclab.cyclops.services.iaas.openstack.resource.interfc.MeteringResource;
+import ch.icclab.cyclops.util.APICallCounter;
 import ch.icclab.cyclops.util.Load;
 import ch.icclab.cyclops.util.ResponseUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,7 +52,8 @@ import java.util.*;
 public class TelemetryResource extends ServerResource implements MeteringResource {
     final static Logger logger = LogManager.getLogger(TelemetryResource.class.getName());
     private InfluxDB influxDB = InfluxDBFactory.connect(Load.configuration.get("InfluxDBURL"), "root", "root");
-
+    private String endpoint = "/api";
+    private APICallCounter counter = APICallCounter.getInstance();
     /**
      * This method calls the private classes to get the data from the Cumulative and Gauge meters
      * of the Ceilometer. This method is called periodically by a scheduler
@@ -67,6 +69,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
      */
     @Get
     public Representation setMeterData() {
+        counter.increment(endpoint);
         logger.trace("BEGIN Representation setMeterData()");
         boolean gaugeMeterOutput = false;
         boolean cumulativeMeterOutput = false;
