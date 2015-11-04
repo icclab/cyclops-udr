@@ -32,6 +32,7 @@ package ch.icclab.cyclops.application;
 
 import ch.icclab.cyclops.services.iaas.openstack.resource.impl.*;
 import ch.icclab.cyclops.util.APICallCounter;
+import ch.icclab.cyclops.util.APICallEndpoint;
 import ch.icclab.cyclops.util.Load;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -62,9 +63,12 @@ public class UDRApplication extends Application {
         APICallCounter counter = APICallCounter.getInstance();
 
         Router router = new Router(getContext());
+
+        router.attach("/status", APICallEndpoint.class);
+        counter.registerEndpoint("/status");
+
         router.attach("/", RootResource.class);
         counter.registerEndpoint("/");
-
 
         router.attach("/api", TelemetryResource.class); //API used internally to trigger the data collection
         counter.registerEndpoint("/api");
