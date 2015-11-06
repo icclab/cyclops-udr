@@ -35,7 +35,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
 
     /**
      * Get the usage data for the userID mentioned in the URL string
-     * <p>
+     * <p/>
      * Pseudo Code<br/>
      * 1. Extract the QueryValues from the URL<br/>
      * 2. Add the meters name to the meter list<br/>

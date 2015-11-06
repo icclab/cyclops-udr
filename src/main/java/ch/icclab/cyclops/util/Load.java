@@ -52,6 +52,80 @@ public class Load extends ClientResource {
     public static ArrayList<String> externalMeterList = new ArrayList<String>();
     private InfluxDB influxDB;
 
+
+    // Rabbit MQ Settings
+    private RabbitMQSettings rabbitMQSettings;
+
+    /**
+     * This class holds Rabbit MQ Settings
+     */
+    public class RabbitMQSettings {
+        private String RabbitMQQueueName;
+        private String RabbitMQUsername;
+        private String RabbitMQPassword;
+        private String RabbitMQHost;
+        private Integer RabbitMQPort;
+        private String RabbitMQVirtualHost;
+
+        public RabbitMQSettings(String rabbitMQQueueName, String rabbitMQUsername, String rabbitMQPassword, String rabbitMQHost, Integer rabbitMQPort, String rabbitMQVirtualHost) {
+            RabbitMQQueueName = rabbitMQQueueName;
+            RabbitMQUsername = rabbitMQUsername;
+            RabbitMQPassword = rabbitMQPassword;
+            RabbitMQHost = rabbitMQHost;
+            RabbitMQPort = rabbitMQPort;
+            RabbitMQVirtualHost = rabbitMQVirtualHost;
+        }
+
+        public String getRabbitMQQueueName() {
+            return RabbitMQQueueName;
+        }
+
+        public String getRabbitMQUsername() {
+            return RabbitMQUsername;
+        }
+
+        public String getRabbitMQPassword() {
+            return RabbitMQPassword;
+        }
+
+        public String getRabbitMQHost() {
+            return RabbitMQHost;
+        }
+
+        public Integer getRabbitMQPort() {
+            return RabbitMQPort;
+        }
+
+        public String getRabbitMQVirtualHost() {
+            return RabbitMQVirtualHost;
+        }
+    }
+
+    /**
+     * Load the RabbitMQ Settings for the first time
+     */
+    private RabbitMQSettings loadRabbitMQSettings() {
+        return new RabbitMQSettings(configuration.get("RabbitMQQueueName"),
+                configuration.get("RabbitMQUsername"), configuration.get("RabbitMQPassword"),
+                configuration.get("RabbitMQHost"), Integer.parseInt(configuration.get("RabbitMQPort")),
+                configuration.get("RabbitMQVirtualHost"));
+    }
+
+    /**
+     * Simple getter for Rabbit MQ settings
+     * @return null or object
+     */
+    public RabbitMQSettings getRabbitMQSettings() {
+        if (rabbitMQSettings == null) {
+            try {
+                rabbitMQSettings = loadRabbitMQSettings();
+            } catch (Exception e) {
+                logger.error("Could not load Rabbit MQ Settings: " + e.getMessage());
+            }
+        }
+        return rabbitMQSettings;
+    }
+
     /**
      * Loads the configuration file
      * <p/>
@@ -92,6 +166,7 @@ public class Load extends ClientResource {
     public void createDatabase() {
         influxDB = InfluxDBFactory.connect(configuration.get("InfluxDBURL"), configuration.get("InfluxDBUsername"), configuration.get("InfluxDBPassword"));
         influxDB.createDatabase(configuration.get("dbName"));
+        influxDB.createDatabase(configuration.get("events_dbname"));
     }
 
     /**

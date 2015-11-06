@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
+import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.json.JSONArray;
@@ -35,11 +36,13 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Author: Srikanta
@@ -47,7 +50,7 @@ import java.util.TreeMap;
  * Upgraded by: Manu
  * Upgraded on: 23-Sep-15
  * Description: Client class for InfluxDB
- * <p/>
+ * <p>
  * Change Log
  * Name        Date     Comments
  */
@@ -62,7 +65,7 @@ public class InfluxDBClient extends ClientResource {
 
     /**
      * Saves the data into InfluxDB via HTTP
-     * <p/>
+     * <p>
      * Pseudo Code<br/>
      * 1. Load the login credentials from the configuration object<br/>
      * 2. Create a client instance and set the HTTP protocol, url and auth details<br/>
@@ -117,7 +120,7 @@ public class InfluxDBClient extends ClientResource {
 
     /**
      * Saves the data into InfluxDB via HTTP
-     * <p/>
+     * <p>
      * Pseudo Code<br/>
      * 1. Load the login credentials from the configuration object<br/>
      * 2. Create a client instance and set the HTTP protocol, url and auth details<br/>
@@ -156,7 +159,7 @@ public class InfluxDBClient extends ClientResource {
                     .tag("time", points.get(i)[timeIndex])
                     .tag("source", points.get(i)[sourceIndex].substring(1, points.get(i)[sourceIndex].length() - 1))
                     .tag("userid", points.get(i)[useridIndex].substring(1, points.get(i)[useridIndex].length() - 1))
-                    .field("usage", points.get(i)[usageIndex].substring(0,points.get(i)[usageIndex].length() - 2))
+                    .field("usage", points.get(i)[usageIndex].substring(0, points.get(i)[usageIndex].length() - 2))
                     .build();
             //logger.debug("Attempting to write the Point (" + points.get(i)[meternameIndex] + ") in the db:" + dbName);
             influxDB.write(dbName, "default", point);
@@ -273,7 +276,7 @@ public class InfluxDBClient extends ClientResource {
         return result;
     }
 
-    public TSDBData [] getCDRData(String parameterQuery) {
+    public TSDBData[] getCDRData(String parameterQuery) {
         logger.debug("Attempting to get CDR Data");
         InfluxDB influxDB = InfluxDBFactory.connect(load.configuration.get("InfluxDBURL"), "root", "root");
         JSONArray resultArray;
@@ -311,5 +314,152 @@ public class InfluxDBClient extends ClientResource {
             e.printStackTrace();
         }
         return dataObj;
+    }
+
+
+    /**
+     * Runs a query on InfluxDB. The first parameter is the query string. The second
+     * is the database.
+     *
+     * @param params
+     * @return
+     */
+    public TSDBData[] query(String... params) {
+        logger.trace("BEGIN query TSDBData[] query(String parameterQuery)");
+        String parameterQuery = params.length > 0 ? params[0] : "";
+        String dbname = params.length > 1 ? params[1] : Load.configuration.get("dbName");
+
+        InfluxDB influxDB = InfluxDBFactory.connect(Load.configuration.get("InfluxDBURL"), "root", "root");
+        TSDBData[] tsdbData = null;
+        JSONArray resultArray = null;
+        TSDBData[] dataObj = null;
+        ObjectMapper mapper = new ObjectMapper();
+
+        Query query = new Query(parameterQuery, dbname);
+        try {
+            logger.debug("Attempting to execute the query: " + parameterQuery + " into the db: " + dbname);
+            resultArray = new JSONArray(influxDB.query(query).getResults());
+            logger.debug("Obtained results: " + resultArray.toString());
+            if (!resultArray.isNull(0)) {
+                if (resultArray.toString().equals("[{}]")) {
+                    logger.debug("Result is [{}]");
+                    TSDBData data = new TSDBData();
+                    data.setColumns(new ArrayList<String>());
+                    data.setPoints(new ArrayList<ArrayList<Object>>());
+                    data.setTags(new HashMap());
+                    tsdbData = new TSDBData[1];
+                    tsdbData[0] = data;
+                } else {
+                    JSONObject obj = (JSONObject) resultArray.get(0);
+                    //TODO: translate data format
+                    logger.debug("JSON obj: " + obj.toString());
+                    JSONArray series = (JSONArray) obj.get("series");
+                    for (int i = 0; i < series.length(); i++) {
+                        String respons = series.get(i).toString();
+                        respons = respons.split("values")[0] + "points" + respons.split("values")[1];
+                        series.put(i, new JSONObject(respons));
+                    }
+                    dataObj = mapper.readValue(series.toString(), TSDBData[].class);
+                    logger.debug("dataObj: " + dataObj.toString());
+                    tsdbData = dataObj;
+                }
+            } else {
+                logger.debug("Result is null");
+                TSDBData data = new TSDBData();
+                data.setColumns(new ArrayList<String>());
+                data.setPoints(new ArrayList<ArrayList<Object>>());
+                data.setTags(new HashMap());
+                tsdbData = new TSDBData[1];
+                tsdbData[0] = data;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        logger.trace("END query TSDBData[] query(String parameterQuery)");
+        return tsdbData;
+    }
+
+    public void generateFakeEvent() {
+        InfluxDB influxDB = InfluxDBFactory.connect(Load.configuration.get("InfluxDBURL"), Load.configuration.get("InfluxDBUsername"), Load.configuration.get("InfluxDBPassword"));
+        String message1 = "{\"id\":32,\"instanceId\":\"id19\",\"productId\":\"service1\",\"agreementId\":\"s1vnf2_4\",\"relatives\":\"s1\",\"productType\":\"service\",\"startDate\":\"2015-06-10T00:00:00\",\"lastBillDate\":\"2015-06-10T00:00:00\",\"providerId\":\"f1\",\"clientId\":\"p1\",\"status\":\"running\",\"billingModel\":\"PAYG\",\"period\":\"P1D\",\"priceUnit\":\"EUR\",\"periodCost\":1.5,\"setupCost\":2,\"renew\":true,\"dateCreated\":\"2015-11-04T07:20:19\",\"dateModified\":\"2015-11-04T08:44:20\"}";
+        savePoint(message1, influxDB);
+    }
+
+    public void clear(String table, String dbname) {
+        InfluxDB influxDB = InfluxDBFactory.connect(Load.configuration.get("InfluxDBURL"), Load.configuration.get("InfluxDBUsername"), Load.configuration.get("InfluxDBPassword"));
+        String drop = "DROP MEASUREMENT " + table;
+        String create = "CREATE MEASUREMENT " + table;
+        Query query1 = new Query(drop, dbname);
+
+        influxDB.query(query1);
+    }
+
+    private void savePoint(String message, InfluxDB influxDB) {
+        try {
+            System.out.println(" [x] Received '" + message + "'");
+            JSONObject msg = new JSONObject(message);
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            Date date = format.parse(msg.get("dateModified").toString());
+            long timeMillisec = date.getTime();
+            Point event2add = Point.measurement("events")
+                    .time(timeMillisec, TimeUnit.MILLISECONDS)
+                    .field("id", msg.get("id"))
+                    .field("status", msg.get("status"))
+                    .field("billingmodel", msg.get("billingModel").toString())
+                    .field("producttype", msg.get("productType").toString())
+                    .field("productid", msg.get("productId").toString())
+                    .field("instanceid", msg.get("instanceId").toString())
+                    .field("setupcost", msg.get("setupCost"))
+                    .field("periodcost", msg.get("periodCost"))
+                    .field("period", msg.get("period"))
+                    .field("providerid", msg.get("providerId").toString())
+                    .field("clientid", msg.get("clientId").toString())
+                    .field("startdate", msg.get("startDate"))
+                    .field("lastbilldate", msg.get("lastBillDate"))
+                    .field("agreementid", msg.get("agreementId").toString())
+                    .field("relatives", msg.get("relatives"))
+                    .field("renew", msg.get("renew"))
+                    .field("dateCreated", msg.get("dateCreated"))
+                    .field("priceUnit", msg.get("priceUnit"))
+                    .build();
+            BatchPoints batchPoints = giveMeEmptyContainer();
+            batchPoints.point(event2add);
+            saveContainerToDB(batchPoints);
+            //influxDB.write(load.configuration.get("dbName"), "default", event2add);
+        } catch (Exception ex) {
+            System.err.println("Caught exception in client thread: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Asks for InfluxDB BatchPoints container
+     * @return empty container
+     */
+    public BatchPoints giveMeEmptyContainer() {
+        return BatchPoints
+                .database(Load.configuration.get("events_dbname"))
+                .retentionPolicy("default")
+                .consistency(InfluxDB.ConsistencyLevel.ALL)
+                .build();
+    }
+
+    /**
+     * Ask for connection to InfluxDB
+     * @return
+     */
+    private InfluxDB getConnection() {
+        return InfluxDBFactory.connect(this.url, this.username, this.password);
+    }
+
+    /**
+     * Save container to InfluxDB container
+     * @param container that is goint to be saved
+     */
+    public void saveContainerToDB(BatchPoints container) {
+        InfluxDB db = getConnection();
+        db.write(container);
     }
 }

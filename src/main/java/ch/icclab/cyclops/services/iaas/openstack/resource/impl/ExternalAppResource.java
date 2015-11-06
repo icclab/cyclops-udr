@@ -48,6 +48,7 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
     final static Logger logger = LogManager.getLogger(ExternalAppResource.class.getName());
     private String endpoint = "/ext/app";
     private APICallCounter counter = APICallCounter.getInstance();
+
     /**
      * Receives the JSON data sent by an external application
      * <p/>

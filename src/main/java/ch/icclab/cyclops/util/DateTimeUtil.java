@@ -86,7 +86,7 @@ public class DateTimeUtil {
             sSec = sec + "";
         }
 
-        to = year + "-" + sMonth + "-" + sDay + "T" + sHour + ":" + sMin + ":" + sSec;
+        to = year + "-" + sMonth + "-" + sDay + "T" + sHour + ":" + sMin + ":" + sSec+"Z";
         Date dateTo = getDate(to);
         //Converting to in UTC
         to = getString(dateTo);
@@ -107,7 +107,7 @@ public class DateTimeUtil {
     public Date getDate(String date) {
         long epochValue = 0;
         Date dateTime = null;
-        SimpleDateFormat dF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat dF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
             dateTime = dF.parse(date);
         } catch (ParseException e) {
@@ -134,4 +134,41 @@ public class DateTimeUtil {
         epochValue = dateTime.getTime();
         return epochValue;
     }
+
+    public static String getDate(long epoch) {
+        Date dateTime = new Date(epoch);
+        SimpleDateFormat dF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        dF.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String date = null;
+        try {
+            date = dF.format(dateTime);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    /**
+     * Formats a date string with character 'T' to a date string that does not contain 'T'.
+     *
+     * @param date
+     * @return
+     */
+    public String formatDate(String date){
+        String result = date.split("T")[0].concat(" ").concat(date.split("T")[1]);
+        return result.replace("\"","");
+    }
+
+    /**
+     * Formats a date string without character 'T' to a date string that contains 'T'.
+     *
+     * @param date
+     * @return
+     */
+    public String reformatDate(String date){
+        String result = date.split(" ")[0].concat("T").concat(date.split(" ")[1]);
+        return result.replace("\"","");
+    }
+
+
 }

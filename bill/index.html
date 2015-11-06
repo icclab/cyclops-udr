@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CYCLOPS Bill Generation</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- JQueryUI -->
+    <link href="css/jquery-ui.min.css" rel="stylesheet">
+    <link href="css/jquery-ui.structure.min.css" rel="stylesheet">
+    <link href="css/jquery-ui.theme.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="page-header">
+        <img src="http://blog.zhaw.ch/icclab/files/2014/04/icclab_logo.png" height="275" width="450" class="img-responsive" alt="Responsive image">
+    </div>
+    <!-- Step One : InfluxDB Login credentials -->
+        <div id="step1" class="jumbotron">
+            <div class="form-signin">
+                <h2 align="center" class="form-signin-heading">InfluxDB Login Credentials</h2>
+                <input type="text" id="dbUsername" class="form-control" value="admin" placeholder="InfluxDB Username" autofocus required>
+                <input type="password" id="dbPassword" class="form-control" value="admin" placeholder="InfluxDB Password"  required>
+                <input type="text" id="dbHost" class="form-control" value="http://localhost" placeholder="InfluxDB Host Name"  required>
+                <input type="number" id="dbPort" class="form-control" value="8086" placeholder="InfluxDB Port"  required>
+                <input type="text" id="dbName" class="form-control" value="udr_service" placeholder="InfluxDB Name"  required><br>
+            </div>
+            <button class="btn btn-lg btn-success" onclick="stepOneNextBtn();">Next</button>
+        </div>
+
+    <!-- Step Two : Meter Selection -->
+        <div id="step2" class="jumbotron">
+            <h3 align="left" class="form-signin-heading">Billing Period</h3>
+            <div align="left">
+                <label>From </label>
+                <input type="text" id="fromDate">
+                <label>To</label>
+                <input type="text" id="toDate">
+            </div></br>
+            <h3 align="left">Billing Entity</h3>
+            <label>Tenant ID</label> <input type="text" id="tenantid" class="form-control" value="5c290736f9eb4ac0a27ddcae4b6bf71f"> </br>
+            <div class="form-signin">
+                <h3 align="left" class="form-signin-heading">Meter Selection</h3>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" onclick="getMeterData('cpu_util');">
+                        CPU Utilization</label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" onclick="getMeterData('network.outgoing.bytes.rate');">
+                        Outgoing Data</label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" onclick="getMeterData('network.incoming.bytes.rate');">
+                        Incoming Data</label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" onclick="getMeterData('memory');">
+                        RAM</label>
+                </div>
+            </div>
+            </br>
+            <a class="btn btn-lg btn-warning" onclick="stepTwoBackBtn();">Back</a>
+            <a class="btn btn-lg btn-primary" onclick="stepTwoNextBtn();">Next</a>
+        </div>
+
+    <!-- Step Three : Rating and Charging -->
+    <div id="step3">
+        <div class="form-signin">
+            <h2 align="center" class="form-signin-heading">Rating & Charging</h2>
+        <table class="table table-hover" align="center">
+            <tr class="info">
+                <th>
+
+                    <p class="text-center">Resource</p>
+
+                </th>
+                <th>
+
+                    <p class="text-center">Usage</p>
+
+                </th>
+                <th>
+
+                    <p class="text-center">Unit</p>
+
+                </th>
+                <th>
+
+                    <p class="text-center">Status</p>
+
+                </th>
+                <th>
+
+                    <p class="text-center">Rate</p>
+
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <p class="text-center" >CPU Utilization</p>
+                </td>
+                <td>
+                        <p class="text-center" id="cpu_util">0</p>
+                </td>
+                <td>
+                    <p class="text-center">%</p>
+                </td>
+                <td id="cpu_utilStatusIndicator">
+                        <p class="text-center" id="cpu_utilStatus">Not Requested</p>
+                </td>
+                <td align="center">
+                    <input type="text" id="cpuUtilCharge" value=".01" onchange="calculateRate();">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                        <p class="text-center">Incoming Data</p>
+                </td>
+                <td>
+                        <p class="text-center" id="dataIn">0</p>
+                </td>
+                <td>
+                    <p class="text-center">Bits</p>
+                </td>
+                <td id="dataInStatusIndicator">
+                        <p class="text-center" id="dataInStatus">Not Requested</p>
+                </td>
+                <td align="center">
+                    <input type="text" id="dataInCharge" value=".0000000034" onchange="calculateRate();">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                        <p class="text-center">Outgoing Data</p>
+                </td>
+                <td>
+                        <p class="text-center" id="dataOut">0</p>
+                </td>
+                <td>
+                    <p class="text-center">Bits</p>
+                </td>
+                <td id="dataOutStatusIndicator">
+                        <p class="text-center" id="dataOutStatus">Not Requested</p>
+                </td>
+                <td align="center">
+                    <input type="text" id="dataOutCharge" value=".0000000982" onchange="calculateRate();">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                        <p class="text-center">RAM</p>
+                </td>
+                <td>
+                        <p class="text-center" id="memory">0</p>
+                </td>
+                <td>
+                    <p class="text-center">MB</p>
+                </td>
+                <td id="memoryStatusIndicator">
+                        <p class="text-center" id="memoryStatus">Not Requested</p>
+                </td>
+                <td align="center">
+                    <input type="text" align="center" id="memoryCharge" value=".0009" onchange="calculateRate();"/>
+                </td>
+            </tr>
+            <tr class="success">
+                <td>
+                        <p class="text-center">CHARGE</p>
+                </td>
+                <td>
+                        <span></span>
+                </td>
+                <td>
+                    <span></span>
+                </td>
+                <td>
+                        <span></span>
+                </td>
+                <td align="center">
+                    <input type="text" id="chargeTotal" disabled="true"/>
+                </td>
+            </tr>
+
+        </table>
+        </br>
+
+        <a class="btn btn-lg btn-warning" onclick="stepThreeBackBtn();">Back</a>
+        <a class="btn btn-lg btn-primary" onclick="stepThreeNextBtn();">Next</a>
+        </div>
+    </div>
+    </br>
+
+    <!-- Step Four : Invoicing -->
+    <div id="step4" class="jumbotron">
+        <h2 align="center">Invoice</h2>
+        <table class="table table-condensed" align="center">
+            <tr>
+                <th>
+                    <p class="text-center">Resource</p>
+                </th>
+                <th>
+                    <p class="text-center">Cost</p>
+                </th>
+                <th>
+                    <p class="text-center">Currency</p>
+                </th>
+            </tr>
+            <tr>
+                <td id="resourceDetails" align="center">
+
+                </td>
+                <td align="center">
+                    <label id="resourceCost">2</label>
+                </td>
+                <td align="center">
+                    CHF
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <label>Total Cost</label>
+                </td>
+                <td align="center">
+                    <label id="totalCost"></label>
+                </td>
+                <td align="center">
+                    CHF
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!-- Footer -->
+    <footer class="modal-footer">
+        <img src="images/zhaw_logo_de.gif" align="left" height="60" width="90" class="img-responsive" alt="ZHAW">
+        <img src="images/FP7-gen-RGB.jpg" align="right" height="48" width="71" class="img-responsive" alt="FP7">
+        <img src="images/eu.jpg" align="right" height="48" width="71" class="img-responsive" alt="EU">
+        <img src="images/mcn_logo.png" align="right" height="90" width="120" class="img-responsive" alt="Mobile Cloud Networking">
+    </footer>
+</div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/bootstrap.min.js"></script>
+<script src="js/logic.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="http://get.influxdb.org/influxdb-latest.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#step2').hide();
+        $('#step3').hide();
+        $('#step4').hide();
+        $('#chargeTotal').val('0');
+        $( "#fromDate" ).datepicker({dateFormat: 'yy-mm-dd'});
+        $( "#toDate" ).datepicker({dateFormat: 'yy-mm-dd'});
+    });
+</script>
+</body>
+</html>

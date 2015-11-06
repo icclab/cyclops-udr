@@ -30,10 +30,12 @@ package ch.icclab.cyclops.services.iaas.openstack.persistence;
  */
 
 import ch.icclab.cyclops.services.iaas.openstack.model.CumulativeMeterData;
+import ch.icclab.cyclops.services.iaas.openstack.model.Event;
 import ch.icclab.cyclops.services.iaas.openstack.model.GaugeMeterData;
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.support.database.influxdb.client.InfluxDBClient;
 import ch.icclab.cyclops.services.iaas.openstack.resource.interfc.DatabaseResource;
+import ch.icclab.cyclops.util.DateTimeUtil;
 import ch.icclab.cyclops.util.Load;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -102,7 +104,7 @@ public class TSDBResource implements DatabaseResource {
                 logger.debug("Point successfully written.");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error while trying to save Gauge meter data into the DB: " + e.getMessage());
             return false;
         }
         return result;
@@ -157,9 +159,39 @@ public class TSDBResource implements DatabaseResource {
                 logger.debug("Point successfully written.");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error while trying to save Cumulative meter data into the DB: "+e.getMessage());
             return false;
         }
+        return result;
+    }
+
+    //TODO: save UDR into database.
+
+    public boolean saveUDR(Event event, long usedSeconds, long computeUDRFrom, long computeUDRTo, boolean flagSetupCost){
+        logger.trace("BEGIN boolean saveUDR(Event event, long usedSeconds, long computeUDRFrom, long computeUDRTo)");
+        boolean result = false;
+        dbname = Load.configuration.get("dbName");
+        DateTimeUtil util = new DateTimeUtil();
+        String toDate = util.getDate(computeUDRTo);
+        try{
+            logger.debug("Attempting to save UDR into the DB.");
+            Point point = Point.measurement("UDR")
+                    .time(computeUDRFrom, TimeUnit.MILLISECONDS)
+                    .field("to", toDate)
+                    .tag("clientId", event.getClientId())
+                    .tag("instanceId", event.getInstanceId())
+                    .field("usedSeconds", usedSeconds)
+                    .field("productType", event.getProductType())
+                    .field("status",event.getStatus())
+                    .build();
+            logger.debug("Attempting to write UDR point.");
+            influxDB.write(dbname, "default", point);
+            result = true;
+        }catch (Exception e){
+            logger.error("Error while trying to save the UDR into the DB: "+e.getMessage());
+            return false;
+        }
+        logger.trace("END boolean saveUDR(Event event, long usedSeconds, long computeUDRFrom, long computeUDRTo)");
         return result;
     }
 
@@ -227,21 +259,6 @@ public class TSDBResource implements DatabaseResource {
         //TODO: does this have sense? check if we can use select * from meterselection
         tsdbData = dbClient.getData("select * from meterselection");
         return tsdbData;
-    }
-
-    private Date formatDate(String dateAndTime) {
-        Date result = null;
-        try {
-            String date = dateAndTime.split("T")[0];
-            String hour = dateAndTime.split("T")[1];
-            hour = hour.substring(0, 8);
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-            result = formatter.parse(date + " " + hour);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
     }
 
     private String reformatDate(String date) {

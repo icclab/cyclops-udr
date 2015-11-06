@@ -24,13 +24,15 @@ package ch.icclab.cyclops.application;
  * Upgraded on: 23-Sep-15
  * Description: Handles the incoming API request be routing it the appropriate resource class.
  * Also loads the configuration file at the start of the application
- * <p/>
+ * <p>
  * Change Log
  * Name          Date               Comments
  * Srikanta     02-Mar-2015     Added the api to save and return info regarding selected meters *
  */
 
+import ch.icclab.cyclops.rabbitMQClient.RabbitMQClient;
 import ch.icclab.cyclops.services.iaas.openstack.resource.impl.*;
+import ch.icclab.cyclops.support.database.influxdb.client.InfluxDBClient;
 import ch.icclab.cyclops.util.APICallCounter;
 import ch.icclab.cyclops.util.APICallEndpoint;
 import ch.icclab.cyclops.util.Load;
@@ -48,7 +50,7 @@ public class UDRApplication extends Application {
 
     /**
      * This method handles the incoming request and routes it to the appropriate resource class
-     *
+     * <p>
      * Pseudo code
      * 1. Create an instance of Router
      * 2. Attach the api end points and their respective resource class for request handling
@@ -60,7 +62,10 @@ public class UDRApplication extends Application {
         logger.trace("BEGIN Restlet createInboundRoot()");
         //Load the configuration files and flags
         loadConfiguration(getContext());
+        startRabbitMQThread();
         APICallCounter counter = APICallCounter.getInstance();
+//        InfluxDBClient influxDBClient = new InfluxDBClient();
+//        influxDBClient.generateFakeEvent();
 
         Router router = new Router(getContext());
 
@@ -82,6 +87,12 @@ public class UDRApplication extends Application {
         router.attach("/usage/resources/{resourceid}", ResourceUsage.class);
         counter.registerEndpoint("/usage/resources");
 
+        router.attach("/mcn/refresh", MCNResource.class); //API used to process events to UDRs
+        counter.registerEndpoint("/mcn/refresh");
+
+        router.attach("/mcn/usage", UsageDataRecordResource.class); //API to query time-based service usage per user (required by RC for T-Nova)
+        counter.registerEndpoint("/mcn/usage");
+
         router.attach("/meters", MeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
         counter.registerEndpoint("/meters");
 
@@ -90,8 +101,17 @@ public class UDRApplication extends Application {
     }
 
     /**
+     * Method that Initialize the Event handler thread.
+     */
+    private void startRabbitMQThread() {
+        InfluxDBClient influxDB = new InfluxDBClient();
+        RabbitMQClient recv = new RabbitMQClient("MCN Events Handler", influxDB);
+        recv.start();
+    }
+
+    /**
      * Loads the configuration file at the beginning of the application startup
-     *
+     * <p>
      * Pseudo Code
      * 1. Create the LoadConfiguration class (derived from cyclops.util)
      * 2. Load the file if the the existing instance of the class is empty
