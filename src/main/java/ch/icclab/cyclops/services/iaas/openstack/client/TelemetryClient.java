@@ -100,7 +100,7 @@ public class TelemetryClient extends ClientResource {
      */
     private String generateTelemetryQuery(String meterType, String meterName, String to, String from) {
         logger.trace("BEGIN generateTelemetryQuery(String meterType, String meterName, String to, String from)");
-        Load load = new Load();
+        Load load = Load.getInstance();
         String url = load.configuration.get("CeilometerURL");
 
         if (meterType.equals("gauge")) {

@@ -43,8 +43,38 @@ import java.util.HashMap;
  * Description: Loads the configuration file into a static object
  */
 public class Load extends ClientResource {
-    final static Logger logger = LogManager.getLogger(Load.class.getName());
 
+    private static Load singleton;
+    private static Context context;
+
+    private Load() {
+        this.singleton = null;
+        try {
+            this.configuration(context);
+            this.createDatabase();
+            this.meterList();
+            this.setEnvironment();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Load getInstance() {
+        if (singleton == null)
+            singleton = new Load();
+        return singleton;
+    }
+
+    public static Load getInstance(Context c) {
+        if (singleton == null) {
+            context = c;
+            singleton = new Load();
+        }
+        return singleton;
+    }
+
+    final static Logger logger = LogManager.getLogger(Load.class.getName());
+    private EnvironmentLoader environment;
     //Instantiating the Instance variable for saving the config details
     public static HashMap<String, String> configuration;
     public static ArrayList<String> openStackCumulativeMeterList = new ArrayList<String>();
@@ -52,6 +82,8 @@ public class Load extends ClientResource {
     public static ArrayList<String> externalMeterList = new ArrayList<String>();
     private InfluxDB influxDB;
 
+    // frequency for internal scheduler
+    private long schedulerFrequency = 0;
 
     // Rabbit MQ Settings
     private RabbitMQSettings rabbitMQSettings;
@@ -113,6 +145,7 @@ public class Load extends ClientResource {
 
     /**
      * Simple getter for Rabbit MQ settings
+     *
      * @return null or object
      */
     public RabbitMQSettings getRabbitMQSettings() {
@@ -128,7 +161,7 @@ public class Load extends ClientResource {
 
     /**
      * Loads the configuration file
-     * <p/>
+     * <p>
      * Pseudo Code
      * 1. Create an instance of the ServletContext
      * 2. Get the relative path of the configuration.txt file
@@ -215,5 +248,52 @@ public class Load extends ClientResource {
                 }
             }
         }
+    }
+
+    public void setEnvironment() {
+        String environment = configuration.get("Environment");
+        if (environment != null) {
+            if (environment.equalsIgnoreCase("Tnova")) {
+                this.environment = new TnovaEnvironment();
+            } else if (environment.equalsIgnoreCase("mcn")) {
+                this.environment = new McnEnvironment();
+            } else {
+                logger.error("Error while reading the configuration file. The Environment variable is not supported: " + environment);
+            }
+        } else {
+            logger.error("Error while reading the configuration file. Empty Environment variable.");
+        }
+    }
+
+    public EnvironmentLoader getEnvironment() {
+        return this.environment;
+    }
+
+    /**
+     * Get desired frequency for internal scheduler
+     * @return long
+     */
+    public long getScheduleFrequency() {
+        // parse only once
+        if (schedulerFrequency <= 0){
+            try {
+                // parse it from config file
+                long freq = Long.parseLong(configuration.get("scheduleFrequency"));
+
+                if (freq > 0) {
+                    // use parsed value
+                    schedulerFrequency = freq;
+                } else {
+                    // or add default one
+                    schedulerFrequency = 300;
+                }
+            } catch (Exception e) {
+                // add default value
+                schedulerFrequency = 300;
+            }
+        }
+
+        // now return cached frequency
+        return schedulerFrequency;
     }
 }

@@ -90,7 +90,7 @@ public class DateTimeUtil {
         Date dateTo = getDate(to);
         //Converting to in UTC
         to = getString(dateTo);
-        long sensuFrequency = Long.parseLong(Load.configuration.get("sensuFrequency"));
+        long sensuFrequency = Long.parseLong(Load.configuration.get("scheduleFrequency"));
 
         long fromTimestamp = dateTo.getTime() - sensuFrequency * 1000;
         Date fromDate = new Date(fromTimestamp);

@@ -106,14 +106,14 @@ public class UsageDataRecordResource extends ServerResource {
             TSDBResource tsdbResource = new TSDBResource();
             DateTimeUtil dateTimeUtil = new DateTimeUtil();
             String[] range = dateTimeUtil.getRange();
-            long computeUDRFrom = dateTimeUtil.getEpoch(range[0]);
-            long computeUDRTo = dateTimeUtil.getEpoch(range[1]);
+            long computeUDRFrom = dateTimeUtil.getEpoch(range[1]);//swaped to 1 from 0
+            long computeUDRTo = dateTimeUtil.getEpoch(range[0]);
             String instanceId = event.getInstanceId();
             String clientId = event.getClientId();
             MCNResource MCNResource = new MCNResource();
             //Get last event date.
             long lastEventDate = dateTimeUtil.getEpoch(event.getDateModified());
-            double price = 0.0;
+
             long usedSeconds;
             logger.debug("Attempting to compute the Usage time and save it into the DB.");
             if (lastEventDate < computeUDRFrom) {
@@ -137,7 +137,7 @@ public class UsageDataRecordResource extends ServerResource {
         logger.debug("Computing the time without any event on the time frame.");
         if (event.getStatus().equals("start"))
             //Generate the UDR with the whole time period as used time
-            return Integer.parseInt(Load.configuration.get("sensuFrequency"));
+            return Load.getInstance().getScheduleFrequency();
         else
             //Generate the UDR with the 0 as used time
             return 0;
@@ -148,15 +148,15 @@ public class UsageDataRecordResource extends ServerResource {
         long usedSeconds;
         long eventTime = dateTimeUtil.getEpoch(events.get(0).getDateModified());
         boolean flagSetupCost = false;
-        if (event.getStatus().equals("running")) {
+        if (event.getStatus().equals("start")) {//TODO: format all the events in the same way or have a constant MCN.START TNOVA.START
             //generate UDR from event.time to "to"
-            usedSeconds = (computeUDRTo - eventTime);
+            usedSeconds = (computeUDRTo - eventTime)/1000;
             if (event.getDateModified().equals(event.getDateCreated())) {
                 flagSetupCost = true;
             }
         } else {
             //generate UDR from "from" to event.time.
-            usedSeconds = (eventTime - computeUDRFrom);
+            usedSeconds = (eventTime - computeUDRFrom)/1000;
         }
         tsdbResource.saveUDR(events.get(0), usedSeconds, computeUDRFrom, computeUDRTo, flagSetupCost);
     }
@@ -166,20 +166,20 @@ public class UsageDataRecordResource extends ServerResource {
         long usedSeconds;
         boolean flagSetupCost = false;
         for (int i = 0; i < events.size(); i++) {
-            if (!events.get(i).getStatus().equals("running")) {
+            if (!events.get(i).getStatus().equals("start")) {
                 //generate udr from UDR FROM time to events.get(i).time
                 long eventTime = dateTimeUtil.getEpoch(events.get(i).getDateModified());
-                usedSeconds = (eventTime - computeUDRFrom);
+                usedSeconds = (eventTime - computeUDRFrom)/1000;
             } else {
                 if (i < events.size() - 1) {
                     //generate udr FROM event(i).time to event(i+1).time
                     long timeFrom = dateTimeUtil.getEpoch(events.get(i).getDateModified());
                     long timeTo = dateTimeUtil.getEpoch(events.get(i + 1).getDateModified());
-                    usedSeconds = (timeTo - timeFrom);
+                    usedSeconds = (timeTo - timeFrom)/1000;
                 } else {
                     //generate udr FROM event(i).time to TO
                     long timeFrom = dateTimeUtil.getEpoch(events.get(i).getDateModified());
-                    usedSeconds = (computeUDRTo - timeFrom);
+                    usedSeconds = (computeUDRTo - timeFrom)/1000;
                     if (events.get(i).getDateModified().equals(events.get(i).getDateCreated()))
                         flagSetupCost = true;
                 }
@@ -190,8 +190,8 @@ public class UsageDataRecordResource extends ServerResource {
     }
 
     private ArrayList<Event> fromTSDBtoEvents(TSDBData tsdbData) {
-        logger.debug("TSDBData: " + Arrays.toString(tsdbData.getColumns().toArray()));
-        logger.debug("TSDBData: " + Arrays.toString(tsdbData.getPoints().toArray()));
+        logger.debug("Columns: " + Arrays.toString(tsdbData.getColumns().toArray()));
+        logger.debug("Points: " + Arrays.toString(tsdbData.getPoints().toArray()));
         ArrayList<String> columns = tsdbData.getColumns();
         ArrayList<ArrayList<Object>> points = tsdbData.getPoints();
         ArrayList<Event> events = new ArrayList<Event>();

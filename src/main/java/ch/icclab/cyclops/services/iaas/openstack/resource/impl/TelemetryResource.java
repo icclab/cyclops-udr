@@ -82,7 +82,7 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
         Representation output = null;
         Response response = null;
         ResponseUtil util = new ResponseUtil();
-        Load load = new Load();
+        Load load = Load.getInstance();
 
         KeystoneClient keystoneClient = new KeystoneClient();
         token = keystoneClient.generateToken();

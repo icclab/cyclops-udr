@@ -67,6 +67,7 @@ public class UDREntry {
 
         // now add default tags
         map.put("clientId", clientId);
+        map.put("productId", this.productId);
 
         return map;
     }
@@ -80,10 +81,10 @@ public class UDREntry {
 
         // now add default fields
         map.put("instanceId", this.instanceId);
-        map.put("productId", this.productId);
+//        map.put("productId", this.productId);
         map.put("productType", this.productType);
         map.put("to", this.to);
-        map.put("usedSeconds", this.usedSeconds);
+        map.put("usage", this.usedSeconds);
         map.put("flagSetupCost", this.flagSetupCost);
 
         return map;

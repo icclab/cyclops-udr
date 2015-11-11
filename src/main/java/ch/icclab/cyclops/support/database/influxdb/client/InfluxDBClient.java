@@ -57,7 +57,7 @@ import java.util.concurrent.TimeUnit;
 public class InfluxDBClient extends ClientResource {
     final static Logger logger = LogManager.getLogger(InfluxDBClient.class.getName());
 
-    Load load = new Load();
+    Load load = Load.getInstance();
     String url = load.configuration.get("InfluxDBURL");
     String username = load.configuration.get("InfluxDBUsername");
     String password = load.configuration.get("InfluxDBPassword");

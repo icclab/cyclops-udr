@@ -54,7 +54,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
         HashMap usageArr = new HashMap();
         ArrayList<TSDBData> meterDataArrList;
         TSDBResource dbResource = new TSDBResource();
-        Load load = new Load();
+        Load load = Load.getInstance();
 
         String fromDate = getQueryValue("from");
         String toDate = getQueryValue("to");

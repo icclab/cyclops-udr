@@ -24,7 +24,7 @@ package ch.icclab.cyclops.services.iaas.openstack.persistence;
  * Upgraded on: 23-Sep-15
  * Description: A RESTLET resource class for handling usage data transformation and
  * persisting into InfluxDB
- * <p/>
+ * <p>
  * Change Log
  * Name        Date     Comments
  */
@@ -62,7 +62,7 @@ public class TSDBResource implements DatabaseResource {
     /**
      * Receives the usage data array and the gauge meter name. The usage data is transformed
      * to a json data and saved into the the InfluxDB
-     * <p/>
+     * <p>
      * Pseudo Code
      * 1. Iterate through the data array to save the data into an ArraList of objects
      * 2. Save the data into the TSDB POJO class
@@ -113,7 +113,7 @@ public class TSDBResource implements DatabaseResource {
     /**
      * Receives the usage data array and the gauge meter name. The usage data is transformed
      * to a json data and saved into the the InfluxDB
-     * <p/>
+     * <p>
      * Pseudo Code
      * 1. Iterate through the data array to save the data into an ArraList of objects
      * 2. Save the data into the TSDB POJO class
@@ -159,7 +159,7 @@ public class TSDBResource implements DatabaseResource {
                 logger.debug("Point successfully written.");
             }
         } catch (Exception e) {
-            logger.error("Error while trying to save Cumulative meter data into the DB: "+e.getMessage());
+            logger.error("Error while trying to save Cumulative meter data into the DB: " + e.getMessage());
             return false;
         }
         return result;
@@ -167,38 +167,36 @@ public class TSDBResource implements DatabaseResource {
 
     //TODO: save UDR into database.
 
-    public boolean saveUDR(Event event, long usedSeconds, long computeUDRFrom, long computeUDRTo, boolean flagSetupCost){
-        logger.trace("BEGIN boolean saveUDR(Event event, long usedSeconds, long computeUDRFrom, long computeUDRTo)");
+    public boolean saveUDR(Event event, long usedSeconds, long computeUDRFrom, long computeUDRTo, boolean flagSetupCost) {
         boolean result = false;
         dbname = Load.configuration.get("dbName");
         DateTimeUtil util = new DateTimeUtil();
         String toDate = util.getDate(computeUDRTo);
-        try{
+        try {
             logger.debug("Attempting to save UDR into the DB.");
             Point point = Point.measurement("UDR")
                     .time(computeUDRFrom, TimeUnit.MILLISECONDS)
                     .field("to", toDate)
                     .tag("clientId", event.getClientId())
                     .tag("instanceId", event.getInstanceId())
-                    .field("usedSeconds", usedSeconds)
-                    .field("productType", event.getProductType())
-                    .field("status",event.getStatus())
+                    .field("usage", usedSeconds)
+                    .tag("productType", event.getProductType())
+                    .field("status", event.getStatus())
                     .build();
             logger.debug("Attempting to write UDR point.");
             influxDB.write(dbname, "default", point);
             result = true;
-        }catch (Exception e){
-            logger.error("Error while trying to save the UDR into the DB: "+e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error while trying to save the UDR into the DB: " + e.getMessage());
             return false;
         }
-        logger.trace("END boolean saveUDR(Event event, long usedSeconds, long computeUDRFrom, long computeUDRTo)");
         return result;
     }
 
     /**
      * Receives the transformed usage data from an external application in terms of an TSDBData POJO.
      * POJO is converted into a json object and the InfluxDB client is invoked to persist the data.
-     * <p/>
+     * <p>
      * Pseudo Code<br/>
      * 1. Convert the TSDB POJO consisting of the usage data into a JSON Obj<br/>
      * 2. Invoke the InfluxDB client<br/>
@@ -246,6 +244,13 @@ public class TSDBResource implements DatabaseResource {
             query = "SELECT avg,unit,type FROM \"" + meterName + "\" WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND userid='" + userId + "' ";
         } else {
             query = "SELECT time,usage FROM \"" + meterName + "\" WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND userid='" + userId + "' ";
+            TSDBData tsdbData = dbClient.getData(query);
+            if (tsdbData.getPoints().size() < 1) {
+                query = "SELECT time,usage FROM UDR WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND clientId='" + userId + "' AND productType='" + meterName + "'";
+                tsdbData = dbClient.getData(query);
+                tsdbData.setName((String) meterName);
+                return tsdbData;
+            }
         }
 
         return dbClient.getData(query);

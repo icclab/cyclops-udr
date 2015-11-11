@@ -81,7 +81,7 @@ public class MCNResource extends ServerResource implements EventProcessingResour
         }
 
         //Load all events
-        dbname = Load.configuration.get("events_dbname");
+        dbname = Load.getInstance().getEnvironment().getEvents_dbname();
         tsdbData = dbClient.query(parameterQuery, dbname);
 
         //Store clientIDs and instance IDs in map
@@ -166,7 +166,7 @@ public class MCNResource extends ServerResource implements EventProcessingResour
 
         DateTimeUtil util = new DateTimeUtil();
         InfluxDBClient dbClient = new InfluxDBClient();
-        dbname = Load.configuration.get("events_dbname");
+        dbname = Load.getInstance().getEnvironment().getEvents_dbname();
 
         String parameterQuery = "SELECT * FROM events WHERE clientid='" +
                 clientId + "' AND instanceid='" + instanceID +
@@ -188,13 +188,13 @@ public class MCNResource extends ServerResource implements EventProcessingResour
     public TSDBData captureLastEventAfterDate(String clientId, String instanceID, Date date){
 
         InfluxDBClient dbClient = new InfluxDBClient();
-        dbname = Load.configuration.get("dbName");
+        dbname = Load.getInstance().getEnvironment().getEvents_dbname();
 
         String parameterQuery = "SELECT * FROM events WHERE clientid='" +
                 clientId + "' AND instanceid='" + instanceID +
                 "' AND time>='"+ date +
                 "' ORDER BY time DESC LIMIT 1";
-        TSDBData [] tsdbData = dbClient.query(parameterQuery);
+        TSDBData [] tsdbData = dbClient.query(parameterQuery, dbname);
 
         return tsdbData[0];
     }
@@ -203,13 +203,13 @@ public class MCNResource extends ServerResource implements EventProcessingResour
         ArrayList<TSDBData> result = new ArrayList<TSDBData>();
 
         InfluxDBClient dbClient = new InfluxDBClient();
-        dbname = Load.configuration.get("dbName");
+        dbname = Load.getInstance().getEnvironment().getEvents_dbname();
 
         String parameterQuery = "SELECT * FROM events WHERE clientid='" +
                 clientId + "' AND instanceid='" + instanceID +
                 "' AND time>='"+ date +
                 "' ORDER BY time DESC";
-        TSDBData [] tsdbData = dbClient.query(parameterQuery);
+        TSDBData [] tsdbData = dbClient.query(parameterQuery, dbname);
 //        for(int i = 0; i<tsdbData.length; i++){
 //            result.add(tsdbData[i]);
 //        }
@@ -338,7 +338,7 @@ public class MCNResource extends ServerResource implements EventProcessingResour
                 dbname = Load.configuration.get("dbName");
 
                 String lastevent = points.get(i).get(statusIndex).toString();
-                if (lastevent.equals("running")){
+                if (lastevent.equals(Load.getInstance().getEnvironment().getStart())){
                     lastevent = "start";
                 }
                 else if ((lastevent.equals("stopped")) || (lastevent.equals("STOP"))){
@@ -358,7 +358,7 @@ public class MCNResource extends ServerResource implements EventProcessingResour
                             .field("lastevent", lastevent)
                             .build();
                     logger.debug("Attempting to write the Point (" + points.get(i).get(timeIndex) + ") in the db:" + dbname);
-                    influxDB.write(Load.configuration.get("events_dbname"), "default", point);
+                    influxDB.write(Load.getInstance().getEnvironment().getEvents_dbname(), "default", point);
                     logger.debug("Point successfully written.");
                 } catch(Exception ex){
                     ex.printStackTrace();

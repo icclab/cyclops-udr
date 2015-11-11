@@ -48,7 +48,7 @@ public class KeystoneClient extends ClientResource {
      * @return token A string consisting of Keystone token
      */
     public String generateToken() {
-        Load load = new Load();
+        Load load = Load.getInstance();
         String keystoneURL = load.configuration.get("KeystoneURL");
         String keystoneUsername = load.configuration.get("KeystoneUsername");
         String keystonePassword = load.configuration.get("KeystonePassword");

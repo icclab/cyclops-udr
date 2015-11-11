@@ -31,6 +31,9 @@ package ch.icclab.cyclops.application;
  */
 
 import ch.icclab.cyclops.rabbitMQClient.RabbitMQClient;
+import ch.icclab.cyclops.rabbitMQClient.ThreadExecutor;
+import ch.icclab.cyclops.schedule.Endpoint;
+import ch.icclab.cyclops.schedule.Scheduler;
 import ch.icclab.cyclops.services.iaas.openstack.resource.impl.*;
 import ch.icclab.cyclops.support.database.influxdb.client.InfluxDBClient;
 import ch.icclab.cyclops.util.APICallCounter;
@@ -61,14 +64,15 @@ public class UDRApplication extends Application {
     public Restlet createInboundRoot() {
         logger.trace("BEGIN Restlet createInboundRoot()");
         //Load the configuration files and flags
-        loadConfiguration(getContext());
-        startRabbitMQThread();
+        loadConfiguration();
+
         APICallCounter counter = APICallCounter.getInstance();
 //        InfluxDBClient influxDBClient = new InfluxDBClient();
 //        influxDBClient.generateFakeEvent();
 
         Router router = new Router(getContext());
 
+        // API endpoint counter for requesting status
         router.attach("/status", APICallEndpoint.class);
         counter.registerEndpoint("/status");
 
@@ -87,14 +91,21 @@ public class UDRApplication extends Application {
         router.attach("/usage/resources/{resourceid}", ResourceUsage.class);
         counter.registerEndpoint("/usage/resources");
 
-        router.attach("/mcn/refresh", MCNResource.class); //API used to process events to UDRs
-        counter.registerEndpoint("/mcn/refresh");
-
         router.attach("/mcn/usage", UsageDataRecordResource.class); //API to query time-based service usage per user (required by RC for T-Nova)
         counter.registerEndpoint("/mcn/usage");
 
         router.attach("/meters", MeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
         counter.registerEndpoint("/meters");
+
+        // internal scheduler with start/stop/restart/force/status commands
+        router.attach("/scheduler/{command}", Endpoint.class);
+        counter.registerEndpoint("/scheduler");
+
+        // but also start scheduler immediately
+        startInternalScheduler();
+
+        // and start rabbitmq thread
+        startRabbitMQThread();
 
         logger.trace("END Restlet createInboundRoot()");
         return router;
@@ -104,9 +115,14 @@ public class UDRApplication extends Application {
      * Method that Initialize the Event handler thread.
      */
     private void startRabbitMQThread() {
-        InfluxDBClient influxDB = new InfluxDBClient();
-        RabbitMQClient recv = new RabbitMQClient("MCN Events Handler", influxDB);
-        recv.start();
+        ThreadExecutor.getInstance().start();
+    }
+
+    /**
+     * Simply start internal scheduler for Event -> UDR
+     */
+    private void startInternalScheduler() {
+        Scheduler.getInstance().start();
     }
 
     /**
@@ -116,21 +132,9 @@ public class UDRApplication extends Application {
      * 1. Create the LoadConfiguration class (derived from cyclops.util)
      * 2. Load the file if the the existing instance of the class is empty
      *
-     * @param context
+     * @param
      */
-    private void loadConfiguration(Context context) {
-
-        logger.trace("BEGIN void loadConfiguration(Context context)");
-        Load load = new Load();
-        if (load.configuration == null) {
-            try {
-                load.configuration(getContext());
-                load.createDatabase();
-                load.meterList();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        logger.trace("END void loadConfiguration(Context context)");
+    private void loadConfiguration() {
+        Load.getInstance(getContext());
     }
 }
