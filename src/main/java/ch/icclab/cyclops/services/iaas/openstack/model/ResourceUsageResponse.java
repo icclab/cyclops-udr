@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
+ * <b>POJO Object</b><p/>
  * Author: Srikanta
  * Created on: 01-Apr-15
  * Description:
@@ -33,6 +34,9 @@ public class ResourceUsageResponse {
     private HashMap time;
     private ArrayList column;
     private ArrayList<ArrayList<Object>> usage;
+    private HashMap tags;
+
+    //TODO: Create constructors to POJO Classes so we don't have to set all the attributes
 
     public String getResourceid() {
         return resourceid;
@@ -64,5 +68,13 @@ public class ResourceUsageResponse {
 
     public void setUsage(ArrayList<ArrayList<Object>> usage) {
         this.usage = usage;
+    }
+
+    public HashMap getTags() {
+        return tags;
+    }
+
+    public void setTags(HashMap tags) {
+        this.tags = tags;
     }
 }

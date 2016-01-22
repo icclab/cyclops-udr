@@ -1,0 +1,25 @@
+######################## PROVIDE CREDENTIALS ####################
+# Connection to your TimeSeries database
+InfluxDBURL=http://localhost:8086
+InfluxDBUsername=root
+InfluxDBPassword=root
+
+# RabbitMQ settings
+RabbitMQUsername=name
+RabbitMQPassword=pass
+RabbitMQHost=ip
+RabbitMQPort=port
+RabbitMQVirtualHost=/
+
+######################## ADVANCED SETTINGS ######################
+# Frequency has to be in seconds
+ScheduleFrequency=300
+Environment=Mcn
+
+# Where to save UDR records?
+InfluxDBDatabaseName=udr_service
+
+# Some other Event based metering settings
+MCNDBEventsName=mcn_events
+MCNEventStart=start
+MCNEventQueue=mcnevents

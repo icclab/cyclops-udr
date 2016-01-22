@@ -1,3 +1,18 @@
+Version 0.6.1
+Date 14/Jan/2016
+Notes
+1. Added support for CloudStack metering
+
+************************************************************
+
+Version 0.6
+Date 23/Sep/2015
+Notes
+1. Migrated to influxdb 0.9.3
+2. Aggregated data for instances fixed
+
+************************************************************
+
 Version 0.5.1
 Date 10/Aug/2015
 Notes

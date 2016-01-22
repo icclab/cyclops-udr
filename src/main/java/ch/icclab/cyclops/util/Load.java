@@ -19,73 +19,42 @@ package ch.icclab.cyclops.util;
 
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.services.iaas.openstack.persistence.TSDBResource;
-import org.restlet.Context;
-import org.restlet.data.MediaType;
-import org.restlet.representation.FileRepresentation;
 import org.restlet.resource.ClientResource;
 
-import javax.servlet.ServletContext;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Author: Srikanta
  * Created on: 17-Nov-14
  * Description: Loads the configuration file into a static object
- *
  */
 public class Load extends ClientResource {
+    //TODO Manu meterlist has to go to the OpenStack layer, then delete this Load class (as we are using different package now)
 
     //Instantiating the Instance variable for saving the config details
-    public static HashMap<String,String> configuration;
-    public static ArrayList<String> openStackCumulativeMeterList = new ArrayList<String>();
-    public static ArrayList<String> openStackGaugeMeterList = new ArrayList<String>();
-    public static ArrayList<String> externalMeterList = new ArrayList<String>();
+    private static ArrayList<String> openStackCumulativeMeterList;
+    private static ArrayList<String> openStackGaugeMeterList;
+    private static ArrayList<String> externalMeterList;
 
     /**
-     * Loads the configuration file
-     *
-     * Pseudo Code
-     * 1. Create an instance of the ServletContext
-     * 2. Get the relative path of the configuration.txt file
-     * 3. Load the file and save the values into a static HashMap
-     *
-     * @param context
-     * @throws IOException
+     * Private constructor, because we are working with singleton pattern
      */
-    public void configuration(Context context) throws IOException {
-        configuration = new HashMap();
-        String nextLine;
-        ServletContext servlet = (ServletContext) context.getAttributes().get("org.restlet.ext.servlet.ServletContext");
-        System.out.println("Reading the config file from " + servlet.getRealPath("/WEB-INF/configuration.txt"));
-        // Get the path of the config file relative to the WAR
-        String rootPath = servlet.getRealPath("/WEB-INF/configuration.txt");
-        Path path = Paths.get(rootPath);
-        File configFile = new File(path.toString());
-        FileRepresentation file = new FileRepresentation(configFile, MediaType.TEXT_PLAIN);
-        // Read the values from the config file
+    public Load() {
         try {
-            BufferedReader reader = new BufferedReader(file.getReader());
-            while((nextLine = reader.readLine()) != null ) {
-                String[] str = nextLine.split("==");
-                configuration.put(str[0],str[1]);
-            }
-        } catch (IOException e) {
-            System.out.println("Failed to load the Config file");
+            // prepare openstack
+            openStackCumulativeMeterList = new ArrayList<String>();
+            openStackGaugeMeterList = new ArrayList<String>();
+            externalMeterList  = new ArrayList<String>();
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //System.out.println("Binding to the Rabbitmq Queue");
-        //RabbitmqClient queueThread = new RabbitmqClient();
-        //queueThread.start();
     }
 
-    public void meterList(){
+    /**
+     * This method formats the meters and inserts them in the Cumulative and Gauge meter lists.
+     */
+    public void meterList() {
         TSDBResource tsdbResource = new TSDBResource();
         TSDBData tsdbData;
         ArrayList<ArrayList<String>> masterMeterList;
@@ -95,7 +64,7 @@ public class Load extends ClientResource {
         int indexMeterType = -1;
         int indexMeterSource = -1;
 
-        if(Flag.isMeterListReset()){
+        if (Flag.isMeterListReset()) {
             Flag.setMeterListReset(false);
             Load.openStackGaugeMeterList.clear();
             Load.openStackCumulativeMeterList.clear();
@@ -109,21 +78,36 @@ public class Load extends ClientResource {
             indexMeterName = tsdbData.getColumns().indexOf("metername");
             indexMeterSource = tsdbData.getColumns().indexOf("metersource");
             // Iterate through the list of arraylist & segregate the meters
-            for(int i=0; i < masterMeterList.size(); i++){
+            for (int i = 0; i < masterMeterList.size(); i++) {
                 meterList = masterMeterList.get(i);
-                if((meterList.get(indexStatus).equals(Constant.METER_SELECTED))
+                if ((meterList.get(indexStatus).equals(String.valueOf(Constant.METER_SELECTED)))
                         && (meterList.get(indexMeterSource).equals(Constant.OPENSTACK))
-                        && meterList.get(indexMeterType).equals(Constant.OPENSTACK_CUMULATIVE_METER)){
+                        && meterList.get(indexMeterType).equals(Constant.OPENSTACK_CUMULATIVE_METER)
+                        && !Load.openStackCumulativeMeterList.contains(meterList.get(indexMeterName).toString())) {
                     Load.openStackCumulativeMeterList.add(meterList.get(indexMeterName).toString());
-                }else if(meterList.get(indexStatus).equals(Constant.METER_SELECTED)
+                } else if (meterList.get(indexStatus).equals(String.valueOf(Constant.METER_SELECTED))
                         && (meterList.get(indexMeterSource).equals(Constant.OPENSTACK))
-                        && meterList.get(indexMeterType).equals(Constant.OPENSTACK_GAUGE_METER)){
+                        && meterList.get(indexMeterType).equals(Constant.OPENSTACK_GAUGE_METER)
+                        && !Load.openStackGaugeMeterList.contains(meterList.get(indexMeterName).toString())) {
                     Load.openStackGaugeMeterList.add(meterList.get(indexMeterName).toString());
-                } else if((meterList.get(indexStatus).equals(Constant.METER_SELECTED))
-                        && !(meterList.get(indexMeterSource).equals(Constant.OPENSTACK))){
+                } else if ((meterList.get(indexStatus).equals(String.valueOf(Constant.METER_SELECTED)))
+                        && !(meterList.get(indexMeterSource).equals(Constant.OPENSTACK))
+                        && !Load.externalMeterList.contains(meterList.get(indexMeterName).toString())) {
                     Load.externalMeterList.add(meterList.get(indexMeterName).toString());
                 }
             }
         }
+    }
+
+    public static ArrayList<String> getOpenStackCumulativeMeterList() {
+        return openStackCumulativeMeterList;
+    }
+
+    public static ArrayList<String> getOpenStackGaugeMeterList() {
+        return openStackGaugeMeterList;
+    }
+
+    public static ArrayList<String> getExternalMeterList() {
+        return externalMeterList;
     }
 }

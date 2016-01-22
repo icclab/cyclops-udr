@@ -3,6 +3,50 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
+
+
+    <context-param>
+        <param-name>isLog4jAutoInitializationDisabled</param-name>
+        <param-value>false</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.apache.logging.log4j.web.Log4jServletContextListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>ch.icclab.cyclops.schedule.Listener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>ch.icclab.cyclops.services.iaas.cloudstack.client.CloudStackListener</listener-class>
+    </listener>
+<listener>
+<listener-class>ch.icclab.cyclops.usecases.tnova.rabbitMQClient.TnovaThreadListener</listener-class>
+    </listener>
+
+<!--    <listener>
+        <listener-class>
+            com.sun.identity.common.ShutdownServletContextListener
+        </listener-class>
+    </listener>-->
+
+    <filter>
+        <filter-name>log4jServletFilter</filter-name>
+        <filter-class>org.apache.logging.log4j.web.Log4jServletFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>log4jServletFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
+
+    <context-param>
+        <param-name>log4jContextName</param-name>
+        <param-value>ch.icclab.cyclops.application.UDRApplication</param-value>
+    </context-param>
+
     <servlet>
         <servlet-name>RestletServlet</servlet-name>
         <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>

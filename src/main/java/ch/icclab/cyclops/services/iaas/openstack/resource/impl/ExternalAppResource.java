@@ -21,7 +21,10 @@ import ch.icclab.cyclops.services.iaas.openstack.model.Response;
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.services.iaas.openstack.persistence.TSDBResource;
 import ch.icclab.cyclops.services.iaas.openstack.resource.interfc.ExternalDataResource;
+import ch.icclab.cyclops.util.APICallCounter;
 import ch.icclab.cyclops.util.ResponseUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.LocalDateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,26 +40,30 @@ import java.util.ArrayList;
  * Author: Srikanta
  * Created on: 13-Jan-15
  * Description: Receives the data sent by an external application
- *
+ * <p/>
  * Change Log
  * Name        Date     Comments
  */
 public class ExternalAppResource extends ServerResource implements ExternalDataResource {
+    final static Logger logger = LogManager.getLogger(ExternalAppResource.class.getName());
+    private String endpoint = "/ext/app";
+    private APICallCounter counter = APICallCounter.getInstance();
 
     /**
      * Receives the JSON data sent by an external application
-     *
-     * Pseudo Code
-     * 1. Receive the data
-     * 2. Extract the JSON array
-     * 3. Send the JSON array to saveData() for further processing
+     * <p/>
+     * Pseudo Code<br/>
+     * 1. Receive the data<br/>
+     * 2. Extract the JSON array<br/>
+     * 3. Send the JSON array to saveData() for further processing<br/>
      *
      * @param entity
      * @return Representation A JSON response is returned
      */
     @Post("json:json")
     public Representation receiveRequest(JsonRepresentation entity) {
-
+        counter.increment(endpoint);
+        logger.trace("BEGIN Representation receiveRequest(JsonRepresentation entity)");
         JSONArray jsonArr = null;
         boolean output = true;
 
@@ -69,36 +76,38 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
             jsonArr = entity.getJsonArray();
             output = saveData(jsonArr);
         } catch (JSONException e) {
+            logger.error("EXCEPTION JSONEXCEPTION Representation receiveRequest(JsonRepresentation entity)");
             output = false;
             e.printStackTrace();
         }
         response.setTimestamp(currentDateTime.toDateTime().toString());
-        if(output){
+        if (output) {
             response.setStatus("Success");
             response.setMessage("Data saved into the DB");
-        }else {
+        } else {
             response.setStatus("Failure");
             response.setMessage("Data could not be saved into the DB");
         }
         jsonResponse = util.toJson(response);
+        logger.trace("END Representation receiveRequest(JsonRepresentation entity)");
         return jsonResponse;
     }
 
     /**
      * Receives the JSON array, transforms it and send it to the db resource to persist it into InfluxDB
-     *
-     * Pseudo Code
-     * 1. Iterate through the JSONArray to get the JSON obj
-     * 2. Iterate through the JSON Obj to get the usage details
-     * 3. Build the TSDB POJO
+     * <p/>
+     * Pseudo Code<br/>
+     * 1. Iterate through the JSONArray to get the JSON obj<br/>
+     * 2. Iterate through the JSON Obj to get the usage details<br/>
+     * 3. Build the TSDB POJO<br/>
      * 4. Pass this POJO obj to the TSDB resource for persisting it into the DB
      *
      * @param jsonArr An array containing the usage data as part of JSON Objects
      * @return String
      */
     public boolean saveData(JSONArray jsonArr) {
-
-        JSONObject jsonObj, metadata,usageData;
+        logger.trace("BEGIN boolean saveData(JSONArray jsonArr)");
+        JSONObject jsonObj, metadata, usageData;
         String metername = null;
         String source;
         TSDBResource dbResource = new TSDBResource();
@@ -113,13 +122,13 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
         columnNameArr.add("usage");
 
         try {
-            for(int i=0; i<jsonArr.length(); i++){
+            for (int i = 0; i < jsonArr.length(); i++) {
                 jsonObj = (JSONObject) jsonArr.get(i);
                 metadata = (JSONObject) jsonObj.get("metadata");
                 source = (String) metadata.get("source");
                 dataArr = (JSONArray) jsonObj.get("usage");
 
-                for(int j=0; j<dataArr.length(); j++){
+                for (int j = 0; j < dataArr.length(); j++) {
                     objArrNode = new ArrayList<Object>();
                     usageData = (JSONObject) dataArr.get(j);
                     metername = (String) usageData.get("metername");
@@ -136,10 +145,11 @@ public class ExternalAppResource extends ServerResource implements ExternalDataR
                 dbResource.saveExtData(dbData);
             }
         } catch (JSONException e) {
+            logger.error("EXCEPTION JSONEXCEPTION boolean saveData(JSONArray jsonArr)");
             e.printStackTrace();
             return false;
         }
-
+        logger.trace("END boolean saveData(JSONArray jsonArr)");
         return true;
     }
 }

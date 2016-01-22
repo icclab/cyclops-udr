@@ -18,10 +18,11 @@
 package ch.icclab.cyclops.services.iaas.openstack.model;
 
 /**
+ * <b>POJO Object</b><p/>
  * Author: Srikanta
  * Created on: 21-Oct-14
  * Description: A POJO class for Gauge Meters from OpenStack's Ceilometer
- *
+ * <p/>
  * Change Log
  * Name        Date     Comments
  */
@@ -32,8 +33,8 @@ public class GaugeMeterData {
     private String period_end;
     private Groupby groupby;
 
-    public class Groupby{
-        private String project_id,user_id,resource_id;
+    public class Groupby {
+        private String project_id, user_id, resource_id;
 
         public String getProject_id() {
             return project_id;

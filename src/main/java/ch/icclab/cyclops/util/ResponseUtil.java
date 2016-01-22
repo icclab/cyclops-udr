@@ -27,7 +27,6 @@ import org.restlet.representation.Representation;
  * Author: Srikanta
  * Created on: 16-Jan-15
  * Description: Util class for doing operation on response object
- *
  */
 public class ResponseUtil {
 
@@ -38,7 +37,7 @@ public class ResponseUtil {
      * @return a Representation object with JSON string
      */
 
-    public Representation toJson(Response response){
+    public Representation toJson(Response response) {
         ObjectMapper mapper = new ObjectMapper();
         String output;
         JsonRepresentation responseJson = null;
@@ -47,7 +46,6 @@ public class ResponseUtil {
             output = mapper.writeValueAsString(response);
             responseJson = new JsonRepresentation(output);
         } catch (JsonProcessingException e) {
-            System.out.println("Creation of response : Failed");
             e.printStackTrace();
         }
         return responseJson;

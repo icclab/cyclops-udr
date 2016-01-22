@@ -20,10 +20,11 @@ package ch.icclab.cyclops.services.iaas.openstack.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
+ * <b>POJO Object</b><p/>
  * Author: Srikanta
  * Created on: 11-Dec-14
  * Description: A POJO class for CumulativeMeters from OpenStack's Ceilometer
- *
+ * <p/>
  * Change Log
  * Name        Date     Comments
  */
@@ -34,9 +35,9 @@ public class CumulativeMeterData {
     private Metadata metadata;
     private String timestamp, recorded_at;
 
-    @JsonIgnoreProperties(ignoreUnknown=true)
-    public class Metadata{
-        private String instance_id,mac, fref, name;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public class Metadata {
+        private String instance_id, mac, fref, name;
         private String instance_type;
 
         public String getInstance_id() {

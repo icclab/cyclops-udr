@@ -20,12 +20,16 @@ package ch.icclab.cyclops.services.iaas.openstack.client;
 /**
  * Author: Srikanta
  * Created on: 06-Oct-14
+ * Upgraded by: Manu
+ * Upgraded on: 23-Sep-15
  * Description: Client class for Telemetry. Connects to the telemetry to get the usage data
- *
  */
 
+import ch.icclab.cyclops.load.Loader;
 import ch.icclab.cyclops.util.DateTimeUtil;
 import ch.icclab.cyclops.util.Load;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.data.Header;
@@ -39,21 +43,21 @@ import org.restlet.util.Series;
 import java.io.IOException;
 
 public class TelemetryClient extends ClientResource {
-
+    final static Logger logger = LogManager.getLogger(TelemetryClient.class.getName());
+    //TODO: consider Singleton connection.
     /**
      * Queries the ceilometer to get the usage data
      *
-     * @param token Keystone token
+     * @param token     Keystone token
      * @param meterName Name of the meter in the Ceilometer
      * @param meterType Cumulative or Gauge meter
      * @return jsonOutput A JSON string consisting of data from a meter
      * @throws IOException
      */
     public String getData(String token, String meterName, String meterType) throws IOException {
-
-        System.out.println("Entered the Telemetry Client and getting data from " + meterName);
+        logger.trace("BEGIN String getData(String token, String meterName, String meterType) throws IOException");
         String jsonOutput;
-        String from,to, url;
+        String from, to, url;
         String[] range;
         ClientResource cr;
         Request req;
@@ -62,11 +66,12 @@ public class TelemetryClient extends ClientResource {
 
         DateTimeUtil dateTime = new DateTimeUtil();
         range = dateTime.getRange();
-        to = range[0];
         from = range[1];
-
+        logger.debug("Obtained \"FROM\" time for the request: " + from);
+        to = range[0];
+        logger.debug("Obtained \"TO\" time for the request: " + to);
         url = generateTelemetryQuery(meterType, meterName, to, from);
-        System.out.println("Ceilometer URL "+url);
+        logger.debug("Ceilometer URL " + url);
         client = new Client(Protocol.HTTP);
         cr = new ClientResource(url);
         req = cr.getRequest();
@@ -77,8 +82,11 @@ public class TelemetryClient extends ClientResource {
         headerValue.add("X-Auth-Token", token);
 
         cr.get(MediaType.APPLICATION_JSON);
+
         Representation output = cr.getResponseEntity();
-        jsonOutput  = output.getText();
+        jsonOutput = output.getText();
+        logger.debug("Ceilometer response: " + jsonOutput);
+        logger.trace("END String getData(String token, String meterName, String meterType) throws IOException");
         return jsonOutput;
     }
 
@@ -87,20 +95,20 @@ public class TelemetryClient extends ClientResource {
      *
      * @param meterType Cumulative or gauge
      * @param meterName Name of the meter in the Ceilometer
-     * @param to Timestamp from where data needs to be collected
-     * @param from Timestamp till when data needs to be collected
+     * @param to        Timestamp from where data needs to be collected
+     * @param from      Timestamp till when data needs to be collected
      * @return url A String consisting of a URL and query parameters
      */
     private String generateTelemetryQuery(String meterType, String meterName, String to, String from) {
+        logger.trace("BEGIN generateTelemetryQuery(String meterType, String meterName, String to, String from)");
+        String url = Loader.getSettings().getKeyStoneSettings().getCeilometerURL();
 
-        Load load = new Load();
-        String url = load.configuration.get("CeilometerURL");
-
-        if(meterType.equals("gauge")){
-            url = url+"meters/"+meterName+"/statistics?q.field=timestamp&q.op=gt&q.value="+from+"&q.field=timestamp&q.op=lt&q.value="+to+"&groupby=user_id&groupby=project_id&groupby=resource_id";
-        }else {
-            url = url+"samples"+"?q.field=timestamp&q.op=ge&q.value="+from+"&q.field=timestamp&q.op=le&q.value="+to+"&q.field=meter&q.op=eq&q.value="+meterName;
+        if (meterType.equals("gauge")) {
+            url = url + "meters/" + meterName + "/statistics?q.field=timestamp&q.op=gt&q.value=" + from + "&q.field=timestamp&q.op=lt&q.value=" + to + "&groupby=user_id&groupby=project_id&groupby=resource_id";
+        } else {
+            url = url + "samples" + "?q.field=timestamp&q.op=ge&q.value=" + from + "&q.field=timestamp&q.op=le&q.value=" + to + "&q.field=meter&q.op=eq&q.value=" + meterName;
         }
+        logger.trace("END generateTelemetryQuery(String meterType, String meterName, String to, String from)");
         return url;
     }
 }

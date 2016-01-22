@@ -1,0 +1,28 @@
+######################## PROVIDE CREDENTIALS ####################
+# Keystone credentials and Ceilometer endpoint
+KeystoneURL=your_url
+KeystoneUsername=name
+KeystonePassword=pass
+KeystoneTenantName=tenant
+CeilometerURL=your_url
+
+# Connection to the TimeSeries database
+InfluxDBURL=http://localhost:8086
+InfluxDBUsername=root
+InfluxDBPassword=root
+
+######################## OPTIONAL PARAMETERS ####################
+# Settings for RabbitMQ in case of event based usage
+RabbitMQUsername=user
+RabbitMQPassword=pass
+RabbitMQHost=ip
+RabbitMQPort=port
+RabbitMQVirtualHost=/
+
+######################## ADVANCED SETTINGS ######################
+# If you are using internal scheduler, provide frequency in seconds
+ScheduleFrequency=300
+Environment=Openstack
+
+# Where to save UDR records?
+InfluxDBDatabaseName=udr_service

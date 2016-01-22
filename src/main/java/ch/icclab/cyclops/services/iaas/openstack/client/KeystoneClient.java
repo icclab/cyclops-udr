@@ -18,6 +18,8 @@
 
 package ch.icclab.cyclops.services.iaas.openstack.client;
 
+import ch.icclab.cyclops.load.Loader;
+import ch.icclab.cyclops.load.model.KeyStoneSettings;
 import ch.icclab.cyclops.util.Load;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.model.identity.Token;
@@ -27,8 +29,10 @@ import org.restlet.resource.ClientResource;
 /**
  * Author: Srikanta
  * Created on: 08-Oct-14
+ * Upgraded by: Manu
+ * Upgraded on: 23-Sep-15
  * Description: Requests the keystone service for a token to be used in transaction with Telemetry service of OpenStack
- *
+ * <p/>
  * Change Log
  * Name        Date     Comments
  */
@@ -36,7 +40,7 @@ public class KeystoneClient extends ClientResource {
 
     /**
      * Generates the token from Keystone service of OpenStack.
-     *
+     * <p/>
      * Pseudo Code
      * 1. Load the auth details of keystone from the configuration object
      * 2. Create a RESTLET client and set the header info
@@ -45,20 +49,18 @@ public class KeystoneClient extends ClientResource {
      *
      * @return token A string consisting of Keystone token
      */
-    public String generateToken(){
-        System.out.println("Generating the Token");
-        Load load = new Load();
-        String keystoneURL = load.configuration.get("KeystoneURL");
-        String keystoneUsername = load.configuration.get("KeystoneUsername");
-        String keystonePassword = load.configuration.get("KeystonePassword");
-        String keystoneTenantName = load.configuration.get("KeystoneTenantName");
+    public String generateToken() {
+        KeyStoneSettings settings = Loader.getSettings().getKeyStoneSettings();
+        String keystoneURL = settings.getKeystoneURL();
+        String keystoneUsername = settings.getKeystoneUsername();
+        String keystonePassword = settings.getKeystonePassword();
+        String keystoneTenantName = settings.getKeystoneTenantName();
         OSClient os = OSFactory.builder()
                 .endpoint(keystoneURL)
                 .credentials(keystoneUsername, keystonePassword)
                 .tenantName(keystoneTenantName)
                 .authenticate();
         Token token = os.getToken();
-        System.out.println(token.getId());
         return token.getId();
     }
 }

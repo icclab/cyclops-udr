@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <File name="udr" filename="/var/log/cyclops/udr.log" append="false">
+            <PatternLayout pattern="[ %-6p] %d{yyyy-MM-dd HH:mm:ss} (%C{2}:%L) - %m%n"/>
+        </File>
+    </Appenders>
+   <!-- <Routing name="Routing">
+        <Routes pattern="/api">
+            <Route appender-ref="udr"/>
+        </Routes>
+    </Routing>
+    Logger Levels: FATAL>ERROR>WARN>INFO>DEBUG>TRACE>ALL-->
+    <Loggers>
+        <Logger name="org.apache.log4j.xml" additivity="false" level="trace"/>
+        <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.ExternalAppResource" additivity="false" level="TRACE">
+            <AppenderRef ref="udr"/>
+        </Logger>
+        <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.MeterResource" additivity="false" level="TRACE">
+            <AppenderRef ref="udr"/>
+        </Logger>
+        <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.ResourceUsage" additivity="false" level="TRACE">
+            <AppenderRef ref="udr"/>
+        </Logger>
+        <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.RootResource" additivity="false" level="TRACE">
+            <AppenderRef ref="udr"/>
+        </Logger>
+        <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.TelemetryResource" additivity="false" level="TRACE">
+            <AppenderRef ref="udr"/>
+        </Logger>
+        <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.UserUsageResource" additivity="false" level="TRACE">
+            <AppenderRef ref="udr"/>
+        </Logger>
+        <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.client.TelemetryClient" additivity="false" level="TRACE">
+            <AppenderRef ref="udr"/>
+        </Logger>
+        <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.UsageDataRecordResource" additivity="false" level="TRACE">
+            <AppenderRef ref="udr"/>
+        </Logger>
+        <Logger name="ch.icclab.cyclops.usecases.mcn.impl.MCNResource" additivity="false" level="TRACE">
+            <AppenderRef ref="udr"/>
+        </Logger>
+        <Root level="trace">
+            <AppenderRef ref="udr"/>
+        </Root>
+    </Loggers>
+</Configuration>

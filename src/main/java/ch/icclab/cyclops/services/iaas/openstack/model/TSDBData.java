@@ -17,13 +17,17 @@
 
 package ch.icclab.cyclops.services.iaas.openstack.model;
 
-import java.util.ArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.*;
 
 /**
+ * <b>POJO Object</b><p/>
  * Author: Srikanta
  * Created on: 15-Oct-14
  * Description: A POJO class for InfluxDB
- *
+ * <p>
  * Change Log
  * Name        Date     Comments
  */
@@ -31,6 +35,9 @@ public class TSDBData {
     private String name;
     private ArrayList<String> columns;
     private ArrayList<ArrayList<Object>> points;
+    private HashMap tags;
+
+    final static Logger logger = LogManager.getLogger(TSDBData.class.getName());
 
     public String getName() {
         return name;
@@ -54,5 +61,13 @@ public class TSDBData {
 
     public void setPoints(ArrayList<ArrayList<Object>> points) {
         this.points = points;
+    }
+
+    public HashMap getTags() {
+        return tags;
+    }
+
+    public void setTags(HashMap tags) {
+        this.tags = tags;
     }
 }

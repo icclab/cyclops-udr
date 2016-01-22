@@ -17,71 +17,16 @@
 
 package ch.icclab.cyclops.application;
 
-/**
- * Author: Srikanta
- * Created on: 06-Oct-14
- * Description: Handles the incoming API request be routing it the appropriate resource class.
- * Also loads the configuration file at the start of the application
- *
- * Change Log
- * Name          Date               Comments
- * Srikanta     02-Mar-2015     Added the api to save and return info regarding selected meters *
- */
-
-import ch.icclab.cyclops.services.iaas.openstack.resource.impl.*;
-import ch.icclab.cyclops.util.Load;
+import ch.icclab.cyclops.applicationFactory.AbstractApplicationFactory;
 import org.restlet.Application;
-import org.restlet.Context;
 import org.restlet.Restlet;
-import org.restlet.routing.Router;
 
-import java.io.IOException;
-
+/**
+ * Created by root on 16.11.15.
+ */
 public class UDRApplication extends Application{
-
-    /**
-     * This method handles the incoming request and routes it to the appropriate resource class
-     *
-     * Pseudo code
-     * 1. Create an instance of Router
-     * 2. Attach the api end points and their respective resource class for request handling
-     * 3. Return the router
-     *
-     * @return Restlet
-     */
+    @Override
     public Restlet createInboundRoot(){
-        //Load the configuration files and flags 
-        loadConfiguration(getContext());
-        
-        Router router = new Router(getContext());
-        router.attach("/", RootResource.class);
-        router.attach("/api", TelemetryResource.class); //API used internally to trigger the data collection
-        router.attach("/ext/app", ExternalAppResource.class); // API used for data insertion from external PaaS/IaaS
-        router.attach("/usage/users/{userid}", UserUsageResource.class); //API used for fetching the usage info for a user
-        router.attach("/usage/resources/{resourceid}", ResourceUsage.class);
-        router.attach("/meters", MeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
-        
-        return router;
-    }
-
-    /**
-     * Loads the configuration file at the beginning of the application startup
-     *
-     * Pseudo Code
-     * 1. Create the LoadConfiguration class
-     * 2. Load the file if the the existing instance of the class is empty
-     *
-     * @param context
-     */
-    private void loadConfiguration(Context context){
-        Load load = new Load();
-        if(load.configuration == null){
-            try {
-                load.configuration(getContext());
-                load.meterList();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        return AbstractApplicationFactory.getApplication(getContext());
     }
 }
