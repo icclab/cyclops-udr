@@ -31,13 +31,13 @@ public class OpenstackUDRApplication extends AbstractApplication {
         router.attach("/api", TelemetryResource.class); //API used internally to trigger the data collection
         counter.registerEndpoint("/api");
 
-        router.attach("/usage/users/{userid}", UserUsageResource.class); //API used for fetching the usage info for a user
+        router.attach("/usage/users/{userId}", UserUsageResource.class); //API used for fetching the usage info for a user
         counter.registerEndpoint("/usage/users");
 
         router.attach("/usage/resources/{resourceid}", ResourceUsage.class);
         counter.registerEndpoint("/usage/resources");
 
-        router.attach("/meters", MeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
+        router.attach("/meters", OpenstackMeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
         counter.registerEndpoint("/meters");
 
         Load load = new Load();
@@ -46,6 +46,6 @@ public class OpenstackUDRApplication extends AbstractApplication {
     @Override
     public void initialiseDatabases() {
         //TODO which databases have to be created
-        //dbClient.createDatabases(settings.getInfluxDBSettings().getInfluxDBDatabaseName(), settings.getCloudStackSettings().getCloudStackDBLogsName());
+        dbClient.createDatabases(settings.getInfluxDBSettings().getInfluxDBDatabaseName());
     }
 }

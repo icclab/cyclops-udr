@@ -355,7 +355,7 @@ public class TnovaResource extends ServerResource implements EventProcessingReso
                     System.out.println(lastevent);
                     Point point = Point.measurement(tablename)
                             .field("time", timeMillisec)
-                            .tag("userid", clientId)
+                            .tag("userId", clientId)
                             .tag("instanceid", instanceId)
                             .field("lastevent", lastevent)
                             .build();

@@ -84,11 +84,10 @@ public class CloudStackResources extends ServerResource {
         args.put("from", resourceid);
 
         // determine from and to
-        DateTimeUtil dateUtil = new DateTimeUtil();
         try {
-            args.put("start", getQueryValue("from"));
+            args.put("start", getQueryValue("from").replace("\"", ""));
 
-            args.put("end", getQueryValue("to"));
+            args.put("end", getQueryValue("to").replace("\"", ""));
         } catch (Exception ignored) {
             logger.debug("Retrieving resources, start or end date not provided");
         }

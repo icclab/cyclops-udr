@@ -78,22 +78,23 @@ public class ResourceUsage extends ServerResource {
         time.put("to", toDate);
 
         if (Load.getOpenStackCumulativeMeterList().contains(resourceId)) {
-            query = "SELECT usage FROM \"" + resourceId + "\" WHERE time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userid";
+            query = "SELECT usage FROM \"" + resourceId + "\" WHERE time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userId";
             sum = true;
         } else if (Load.getOpenStackGaugeMeterList().contains(resourceId)) {
-            query = "SELECT MEAN(avg) FROM \"" + resourceId + "\" WHERE time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userid";
+            query = "SELECT MEAN(avg) FROM \"" + resourceId + "\" WHERE time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userId";
         } else if (Load.getExternalMeterList().contains(resourceId)) {
             //query = "SELECT SUM(usage) FROM \"" + resourceId + "\" WHERE time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userid";
-            query = "SELECT usage FROM \"" + resourceId + "\" WHERE time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userid";
+            query = "SELECT usage FROM \"" + resourceId + "\" WHERE time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userId";
             sum = true;
         } else {
             // Fall back response TODO
             logger.debug("DEBUG Representation getResourceUsage(Entity entity): No Meter List specified");
         }
         tsdbData = dbClient.getCDRData(query);
-        if (sum)
-            tsdbData = sumExternalMeterData(tsdbData);
+
         if (tsdbData != null) {
+            if (sum)
+                tsdbData = sumExternalMeterData(tsdbData);
             for (int i = 0; i < tsdbData.length; i++) {
                 //Create a new ResourceUsageResponse
                 resourceUsageResponse = new ResourceUsageResponse();
@@ -108,7 +109,6 @@ public class ResourceUsage extends ServerResource {
             }
         } else {
             logger.debug("DEBUG Representation getResourceUsage(Entity entity): tsdbData is null");
-            //TODO: 2 field constructor to set null columns and usage.
             resourceUsageResponse.setResourceid(resourceId);
             resourceUsageResponse.setTime(time);
             resourceUsageResponse.setColumn(null);
@@ -127,7 +127,7 @@ public class ResourceUsage extends ServerResource {
 
     /**
      * This method sums all the values of the gotten points from the external meter data and sums their values.
-     *<br/>
+     * <br/>
      * Pseudo Code:
      * <br/>
      * 1. Get the column indexes <br/>
@@ -145,10 +145,10 @@ public class ResourceUsage extends ServerResource {
             int usageIndex = tsdbData[i].getColumns().indexOf("usage");
             int timeIndex = tsdbData[i].getColumns().indexOf("time");
 
-            for (int o = 0; o<tsdbData[i].getPoints().size(); o++){
-                usage = usage + Integer.parseInt((String)tsdbData[i].getPoints().get(o).get(usageIndex));
-                if(o == tsdbData[i].getPoints().size() -1) {
-                    String time = (String)tsdbData[i].getPoints().get(o).get(timeIndex);
+            for (int o = 0; o < tsdbData[i].getPoints().size(); o++) {
+                usage = usage + Integer.parseInt((String) tsdbData[i].getPoints().get(o).get(usageIndex));
+                if (o == tsdbData[i].getPoints().size() - 1) {
+                    String time = (String) tsdbData[i].getPoints().get(o).get(timeIndex);
                     finalPoint.add(timeIndex, time);
                     finalPoint.add(usageIndex, String.valueOf(usage));
                 }

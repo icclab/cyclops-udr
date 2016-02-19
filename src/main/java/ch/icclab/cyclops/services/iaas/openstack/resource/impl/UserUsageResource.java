@@ -46,7 +46,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
     private APICallCounter counter = APICallCounter.getInstance();
 
     public void doInit() {
-        userId = (String) getRequestAttributes().get("userid");
+        userId = (String) getRequestAttributes().get("userId");
     }
 
     /**
@@ -64,7 +64,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
     @Get
     public Representation getData() {
         counter.increment(endpoint);
-        logger.trace("BEGIN Representation getData()");
+        logger.debug("Attempting to get Usage Data");
         Representation userUsageResponse;
         TSDBData usageData = null;
         HashMap usageArr = new HashMap();

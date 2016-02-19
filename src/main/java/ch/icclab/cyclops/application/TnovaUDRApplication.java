@@ -25,7 +25,7 @@ import ch.icclab.cyclops.usecases.tnova.rabbitMQClient.TnovaThreadExecutor;
 import ch.icclab.cyclops.schedule.Endpoint;
 import ch.icclab.cyclops.schedule.Scheduler;
 import ch.icclab.cyclops.services.iaas.openstack.resource.impl.ExternalAppResource;
-import ch.icclab.cyclops.services.iaas.openstack.resource.impl.MeterResource;
+import ch.icclab.cyclops.services.iaas.openstack.resource.impl.OpenstackMeterResource;
 import ch.icclab.cyclops.services.iaas.openstack.resource.impl.ResourceUsage;
 import ch.icclab.cyclops.usecases.tnova.impl.TnovaUsageDataRecordResource;
 
@@ -42,7 +42,7 @@ public class TnovaUDRApplication extends AbstractApplication {
         router.attach("/ext/app", ExternalAppResource.class); // API used for data insertion from external PaaS/IaaS
         counter.registerEndpoint("/ext/app");
 
-        router.attach("/usage/users/{userid}", TnovaUsage.class); //API used for fetching the usage info for a user
+        router.attach("/usage/users/{userId}", TnovaUsage.class); //API used for fetching the usage info for a user
         counter.registerEndpoint("/usage/users");
 
         router.attach("/usage/instance/", TnovaInstanceUsageResource.class);
@@ -54,7 +54,7 @@ public class TnovaUDRApplication extends AbstractApplication {
         router.attach("/tnova/usage", TnovaUsageDataRecordResource.class); //TODO: import from tnova package
         counter.registerEndpoint("/tnova/usage");
 
-        router.attach("/meters", MeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
+        router.attach("/meters", OpenstackMeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
         counter.registerEndpoint("/meters");
 
         // internal scheduler with start/stop/restart/force/status commands

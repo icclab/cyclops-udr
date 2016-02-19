@@ -21,8 +21,9 @@ import ch.icclab.cyclops.load.Loader;
 import ch.icclab.cyclops.schedule.Endpoint;
 import ch.icclab.cyclops.schedule.Scheduler;
 import ch.icclab.cyclops.services.iaas.openstack.resource.impl.ExternalAppResource;
-import ch.icclab.cyclops.services.iaas.openstack.resource.impl.MeterResource;
+import ch.icclab.cyclops.services.iaas.openstack.resource.impl.OpenstackMeterResource;
 import ch.icclab.cyclops.services.iaas.openstack.resource.impl.ResourceUsage;
+import ch.icclab.cyclops.services.iaas.openstack.resource.impl.UserUsageResource;
 import ch.icclab.cyclops.usecases.mcn.impl.McnEventToUDR;
 import ch.icclab.cyclops.usecases.mcn.impl.McnUsage;
 import ch.icclab.cyclops.usecases.mcn.impl.McnUsageDataRecordResource;
@@ -42,7 +43,8 @@ public class McnUDRApplication extends AbstractApplication {
         router.attach("/ext/app", ExternalAppResource.class); // API used for data insertion from external PaaS/IaaS
         counter.registerEndpoint("/ext/app");
 
-        router.attach("/usage/users/{userid}", McnUsage.class); //API used for fetching the usage info for a user
+        router.attach("/usage/users/{userId}", UserUsageResource.class); //API used for fetching the usage info for a user
+
         counter.registerEndpoint("/usage/users");
 
         router.attach("/usage/resources/{resourceid}", ResourceUsage.class);
@@ -51,7 +53,7 @@ public class McnUDRApplication extends AbstractApplication {
         router.attach("/mcn/usage", McnUsageDataRecordResource.class); //API to query time-based service usage per user (required by RC for T-Nova)
         counter.registerEndpoint("/mcn/usage");
 
-        router.attach("/meters", MeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
+        router.attach("/meters", OpenstackMeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
         counter.registerEndpoint("/meters");
 
         // internal scheduler with start/stop/restart/force/status commands

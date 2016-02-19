@@ -16,7 +16,7 @@
         <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.ExternalAppResource" additivity="false" level="TRACE">
             <AppenderRef ref="udr"/>
         </Logger>
-        <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.MeterResource" additivity="false" level="TRACE">
+        <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.OpenstackMeterResource" additivity="false" level="TRACE">
             <AppenderRef ref="udr"/>
         </Logger>
         <Logger name="ch.icclab.cyclops.services.iaas.openstack.resource.impl.ResourceUsage" additivity="false" level="TRACE">

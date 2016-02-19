@@ -37,7 +37,7 @@ public class CloudstackUDRApplication extends AbstractApplication {
         counter.registerEndpoint("/ext/app");
 
         //API used for fetching the usage info for a user
-        router.attach("/usage/users/{userid}", CloudStackUsage.class);
+        router.attach("/usage/users/{userId}", CloudStackUsage.class);
         counter.registerEndpoint("/usage/users");
 
         // API endpoint used for requesting resource usage

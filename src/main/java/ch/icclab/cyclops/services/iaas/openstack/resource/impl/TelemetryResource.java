@@ -78,9 +78,8 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
     @Get
     public Representation setMeterData() {
         counter.increment(endpoint);
-        logger.trace("BEGIN Representation setMeterData()");
+        logger.debug("Loading the Meter List");
         InfluxDBClient dbClient = new InfluxDBClient();
-        dbClient.generateFakeEvent();
         boolean gaugeMeterOutput = false;
         boolean cumulativeMeterOutput = false;
         String token;
@@ -108,7 +107,6 @@ public class TelemetryResource extends ServerResource implements MeteringResourc
         response = constructResponse(cumulativeMeterOutput, gaugeMeterOutput);
         //Return the response in the JSON format
         output = util.toJson(response);
-        logger.trace("END Representation setMeterData()");
         return output;
     }
 

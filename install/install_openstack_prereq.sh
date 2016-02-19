@@ -14,7 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# Author: Martin Skoviera
+# Author: Piyush Harsh, Martin Skoviera
 
 echo "Installing OpenStack prerequisites"
 cd openstack

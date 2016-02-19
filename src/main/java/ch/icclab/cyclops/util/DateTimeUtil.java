@@ -156,7 +156,9 @@ public class DateTimeUtil {
      * @return
      */
     public String formatDate(String date){
-        String result = date.split("T")[0].concat(" ").concat(date.split("T")[1]);
+        String result = date;
+        if(date.contains("T"))
+            result = date.split("T")[0].concat(" ").concat(date.split("T")[1]);
         return result.replace("\"","");
     }
 

@@ -37,6 +37,7 @@ import ch.icclab.cyclops.services.iaas.openstack.model.GaugeMeterData;
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.support.database.influxdb.client.InfluxDBClient;
 import ch.icclab.cyclops.services.iaas.openstack.resource.interfc.DatabaseResource;
+import ch.icclab.cyclops.usecases.external.model.ExternalDataPoint;
 import ch.icclab.cyclops.util.DateTimeUtil;
 import ch.icclab.cyclops.util.Load;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -97,7 +98,7 @@ public class TSDBResource implements DatabaseResource {
                 logger.debug("Attempting to build a Point for: " + meterName);
                 Point point = Point.measurement(meterName)
                         .time(timeMillisec, TimeUnit.MILLISECONDS)
-                        .tag("userid", gMeterData.getGroupby().getUser_id())
+                        .tag("userId", gMeterData.getGroupby().getUser_id())
                         .tag("resourceid", gMeterData.getGroupby().getResource_id())
                         .tag("projectid", gMeterData.getGroupby().getProject_id())
                         .tag("type", "gauge")
@@ -148,7 +149,7 @@ public class TSDBResource implements DatabaseResource {
                 logger.debug("Attempting to build a Point for: " + meterName);
                 Point point = Point.measurement(meterName)
                         .time(timeMillisec, TimeUnit.MILLISECONDS)
-                        .tag("userid", cMeterData.getUser_id())
+                        .tag("userId", cMeterData.getUser_id())
                         .tag("resourceid", cMeterData.getResource_id())
                         .field("volume", cMeterData.getVolume())
                         .field("usage", cMeterData.getUsage())
@@ -206,30 +207,30 @@ public class TSDBResource implements DatabaseResource {
     }
 
     /**
-     * Receives the transformed usage data from an external application in terms of an TSDBData POJO.
-     * POJO is converted into a json object and the InfluxDB client is invoked to persist the data.
-     * <p>
-     * Pseudo Code<br/>
-     * 1. Convert the TSDB POJO consisting of the usage data into a JSON Obj<br/>
-     * 2. Invoke the InfluxDB client<br/>
-     * 3. Save the data in to the DB
+     * Receives an External data point to save into the DB.
+     * Gets it's parameters and saves it.
      *
-     * @param dbData
-     * @return result A boolean output as a result of saving the meter data into the db
+     * @param externalDataPoint
+     * @return
      */
-    public boolean saveExtData(TSDBData dbData) {
-        InfluxDBClient dbClient = new InfluxDBClient();
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonData;
-        boolean result = true;
-
+    public boolean saveExtData(ExternalDataPoint externalDataPoint) {
+        boolean result = false;
+        dbname = settings.getInfluxDBDatabaseName();
+        DateTimeUtil util = new DateTimeUtil();
         try {
-            jsonData = mapper.writeValueAsString(dbData);
-            dbClient.saveExtData(jsonData);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            result = false;
-            return result;
+            logger.debug("Attempting to save UDR into the DB.");
+            Point point = Point.measurement(externalDataPoint.getMeterName())
+                    .time(externalDataPoint.getTimestamp(), TimeUnit.MILLISECONDS)
+                    .tag("userId", externalDataPoint.getUserId())
+                    .tag("source", externalDataPoint.getSource())
+                    .field("usage", externalDataPoint.getUsage())
+                    .build();
+            logger.debug("Attempting to write UDR point.");
+            influxDB.write(dbname, "default", point);
+            result = true;
+        } catch (Exception e) {
+            logger.error("Error while trying to save the UDR into the DB: " + e.getMessage());
+            return false;
         }
         return result;
     }
@@ -248,23 +249,58 @@ public class TSDBResource implements DatabaseResource {
     public TSDBData getUsageData(String from, String to, String userId, Object meterName, String source, String type) {
         String query = null;
         InfluxDBClient dbClient = new InfluxDBClient();
-        String formatedFrom = reformatDate(from);
-        String formatedTo = reformatDate(to);
-        if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("cumulative")) {
-            query = "SELECT usage,unit,type FROM \"" + meterName + "\" WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND userid='" + userId + "' ";
-        } else if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("gauge")) {
-            query = "SELECT avg,unit,type FROM \"" + meterName + "\" WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND userid='" + userId + "' ";
+        if (from != null && to != null) {
+            String formatedFrom = reformatDate(from);
+            String formatedTo = reformatDate(to);
+            if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("cumulative")) {
+                query = "SELECT usage,unit,type FROM \"" + meterName + "\" WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND userId='" + userId + "' ";
+            } else if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("gauge")) {
+                query = "SELECT avg,unit,type FROM \"" + meterName + "\" WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND userId='" + userId + "' ";
+            } else {
+                query = "SELECT time,usage FROM \"" + meterName + "\" WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND userId='" + userId + "' ";
+                TSDBData tsdbData = dbClient.getData(query);
+                if (tsdbData.getPoints().size() < 1) {
+                    query = "SELECT time,usage FROM UDR WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND clientId='" + userId + "' AND productType='" + meterName + "'";
+                    tsdbData = dbClient.getData(query);
+                    tsdbData.setName((String) meterName);
+                    return tsdbData;
+                }
+            }
         } else {
-            query = "SELECT time,usage FROM \"" + meterName + "\" WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND userid='" + userId + "' ";
-            TSDBData tsdbData = dbClient.getData(query);
-            if (tsdbData.getPoints().size() < 1) {
-                query = "SELECT time,usage FROM UDR WHERE time > '" + formatedFrom + "' AND time < '" + formatedTo + "' AND clientId='" + userId + "' AND productType='" + meterName + "'";
-                tsdbData = dbClient.getData(query);
-                tsdbData.setName((String) meterName);
-                return tsdbData;
+            if (from == null)
+                if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("cumulative")) {
+                    query = "SELECT usage,unit,type FROM \"" + meterName + "\" WHERE userId='" + userId + "' ";
+                } else if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("gauge")) {
+                    query = "SELECT avg,unit,type FROM \"" + meterName + "\" WHERE userId='" + userId + "' ";
+                } else {
+                    query = "SELECT time,usage FROM \"" + meterName + "\" WHERE userId='" + userId + "' ";
+                    TSDBData tsdbData = dbClient.getData(query);
+                    if (tsdbData.getPoints().size() < 1) {
+                        query = "SELECT time,usage FROM UDR WHERE  clientId='" + userId + "' AND productType='" + meterName + "'";
+                        tsdbData = dbClient.getData(query);
+                        tsdbData.setName((String) meterName);
+                        return tsdbData;
+                    }
+                }
+            else {
+                String formatedFrom = reformatDate(from);
+
+                if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("cumulative")) {
+                    query = "SELECT usage,unit,type FROM \"" + meterName + "\" WHERE userId='" + userId + "' AND time > '" + formatedFrom + "'";
+                } else if (source.equalsIgnoreCase("openstack") && type.equalsIgnoreCase("gauge")) {
+                    query = "SELECT avg,unit,type FROM \"" + meterName + "\" WHERE userId='" + userId + "' AND time > '" + formatedFrom + "'";
+                } else {
+                    query = "SELECT time,usage FROM \"" + meterName + "\" WHERE userId='" + userId + "' AND time > '" + formatedFrom + "'";
+                    TSDBData tsdbData = dbClient.getData(query);
+                    if (tsdbData.getPoints().size() < 1) {
+                        query = "SELECT time,usage FROM UDR WHERE  clientId='" + userId + "' AND productType='" + meterName + "' AND time > '" + formatedFrom + "'";
+                        tsdbData = dbClient.getData(query);
+                        tsdbData.setName((String) meterName);
+                        return tsdbData;
+                    }
+                }
             }
         }
-
         return dbClient.getData(query);
     }
 
@@ -279,9 +315,11 @@ public class TSDBResource implements DatabaseResource {
     }
 
     private String reformatDate(String date) {
-        String day = date.split(" ")[0];
-        String hour = date.split(" ")[1];
-        return day + "T" + hour + ":00Z";
+        if (date.contains(" ")) {
+            String day = date.split(" ")[0];
+            String hour = date.split(" ")[1];
+            return day + "T" + hour + ":00Z";
+        } else return date;
     }
 
     /**
@@ -299,7 +337,7 @@ public class TSDBResource implements DatabaseResource {
         ObjectMapper mapper = new ObjectMapper();
 
         //Get the last entry
-        tsdbData = dbClient.getData("SELECT volume FROM \"" + metername + "\" WHERE resourceid='" + resource_id + "' AND userid='" + user_id + "' order by time desc limit 1");
+        tsdbData = dbClient.getData("SELECT volume FROM \"" + metername + "\" WHERE resourceid='" + resource_id + "' AND userId='" + user_id + "' order by time desc limit 1");
         if (tsdbData.getPoints().size() == 0)
             return 0;
         else {

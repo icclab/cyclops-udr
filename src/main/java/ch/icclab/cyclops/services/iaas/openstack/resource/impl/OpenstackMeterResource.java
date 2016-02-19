@@ -17,6 +17,10 @@
 
 package ch.icclab.cyclops.services.iaas.openstack.resource.impl;
 
+import ch.icclab.cyclops.load.Loader;
+import ch.icclab.cyclops.services.iaas.openstack.client.KeystoneClient;
+import ch.icclab.cyclops.services.iaas.openstack.model.InfluxDBMeterSelection;
+import ch.icclab.cyclops.services.iaas.openstack.model.OpenstackMeter;
 import ch.icclab.cyclops.services.iaas.openstack.model.Response;
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.support.database.influxdb.client.InfluxDBClient;
@@ -26,16 +30,18 @@ import ch.icclab.cyclops.util.APICallCounter;
 import ch.icclab.cyclops.util.Flag;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.LocalDateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.restlet.data.Header;
+import org.restlet.data.MediaType;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
-import org.restlet.resource.Get;
-import org.restlet.resource.Post;
-import org.restlet.resource.ServerResource;
+import org.restlet.resource.*;
+import org.restlet.util.Series;
 
 import java.io.IOException;
 
@@ -43,18 +49,19 @@ import java.io.IOException;
  * Author: Srikanta
  * Created on: 02-Mar-15
  * Description: Services the GET and POST request regarding the information of meters that are selected
- * <p/>
+ * <p>
  * Change Log
  * Name        Date     Comments
  */
-public class MeterResource extends ServerResource implements UDRResource {
+public class OpenstackMeterResource extends ServerResource implements UDRResource {
 
-    final static Logger logger = LogManager.getLogger(MeterResource.class.getName());
+    final static Logger logger = LogManager.getLogger(OpenstackMeterResource.class.getName());
     private String endpoint = "/meters";
     private APICallCounter counter = APICallCounter.getInstance();
+
     /**
      * Receives the JSON data consisting of meter selection status
-     * <p/>
+     * <p>
      * Pseudo Code<br>
      * 1. Receive the data<br>
      * 2. Extract the JSON array<br>
@@ -118,7 +125,7 @@ public class MeterResource extends ServerResource implements UDRResource {
 
     /**
      * Invoke the db client to persist the data
-     * <p/>
+     * <p>
      * Pseudo Code<br>
      * 1. Receive the data<br>
      * 2. Save the data using the InfluxDB client
@@ -127,18 +134,17 @@ public class MeterResource extends ServerResource implements UDRResource {
      * @return boolean
      */
     private boolean saveData(JSONObject jsonObj) {
-        logger.trace("BEGIN boolean saveData(JSONObject jsonObj)");
+        logger.debug("Attempting to save data in influxDB.");
         InfluxDBClient dbClient = new InfluxDBClient();
         boolean status = false;
 
         status = dbClient.saveData(jsonObj.toString());
-        logger.trace("END boolean saveData(JSONObject jsonObj)");
         return status;
     }
 
     /**
      * Returns the last persisted list of meters
-     * <p/>
+     * <p>
      * Pseudo Code<br>
      * 1. Receive the request for the list of meters<br>
      * 2. Query the DB to get the list<br>
@@ -147,23 +153,53 @@ public class MeterResource extends ServerResource implements UDRResource {
      * @return Representation A JSON response containing the list of meters
      */
     @Get
-    public Representation getMeterList() {
+    public String getMeterList() {
         counter.increment(endpoint);
+
+        Gson gson = new Gson();
 
         JsonRepresentation responseJson = null;
         TSDBData responseObj;
         ObjectMapper mapper = new ObjectMapper();
         TSDBResource tsdbResource = new TSDBResource();
         responseObj = tsdbResource.getMeterList();
+        ClientResource clientResource = new ClientResource(Loader.getSettings().getKeyStoneSettings().getCeilometerURL()+"/meters");
 
+        String jsonStr = "{}";
         try {
-            String jsonStr = mapper.writeValueAsString(responseObj);
-            responseJson = new JsonRepresentation(jsonStr);
+            jsonStr = mapper.writeValueAsString(responseObj);
         } catch (JsonProcessingException e) {
             logger.error("Could not parse JSON when getting meterList: " + e.getMessage());
-            e.printStackTrace();
         }
+        return jsonStr;
+//
+//        InfluxDBMeterSelection selection = gson.fromJson(jsonStr, InfluxDBMeterSelection.class);
 
-        return responseJson;
+//        try {
+//            String meterUrl = Loader.getSettings().getKeyStoneSettings().getCeilometerURL()+"/meters";
+//            ClientResource meterResource = new ClientResource(meterUrl);
+//
+//            Series<Header> requestHeaders =
+//                    (Series<Header>) meterResource.getRequestAttributes().get("org.restlet.http.headers");
+//
+//            if (requestHeaders == null) {
+//                requestHeaders = new Series<Header>(Header.class);
+//                meterResource.getRequestAttributes().put("org.restlet.http.headers", requestHeaders);
+//            }
+//
+//            KeystoneClient keystoneClient = new KeystoneClient();
+//            logger.trace("Attempting to create the token");
+//            String subjectToken = keystoneClient.generateToken();
+//
+//            requestHeaders.set("X-Auth-Token", subjectToken);
+//
+//            OpenstackMeter[] meters = gson.fromJson(meterResource.get(MediaType.APPLICATION_JSON).getText(), OpenstackMeter[].class);
+//
+//            return gson.toJson(meters);
+//
+//        } catch (Exception e) {
+//            logger.error("Error while getting the Keystone Meters: "+e.getMessage());
+//            return null;
+//        }
     }
 }

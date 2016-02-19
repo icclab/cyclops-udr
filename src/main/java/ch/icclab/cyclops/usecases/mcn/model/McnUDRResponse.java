@@ -25,14 +25,15 @@ import java.util.ArrayList;
 public class McnUDRResponse {
     private String time;
     private Double usage;
-    private String productType;
 
-    public String getProductType() {
-        return productType;
+    private String label;
+
+    public String getLabel() {
+        return label;
     }
 
-    public void setProductType(String productType) {
-        this.productType = productType;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getTime() {
@@ -54,7 +55,7 @@ public class McnUDRResponse {
     public void setFields(ArrayList<Object> value, ArrayList<String> columns) {
         this.setTime((String) value.get(columns.indexOf("time")));
         this.setUsage(getDoubleValue(value.get(columns.indexOf("usage"))));
-        this.setProductType((String) value.get(columns.indexOf("productType")));
+        this.setLabel((String) value.get(columns.indexOf("productType")));
     }
 
     private Double getDoubleValue(Object number){

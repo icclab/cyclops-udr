@@ -20,6 +20,7 @@ package ch.icclab.cyclops.support.database.influxdb.client;
 import ch.icclab.cyclops.load.Loader;
 import ch.icclab.cyclops.load.model.InfluxDBSettings;
 import ch.icclab.cyclops.services.iaas.cloudstack.util.Time;
+import ch.icclab.cyclops.services.iaas.openstack.model.Response;
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.util.Load;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -154,7 +155,7 @@ public class InfluxDBClient extends ClientResource {
                 sourceIndex = i;
             else if (columns[i].equals("usage"))
                 usageIndex = i;
-            else if (columns[i].equals("userid"))
+            else if (columns[i].equals("userId"))
                 useridIndex = i;
         }
         logger.debug("Obtained indexes from the columns: Metername: " + meternameIndex + " Time: " + timeIndex + " Source: " + sourceIndex);
@@ -165,7 +166,7 @@ public class InfluxDBClient extends ClientResource {
             Point point = Point.measurement(metername)
                     .tag("time", points.get(i)[timeIndex])
                     .tag("source", points.get(i)[sourceIndex].substring(1, points.get(i)[sourceIndex].length() - 1))
-                    .tag("userid", points.get(i)[useridIndex].substring(1, points.get(i)[useridIndex].length() - 1))
+                    .tag("userId", points.get(i)[useridIndex].substring(1, points.get(i)[useridIndex].length() - 1))
                     .field("usage", points.get(i)[usageIndex].substring(0, points.get(i)[usageIndex].length() - 2))
                     .build();
             //logger.debug("Attempting to write the Point (" + points.get(i)[meternameIndex] + ") in the db:" + dbName);
@@ -242,10 +243,12 @@ public class InfluxDBClient extends ClientResource {
 
                 }
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("Error while getting data from the DB: "+e.getMessage());
+            Response response = new Response();
+            response.setStatus("Failed");
+            response.setMessage("Error while getting data from the DB: "+e.getMessage());
+//            return response;
         }
         return dataObj[0];
     }
@@ -287,7 +290,7 @@ public class InfluxDBClient extends ClientResource {
         logger.debug("Attempting to get CDR Data");
         InfluxDB influxDB = InfluxDBFactory.connect(this.url, this.username, this.password);
         JSONArray resultArray;
-        TSDBData[] dataObj = null;
+        TSDBData[] dataObj = new TSDBData[1];
         ObjectMapper mapper = new ObjectMapper();
         int timeIndex = -1;
         int usageIndex = -1;
@@ -298,12 +301,13 @@ public class InfluxDBClient extends ClientResource {
             logger.debug("Obtained results: " + resultArray.toString());
             if (!resultArray.isNull(0)) {
                 if (resultArray.toString().equals("[{}]")) {
-                    TSDBData data = new TSDBData();
-                    data.setColumns(new ArrayList<String>());
-                    data.setPoints(new ArrayList<ArrayList<Object>>());
-                    data.setTags(new HashMap());
-                    dataObj[0] = data;
-                    return dataObj;
+//                    TSDBData data = new TSDBData();
+//                    data.setColumns(new ArrayList<String>());
+//                    data.setPoints(new ArrayList<ArrayList<Object>>());
+//                    data.setTags(new HashMap());
+//                    dataObj[0] = data;
+//                    return dataObj;
+                    return null;
                 } else {
                     JSONObject obj = (JSONObject) resultArray.get(0);
                     JSONArray series = (JSONArray) obj.get("series");

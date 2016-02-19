@@ -57,7 +57,7 @@ public class McnUsage extends ServerResource{
 
 
     public void doInit() {
-        userId = (String) getRequestAttributes().get("userid");
+        userId = (String) getRequestAttributes().get("userId");
     }
 
     @Get
@@ -65,7 +65,7 @@ public class McnUsage extends ServerResource{
 
         counter.increment(endpoint);
         if (userId == null || userId.isEmpty()) {
-            logger.error("Trying to get Usage Records for user, but userid is not provided");
+            logger.error("Trying to get Usage Records for user, but userId is not provided");
             throw new ResourceException(500);
         } else {
             logger.trace("Accessing usage records for user: " + userId);

@@ -363,8 +363,8 @@
               "function": "mean",
               "column": "max",
               "series": "cpu_util",
-              "query": "select userid, mean(max) from \"cpu_util\" where $timeFilter group by time($interval), userid order asc",
-              "groupby_field": "userid",
+              "query": "select userId, mean(max) from \"cpu_util\" where $timeFilter group by time($interval), userId order asc",
+              "groupby_field": "userId",
               "rawQuery": false,
               "interval": ""
             }
@@ -825,8 +825,8 @@
               "function": "mean",
               "column": "avg",
               "series": "network.outgoing.bytes.rate",
-              "query": "select userid, mean(avg) from \"network.outgoing.bytes.rate\" where $timeFilter group by time($interval), userid order asc",
-              "groupby_field": "userid"
+              "query": "select userId, mean(avg) from \"network.outgoing.bytes.rate\" where $timeFilter group by time($interval), userId order asc",
+              "groupby_field": "userId"
             }
           ],
           "aliasColors": {},

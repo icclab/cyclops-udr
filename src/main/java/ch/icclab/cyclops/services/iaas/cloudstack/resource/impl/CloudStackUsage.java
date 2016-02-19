@@ -49,7 +49,7 @@ public class CloudStackUsage extends ServerResource {
     }
 
     public void doInit() {
-        userId = (String) getRequestAttributes().get("userid");
+        userId = (String) getRequestAttributes().get("userId");
     }
 
     @Get
