@@ -59,88 +59,6 @@ public class OpenstackMeterResource extends ServerResource implements UDRResourc
     private String endpoint = "/meters";
     private APICallCounter counter = APICallCounter.getInstance();
 
-    /**
-     * Receives the JSON data consisting of meter selection status
-     * <p>
-     * Pseudo Code<br>
-     * 1. Receive the data<br>
-     * 2. Extract the JSON array<br>
-     * 3. Send the JSON array to saveData() for persistence into the DB
-     *
-     * @param entity The body of the POST request
-     * @return Representation A JSON response containing the status of the request serviced
-     */
-    @Post("json:json")
-    public Representation setMeterList(Representation entity) {
-        counter.increment(endpoint);
-        logger.trace("BEGIN Representation setMeterList(Representation entity)");
-        boolean output = true;
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonData = null;
-        JsonRepresentation request = null;
-        JsonRepresentation responseJson = null;
-        LocalDateTime currentDateTime = new LocalDateTime();
-        Response response = new Response();
-
-        // Get the JSON representation of the incoming POST request
-        try {
-            request = new JsonRepresentation(entity);
-        } catch (IOException e) {
-            logger.error("EXCEPTION IOEXCEPTION Representation setMeterList(Representation entity)");
-            e.printStackTrace();
-        }
-        //Tells to UDR that need to reload the meter list in Load
-        Flag.setMeterListReset(true);
-        // Process the incoming request
-        try {
-            output = saveData(request.getJsonObject());
-        } catch (JSONException e) {
-            logger.error("EXCEPTION JSONGEXCEPTION Representation setMeterList(Representation entity)");
-            output = false;
-            e.printStackTrace();
-        }
-        // Set the time stamp
-        response.setTimestamp(currentDateTime.toDateTime().toString());
-        // Set the status and message
-        if (output) {
-            response.setStatus("Success");
-            response.setMessage("Data saved into the DB");
-        } else {
-            logger.debug("DEBUG Representation setMeterList(Representation entity): Data could not be saved into the DB");
-            response.setStatus("Failure");
-            response.setMessage("Data could not be saved into the DB");
-        }
-        //TODO: jsonMapper method. reusable in all the classes.
-        // Convert the Java object to a JSON string
-        try {
-            jsonData = mapper.writeValueAsString(response);
-            responseJson = new JsonRepresentation(jsonData);
-        } catch (JsonProcessingException e) {
-            logger.error("EXCEPTION JSONPROCESSINGEXCEPTION Representation setMeterList(Representation entity)");
-            e.printStackTrace();
-        }
-        logger.trace("END Representation setMeterList(Representation entity)");
-        return responseJson;
-    }
-
-    /**
-     * Invoke the db client to persist the data
-     * <p>
-     * Pseudo Code<br>
-     * 1. Receive the data<br>
-     * 2. Save the data using the InfluxDB client
-     *
-     * @param jsonObj The JSON object that needs to be persisted into the DB
-     * @return boolean
-     */
-    private boolean saveData(JSONObject jsonObj) {
-        logger.debug("Attempting to save data in influxDB.");
-        InfluxDBClient dbClient = new InfluxDBClient();
-        boolean status = false;
-
-        status = dbClient.saveData(jsonObj.toString());
-        return status;
-    }
 
     /**
      * Returns the last persisted list of meters
@@ -158,48 +76,31 @@ public class OpenstackMeterResource extends ServerResource implements UDRResourc
 
         Gson gson = new Gson();
 
-        JsonRepresentation responseJson = null;
-        TSDBData responseObj;
-        ObjectMapper mapper = new ObjectMapper();
-        TSDBResource tsdbResource = new TSDBResource();
-        responseObj = tsdbResource.getMeterList();
-        ClientResource clientResource = new ClientResource(Loader.getSettings().getKeyStoneSettings().getCeilometerURL()+"/meters");
-
-        String jsonStr = "{}";
         try {
-            jsonStr = mapper.writeValueAsString(responseObj);
-        } catch (JsonProcessingException e) {
-            logger.error("Could not parse JSON when getting meterList: " + e.getMessage());
-        }
-        return jsonStr;
-//
-//        InfluxDBMeterSelection selection = gson.fromJson(jsonStr, InfluxDBMeterSelection.class);
+            String meterUrl = Loader.getSettings().getKeyStoneSettings().getCeilometerURL()+"/meters";
+            ClientResource meterResource = new ClientResource(meterUrl);
 
-//        try {
-//            String meterUrl = Loader.getSettings().getKeyStoneSettings().getCeilometerURL()+"/meters";
-//            ClientResource meterResource = new ClientResource(meterUrl);
-//
-//            Series<Header> requestHeaders =
-//                    (Series<Header>) meterResource.getRequestAttributes().get("org.restlet.http.headers");
-//
-//            if (requestHeaders == null) {
-//                requestHeaders = new Series<Header>(Header.class);
-//                meterResource.getRequestAttributes().put("org.restlet.http.headers", requestHeaders);
-//            }
-//
-//            KeystoneClient keystoneClient = new KeystoneClient();
-//            logger.trace("Attempting to create the token");
-//            String subjectToken = keystoneClient.generateToken();
-//
-//            requestHeaders.set("X-Auth-Token", subjectToken);
-//
-//            OpenstackMeter[] meters = gson.fromJson(meterResource.get(MediaType.APPLICATION_JSON).getText(), OpenstackMeter[].class);
-//
-//            return gson.toJson(meters);
-//
-//        } catch (Exception e) {
-//            logger.error("Error while getting the Keystone Meters: "+e.getMessage());
-//            return null;
-//        }
+            Series<Header> requestHeaders =
+                    (Series<Header>) meterResource.getRequestAttributes().get("org.restlet.http.headers");
+
+            if (requestHeaders == null) {
+                requestHeaders = new Series<Header>(Header.class);
+                meterResource.getRequestAttributes().put("org.restlet.http.headers", requestHeaders);
+            }
+
+            KeystoneClient keystoneClient = new KeystoneClient();
+            logger.trace("Attempting to create the token");
+            String subjectToken = keystoneClient.generateToken();
+
+            requestHeaders.set("X-Auth-Token", subjectToken);
+
+            OpenstackMeter[] meters = gson.fromJson(meterResource.get(MediaType.APPLICATION_JSON).getText(), OpenstackMeter[].class);
+
+            return gson.toJson(meters);
+
+        } catch (Exception e) {
+            logger.error("Error while getting the Keystone Meters: "+e.getMessage());
+            return null;
+        }
     }
 }

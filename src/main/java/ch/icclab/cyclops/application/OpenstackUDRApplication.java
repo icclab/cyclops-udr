@@ -37,8 +37,11 @@ public class OpenstackUDRApplication extends AbstractApplication {
         router.attach("/usage/resources/{resourceid}", ResourceUsage.class);
         counter.registerEndpoint("/usage/resources");
 
-        router.attach("/meters", OpenstackMeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
+        router.attach("/meters", MeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
         counter.registerEndpoint("/meters");
+
+        router.attach("/environment/meters", OpenstackMeterResource.class); //API used for saving and returning the information on selected meters for usage metrics collection
+        counter.registerEndpoint("environment/meters");
 
         Load load = new Load();
     }

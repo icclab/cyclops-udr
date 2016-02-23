@@ -55,7 +55,7 @@ public class TelemetryClient extends ClientResource {
      * @throws IOException
      */
     public String getData(String token, String meterName, String meterType) throws IOException {
-        logger.trace("BEGIN String getData(String token, String meterName, String meterType) throws IOException");
+        logger.trace("Attempting to get meter data for: " + meterName);
         String jsonOutput;
         String from, to, url;
         String[] range;
@@ -86,7 +86,6 @@ public class TelemetryClient extends ClientResource {
         Representation output = cr.getResponseEntity();
         jsonOutput = output.getText();
         logger.debug("Ceilometer response: " + jsonOutput);
-        logger.trace("END String getData(String token, String meterName, String meterType) throws IOException");
         return jsonOutput;
     }
 
@@ -100,7 +99,7 @@ public class TelemetryClient extends ClientResource {
      * @return url A String consisting of a URL and query parameters
      */
     private String generateTelemetryQuery(String meterType, String meterName, String to, String from) {
-        logger.trace("BEGIN generateTelemetryQuery(String meterType, String meterName, String to, String from)");
+        logger.trace("Creating the query for the meter: "+meterName);
         String url = Loader.getSettings().getKeyStoneSettings().getCeilometerURL();
 
         if (meterType.equals("gauge")) {
