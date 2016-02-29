@@ -17,6 +17,7 @@
 
 package ch.icclab.cyclops.util;
 
+import ch.icclab.cyclops.services.iaas.openstack.client.KeystoneClient;
 import ch.icclab.cyclops.services.iaas.openstack.model.TSDBData;
 import ch.icclab.cyclops.services.iaas.openstack.persistence.TSDBResource;
 import org.restlet.resource.ClientResource;
@@ -32,9 +33,9 @@ public class Load extends ClientResource {
     //TODO Manu meterlist has to go to the OpenStack layer, then delete this Load class (as we are using different package now)
 
     //Instantiating the Instance variable for saving the config details
-    private static ArrayList<String> openStackCumulativeMeterList;
-    private static ArrayList<String> openStackGaugeMeterList;
-    private static ArrayList<String> externalMeterList;
+    public static ArrayList<String> openStackCumulativeMeterList;
+    public static ArrayList<String> openStackGaugeMeterList;
+    public static ArrayList<String> externalMeterList;
 
     /**
      * Private constructor, because we are working with singleton pattern
@@ -64,8 +65,11 @@ public class Load extends ClientResource {
         int indexMeterType = -1;
         int indexMeterSource = -1;
 
+//        KeystoneClient client = new KeystoneClient();     //Openstack4j get MeterList
+//        client.getMeterList();
+
         if (Flag.isMeterListReset()) {
-            Flag.setMeterListReset(false);
+//            Flag.setMeterListReset(false);
             Load.openStackGaugeMeterList.clear();
             Load.openStackCumulativeMeterList.clear();
 

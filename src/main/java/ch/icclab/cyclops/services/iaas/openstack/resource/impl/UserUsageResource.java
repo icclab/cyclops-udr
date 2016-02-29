@@ -21,11 +21,13 @@ import ch.icclab.cyclops.services.iaas.openstack.model.UserUsageResponse;
 import ch.icclab.cyclops.services.iaas.openstack.persistence.TSDBResource;
 import ch.icclab.cyclops.services.iaas.openstack.resource.interfc.UsageResource;
 import ch.icclab.cyclops.util.APICallCounter;
+import ch.icclab.cyclops.util.DateTimeUtil;
 import ch.icclab.cyclops.util.Load;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -64,15 +66,14 @@ public class UserUsageResource extends ServerResource implements UsageResource {
     @Get
     public Representation getData() {
         counter.increment(endpoint);
-        logger.debug("Attempting to get Usage Data");
         Representation userUsageResponse;
         TSDBData usageData = null;
         HashMap usageArr = new HashMap();
         ArrayList<TSDBData> meterDataArrList;
         TSDBResource dbResource = new TSDBResource();
-
         String fromDate = getQueryValue("from");
         String toDate = getQueryValue("to");
+        logger.debug("Attempting to get Usage Data for user: " + userId + " from: " + fromDate + " + to: " + toDate);
 
         if (Load.getOpenStackCumulativeMeterList().size() != 0 || Load.getOpenStackGaugeMeterList().size() != 0) {
             meterDataArrList = new ArrayList<TSDBData>();
@@ -80,6 +81,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
             for (int i = 0; i < Load.getOpenStackCumulativeMeterList().size(); i++) {
                 usageData = dbResource.getUsageData(fromDate, toDate, userId, Load.getOpenStackCumulativeMeterList().get(i), "openstack", "cumulative");
                 if (usageData != null && usageData.getPoints().size() != 0) {
+                    usageData = formatTime(usageData, usageData.getColumns().indexOf("time"));
                     meterDataArrList.add(usageData);
                 }
             }
@@ -87,6 +89,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
             for (int i = 0; i < Load.getOpenStackGaugeMeterList().size(); i++) {
                 usageData = dbResource.getUsageData(fromDate, toDate, userId, Load.getOpenStackGaugeMeterList().get(i), "openstack", "gauge");
                 if (usageData != null && usageData.getPoints().size() != 0) {
+                    usageData = formatTime(usageData, usageData.getColumns().indexOf("time"));
                     meterDataArrList.add(usageData);
                 }
             }
@@ -101,6 +104,7 @@ public class UserUsageResource extends ServerResource implements UsageResource {
             for (int i = 0; i < Load.getExternalMeterList().size(); i++) {
                 usageData = dbResource.getUsageData(fromDate, toDate, userId, Load.getExternalMeterList().get(i), "", "");
                 if (usageData != null && usageData.getPoints().size() != 0) {
+                    usageData = formatTime(usageData, usageData.getColumns().indexOf("time"));
                     meterDataArrList.add(usageData);
                 }
             }
@@ -113,6 +117,15 @@ public class UserUsageResource extends ServerResource implements UsageResource {
         userUsageResponse = constructResponse(usageArr, userId, fromDate, toDate);
         logger.trace("END Representation getData()");
         return userUsageResponse;
+    }
+
+    private TSDBData formatTime(TSDBData usageData, int timeIndex) {
+        DateTimeUtil dateTimeUtil = new DateTimeUtil();
+        ArrayList<ArrayList<Object>> points = usageData.getPoints();
+        for(ArrayList<Object> point : points){
+            point.set(timeIndex, dateTimeUtil.getTimestamp(String.valueOf(point.get(timeIndex))));
+        }
+        return usageData;
     }
 
     /**

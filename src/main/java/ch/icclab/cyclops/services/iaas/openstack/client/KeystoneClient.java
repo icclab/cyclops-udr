@@ -23,8 +23,13 @@ import ch.icclab.cyclops.load.model.KeyStoneSettings;
 import ch.icclab.cyclops.util.Load;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.model.identity.Token;
+import org.openstack4j.model.telemetry.Meter;
+import org.openstack4j.model.telemetry.Sample;
+import org.openstack4j.model.telemetry.Statistics;
 import org.openstack4j.openstack.OSFactory;
 import org.restlet.resource.ClientResource;
+
+import java.util.List;
 
 /**
  * Author: Srikanta
@@ -50,6 +55,30 @@ public class KeystoneClient extends ClientResource {
      * @return token A string consisting of Keystone token
      */
     public String generateToken() {
+        OSClient os = buildClient();
+        Token token = os.getToken();
+        return token.getId();
+    }
+
+    public List<? extends Meter> getMeterList(){
+        OSClient os = buildClient();
+        List<? extends Meter> meters = os.telemetry().meters().list();
+        return meters;
+    }
+
+    public List<? extends Sample> getSamples(String metername){
+        OSClient os = buildClient();
+        List<? extends Sample> samples = os.telemetry().meters().samples(metername);
+        return samples;
+    }
+
+    public List<? extends Statistics> getStatistics(String metername){
+        OSClient os = buildClient();
+        List<? extends Statistics> statistics = os.telemetry().meters().statistics(metername);
+        return statistics;
+    }
+
+    public OSClient buildClient(){
         KeyStoneSettings settings = Loader.getSettings().getKeyStoneSettings();
         String keystoneURL = settings.getKeystoneURL();
         String keystoneUsername = settings.getKeystoneUsername();
@@ -60,7 +89,6 @@ public class KeystoneClient extends ClientResource {
                 .credentials(keystoneUsername, keystonePassword)
                 .tenantName(keystoneTenantName)
                 .authenticate();
-        Token token = os.getToken();
-        return token.getId();
+        return os;
     }
 }

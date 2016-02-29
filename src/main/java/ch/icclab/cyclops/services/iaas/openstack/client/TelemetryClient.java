@@ -62,8 +62,6 @@ public class TelemetryClient extends ClientResource {
         ClientResource cr;
         Request req;
         Series<Header> headerValue;
-        Client client;
-
         DateTimeUtil dateTime = new DateTimeUtil();
         range = dateTime.getRange();
         from = range[1];
@@ -72,7 +70,7 @@ public class TelemetryClient extends ClientResource {
         logger.debug("Obtained \"TO\" time for the request: " + to);
         url = generateTelemetryQuery(meterType, meterName, to, from);
         logger.debug("Ceilometer URL " + url);
-        client = new Client(Protocol.HTTP);
+
         cr = new ClientResource(url);
         req = cr.getRequest();
         headerValue = new Series<Header>(Header.class);

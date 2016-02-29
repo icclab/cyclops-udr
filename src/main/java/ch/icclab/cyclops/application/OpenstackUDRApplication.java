@@ -17,8 +17,14 @@
 
 package ch.icclab.cyclops.application;
 
+import ch.icclab.cyclops.load.Loader;
+import ch.icclab.cyclops.schedule.Scheduler;
+import ch.icclab.cyclops.services.iaas.openstack.client.UDRCollection;
 import ch.icclab.cyclops.services.iaas.openstack.resource.impl.*;
+import ch.icclab.cyclops.usecases.tnova.impl.TnovaEventToUDR;
 import ch.icclab.cyclops.util.Load;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Manu
@@ -44,6 +50,15 @@ public class OpenstackUDRApplication extends AbstractApplication {
         counter.registerEndpoint("environment/meters");
 
         Load load = new Load();
+
+        // but also start scheduler immediately
+        startInternalScheduler();
+    }
+
+    private void startInternalScheduler() {
+        Scheduler scheduler = Scheduler.getInstance();
+        scheduler.addRunner(new UDRCollection(), 0, Loader.getSettings().getSchedulerSettings().getSchedulerFrequency(), TimeUnit.SECONDS);
+        scheduler.start();
     }
 
     @Override

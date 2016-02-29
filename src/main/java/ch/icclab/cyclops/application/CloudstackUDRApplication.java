@@ -20,10 +20,7 @@ package ch.icclab.cyclops.application;
 import ch.icclab.cyclops.services.iaas.cloudstack.client.CloudStackScheduler;
 import ch.icclab.cyclops.services.iaas.cloudstack.model.CloudStackUsageTypes;
 import ch.icclab.cyclops.services.iaas.cloudstack.resource.dto.MeterList;
-import ch.icclab.cyclops.services.iaas.cloudstack.resource.impl.CloudStackMeter;
-import ch.icclab.cyclops.services.iaas.cloudstack.resource.impl.CloudStackEndpoint;
-import ch.icclab.cyclops.services.iaas.cloudstack.resource.impl.CloudStackResources;
-import ch.icclab.cyclops.services.iaas.cloudstack.resource.impl.CloudStackUsage;
+import ch.icclab.cyclops.services.iaas.cloudstack.resource.impl.*;
 import ch.icclab.cyclops.services.iaas.openstack.resource.impl.*;
 
 /**
@@ -47,6 +44,9 @@ public class CloudstackUDRApplication extends AbstractApplication {
         //API used for saving and returning the information on selected meters for usage metrics collection
         router.attach("/meters", CloudStackMeter.class);
         counter.registerEndpoint("/meters");
+
+        router.attach("/meters/v2/", CloudStackMeterV2.class);
+        counter.registerEndpoint("/meters/v2/");
 
         // API used to get usage data from CloudStack
         router.attach("/scheduler/{command}", CloudStackEndpoint.class);

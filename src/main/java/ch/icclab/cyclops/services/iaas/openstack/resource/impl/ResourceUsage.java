@@ -57,7 +57,7 @@ public class ResourceUsage extends ServerResource {
     @Get
     public Representation getResourceUsage(Entity entity) {
         counter.increment(endpoint);
-        logger.trace("BEGIN Representation getResourceUsage(Entity entity)");
+        logger.trace("Attempting to get usage for the resource: " + resourceId);
         String query = null;
         String jsonStr;
         JsonRepresentation responseJson = null;
@@ -88,7 +88,6 @@ public class ResourceUsage extends ServerResource {
             sum = true;
         } else {
             // Fall back response TODO
-            logger.debug("DEBUG Representation getResourceUsage(Entity entity): No Meter List specified");
         }
         tsdbData = dbClient.getCDRData(query);
 
@@ -108,7 +107,6 @@ public class ResourceUsage extends ServerResource {
 
             }
         } else {
-            logger.debug("DEBUG Representation getResourceUsage(Entity entity): tsdbData is null");
             resourceUsageResponse.setResourceid(resourceId);
             resourceUsageResponse.setTime(time);
             resourceUsageResponse.setColumn(null);
@@ -119,8 +117,7 @@ public class ResourceUsage extends ServerResource {
             jsonStr = mapper.writeValueAsString(resourcesArray);
             responseJson = new JsonRepresentation(jsonStr);
         } catch (JsonProcessingException e) {
-            logger.error("EXCEPTION JSONPROCESSINGEXCEPTION Representation getResourceUsage(Entity entity)");
-            e.printStackTrace();
+            logger.error("Error while getting the resouce usage: "+e.getMessage());
         }
         return responseJson;
     }

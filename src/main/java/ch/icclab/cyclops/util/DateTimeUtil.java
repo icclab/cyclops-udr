@@ -104,6 +104,18 @@ public class DateTimeUtil {
         return dateTime;
     }
 
+    public long getTimestamp(String date){
+        long epochValue = 0;
+        Date dateTime = null;
+        SimpleDateFormat dF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        try {
+            dateTime = dF.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        epochValue = dateTime.getTime();
+        return epochValue;
+    }
 
     public Date getDate(String date) {
         long epochValue = 0;
