@@ -220,7 +220,7 @@ public class TSDBResource implements DatabaseResource {
         try {
             logger.debug("Attempting to save UDR into the DB.");
             Point point = Point.measurement(externalDataPoint.getMeterName())
-                    .time(externalDataPoint.getTimestamp(), TimeUnit.MILLISECONDS)
+                    .time(externalDataPoint.getTimestamp(), TimeUnit.SECONDS)
                     .tag("userId", externalDataPoint.getUserId())
                     .tag("source", externalDataPoint.getSource())
                     .field("usage", externalDataPoint.getUsage())

@@ -73,8 +73,9 @@ public class UserUsageResource extends ServerResource implements UsageResource {
         TSDBResource dbResource = new TSDBResource();
         String fromDate = getQueryValue("from");
         String toDate = getQueryValue("to");
-        logger.debug("Attempting to get Usage Data for user: " + userId + " from: " + fromDate + " + to: " + toDate);
-
+        logger.debug("Attempting to get Usage Data for user: " + userId + " from: " + fromDate + " to: " + toDate);
+        Load load = new Load();
+        load.meterList();
         if (Load.getOpenStackCumulativeMeterList().size() != 0 || Load.getOpenStackGaugeMeterList().size() != 0) {
             meterDataArrList = new ArrayList<TSDBData>();
             //Get the data for the OpenStack Cumulative Meters from the DB and create the arraylist consisting of hashmaps of meter name and usage value
