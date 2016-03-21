@@ -77,6 +77,9 @@ public class ResourceUsage extends ServerResource {
         time.put("from", fromDate);
         time.put("to", toDate);
 
+        Load load = new Load();
+        load.meterList();
+
         if (Load.getOpenStackCumulativeMeterList().contains(resourceId)) {
             query = "SELECT usage FROM \"" + resourceId + "\" WHERE time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userId";
             sum = true;
@@ -90,6 +93,11 @@ public class ResourceUsage extends ServerResource {
             // Fall back response TODO
         }
         tsdbData = dbClient.getCDRData(query);
+
+        if (tsdbData == null) {
+            query = "SELECT usage FROM UDR WHERE productType='" + resourceId + "' AND time > '" + fromDate + "' AND time < '" + toDate + "' GROUP BY userId";
+            tsdbData = dbClient.getCDRData(query);
+        }
 
         if (tsdbData != null) {
             if (sum)
@@ -117,7 +125,7 @@ public class ResourceUsage extends ServerResource {
             jsonStr = mapper.writeValueAsString(resourcesArray);
             responseJson = new JsonRepresentation(jsonStr);
         } catch (JsonProcessingException e) {
-            logger.error("Error while getting the resouce usage: "+e.getMessage());
+            logger.error("Error while getting the resouce usage: " + e.getMessage());
         }
         return responseJson;
     }
@@ -143,7 +151,7 @@ public class ResourceUsage extends ServerResource {
             int timeIndex = tsdbData[i].getColumns().indexOf("time");
 
             for (int o = 0; o < tsdbData[i].getPoints().size(); o++) {
-                usage = usage + Integer.parseInt((String) tsdbData[i].getPoints().get(o).get(usageIndex));
+                usage = usage + Integer.parseInt(tsdbData[i].getPoints().get(o).get(usageIndex).toString());//TODO: Error while executing, change to pojo class and solve (.getPoints()/.getUsage)
                 if (o == tsdbData[i].getPoints().size() - 1) {
                     String time = (String) tsdbData[i].getPoints().get(o).get(timeIndex);
                     finalPoint.add(timeIndex, time);

@@ -22,19 +22,10 @@ echo "Installing Prerequisites"
 wget http://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
 sudo dpkg -i erlang-solutions_1.0_all.deb
 
-wget -q http://repos.sensuapp.org/apt/pubkey.gpg -O- | sudo apt-key add -
-echo "deb     http://repos.sensuapp.org/apt sensu main" | sudo tee /etc/apt/sources.list.d/sensu.list
-sudo add-apt-repository -y ppa:webupd8team/java
-
 sudo apt-get update
 sudo apt-get install -y erlang
 sudo apt-get -y install rabbitmq-server
 sudo update-rc.d rabbitmq-server defaults
-sudo /etc/init.d/rabbitmq-server restart
-sudo rabbitmqctl add_vhost /sensu
-sudo rabbitmqctl add_user sensu secret
-sudo rabbitmqctl set_permissions -p /sensu sensu ".*" ".*" ".*"
-sudo rabbitmq-plugins enable rabbitmq_management
 sudo /etc/init.d/rabbitmq-server restart
 wget http://localhost:15672/cli/rabbitmqadmin
 chmod +x rabbitmqadmin
@@ -43,56 +34,6 @@ sudo mv rabbitmqadmin /usr/bin/
 # please change the rabbitmq administrator account password
 ##########################################
 #sudo rabbitmqctl change_password guest pass1234
-
-sudo apt-get -y install redis-server
-sudo update-rc.d redis-server defaults
-sudo /etc/init.d/redis-server restart
-sudo apt-get install -y sensu
-
-sudo wget -O /etc/sensu/config.json http://sensuapp.org/docs/0.20/files/config.json
-sudo wget -O /etc/sensu/conf.d/check_memory.json http://sensuapp.org/docs/0.20/files/check_memory.json
-sudo wget -O /etc/sensu/conf.d/default_handler.json http://sensuapp.org/docs/0.20/files/default_handler.json
-sudo chown -R sensu:sensu /etc/sensu
-
-sudo update-rc.d sensu-server defaults
-sudo update-rc.d sensu-api defaults
-
-sudo /etc/init.d/sensu-server restart
-sudo /etc/init.d/sensu-api restart
-
-sudo wget -O /etc/sensu/conf.d/client.json http://sensuapp.org/docs/0.20/files/client.json
-
-sudo wget -O /etc/sensu/plugins/check-memory.sh http://sensuapp.org/docs/0.20/files/check-memory.sh
-sudo chmod +x /etc/sensu/plugins/check-memory.sh
-
-sudo chown -R sensu:sensu /etc/sensu
-
-sudo update-rc.d sensu-client defaults
-sudo /etc/init.d/sensu-client restart
-
-wget http://dl.bintray.com/palourde/uchiwa/uchiwa_0.10.4-1_amd64.deb
-sudo dpkg -i uchiwa_0.10.4-1_amd64.deb
-
-cat << EOF | sudo tee /etc/sensu/uchiwa.json
-{
-  "sensu": [
-    {
-      "name": "MCNRCBsite",
-      "host": "127.0.0.1",
-      "port": 4567,
-      "timeout": 5
-    }
-  ],
-  "uchiwa": {
-    "host": "0.0.0.0",
-    "port": 3000,
-    "interval": 5
-  }
-}
-EOF
-
-sudo update-rc.d uchiwa defaults
-sudo /etc/init.d/uchiwa restart
 
 ### You can test uchiwa dashboard at IP:3000/ ###
 ### Installing InfluxDB ###

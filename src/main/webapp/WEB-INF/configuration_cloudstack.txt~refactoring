@@ -1,0 +1,28 @@
+######################## PROVIDE CREDENTIALS ####################
+# Connection to your TimeSeries database
+InfluxDBURL=http://localhost:8086
+InfluxDBUsername=root
+InfluxDBPassword=root
+
+# CloudStack Endpoint and its credentials
+CloudStackURL=your_url
+CloudStackAPIKey=your_api
+CloudStackSecretKey=your_secret
+
+######################## FIRST IMPORT DATE ######################
+# If you want to start importing only from this day, specify YYYY-MM-DD, if not comment the line
+#CloudStackFirstImport=2016-01-13
+
+######################## ADVANCED SETTINGS ######################
+# Frequency has to be in seconds
+ScheduleFrequency=300
+Environment=Cloudstack
+
+# Where to save UDR records?
+InfluxDBDatabaseName=udr_service
+
+# Some CloudStack advanced settings
+CloudStackPageSize=500
+CloudStackDBLogsName=udr_logs
+CloudStackEventMeasurement=cloudstack.events
+CloudStackMeterListSelection=meterlist
