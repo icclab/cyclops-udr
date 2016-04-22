@@ -1,0 +1,29 @@
+######################## PROVIDE CREDENTIALS ####################
+# Connection to the TimeSeries database
+InfluxDBURL=http://localhost:8086
+InfluxDBUsername=root
+InfluxDBPassword=root
+InfluxDBDatabaseName=udr_service
+
+# Settings for RabbitMQ in case of event based usage
+RabbitMQUsername=guest
+RabbitMQPassword=guest
+RabbitMQHost=localhost
+RabbitMQPort=5672
+RabbitMQVirtualHost=/
+
+
+######################## ADVANCED SETTINGS ######################
+# Select the use case you want to work with (TNOVA, MCN, CLOUDSTACK, OPENSTACK)
+Environment=OpenstackCollector
+
+# If you are using internal scheduler, provide frequency in seconds
+ScheduleFrequency=30
+
+# Some OpenStack settings
+OpenstackCollectorDBEventsName=openstack_events
+OpenstackCollectorEventQueue=udr
+OpenstackCollectorEventStart=powering-on
+OpenstackCollectorEventSpawn=spawning
+OpenstackCollectorEventUnpause=unpausing
+OpenstackCollectorEventResume=resuming

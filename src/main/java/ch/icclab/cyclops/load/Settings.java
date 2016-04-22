@@ -25,6 +25,8 @@ import java.util.Properties;
 /**
  * Author: Martin Skoviera
  * Created on: 16-Nov-15
+ * Updated by: Serhiienko Oleksii
+ * Updated on: 5-April-16
  * Description: Parent for specific environmental settings
  */
 public class Settings {
@@ -38,6 +40,7 @@ public class Settings {
     protected KeyStoneSettings keyStoneSettings;
     protected TNovaSettings tNovaSettings;
     protected MCNSettings mcnSettings;
+    protected OpenstackCollectorSettings OpenstackCollectorSettings;
 
     // our running environment
     private String environment;
@@ -97,6 +100,12 @@ public class Settings {
 
     private MCNSettings loadMCNSettings() {
         return new MCNSettings(properties.getProperty("MCNDBEventsName"), properties.getProperty("MCNEventStart"), properties.getProperty("MCNEventQueue"));
+    }
+
+    private OpenstackCollectorSettings loadOpenstackCollectorSettings() {
+        return new OpenstackCollectorSettings(properties.getProperty("OpenstackCollectorDBEventsName"), properties.getProperty("OpenstackCollectorEventStart"),
+                properties.getProperty("OpenstackCollectorEventQueue"), properties.getProperty("OpenstackCollectorEventSpawn"),
+                properties.getProperty("OpenstackCollectorEventUnpause"), properties.getProperty("OpenstackCollectorEventResume"));
     }
 
     // ===== Section for accessing loaded settings
@@ -182,5 +191,16 @@ public class Settings {
             }
         }
         return mcnSettings;
+    }
+
+    public OpenstackCollectorSettings getOpenstackCollectorSettings() {
+        if (OpenstackCollectorSettings == null) {
+            try {
+                OpenstackCollectorSettings = loadOpenstackCollectorSettings();
+            } catch (Exception e) {
+                logger.error("Could not load OpenstackCollector Settings from configuration file: " + e.getMessage());
+            }
+        }
+        return OpenstackCollectorSettings;
     }
 }
