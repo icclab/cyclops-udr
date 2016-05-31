@@ -28,8 +28,8 @@ import java.util.Map;
  */
 public class Meter extends DTOObject {
     private String time;
-    private String metertype;
-    private String source;
+    private String metertype = "gauge";
+    private String source = "cloudstack";
     private String metername;
 
     // couple default values
