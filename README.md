@@ -1,5 +1,8 @@
 <a href="http://icclab.github.io/cyclops" target="_blank"><img align="middle" src="http://icclab.github.io/cyclops/assets/images/logo_big.png"></img></a>
 
+# New release
+The RCB Cyclops 2.0 is finally available, please visit this <a href="https://github.com/icclab/cyclops">page</a> and update accordingly.
+
 ## User Data Records microservice
 UDR Service is one of the micro services as part of <a href="http://icclab.github.io/cyclops" target="_blank">CYCLOPS - A Rating, Charging & Billing solution</a> for cloud being developed by <a href="http://blog.zhaw.ch/icclab/">InIT Cloud Computing Lab</a> at <a href="http://www.zhaw.ch">ZHAW</a>. The service collects the usage data from a source (OpenStack, CloudStack, SaaS, PaaS, etc ..), transforms the data and persists it in a Time Series Database. This harmonised data is exposed through REST APIs. The harmonised usage data from UDR Service is used by other micro services (Rating & Charging Service & Billing Service) to process and generate a bill for the end user as per the usage made.
 
